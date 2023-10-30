@@ -13,7 +13,7 @@ if not cap.isOpened():
 while True:
     # Read a frame from the camera
     ret, frame = cap.read()
-
+    print(ret)
     # Check if the frame was read successfully
     if not ret:
         print("Error: Could not read frame.")
