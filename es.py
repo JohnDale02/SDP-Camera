@@ -116,80 +116,87 @@
 
 
 
-import cv2
-import hashlib
-import json
-#import boto3  # Import the appropriate cloud storage library
+# import cv2
+# import hashlib
+# import json
+# #import boto3  # Import the appropriate cloud storage library
 
-def capture_image():
-    # Initialize the camera (use the appropriate video device)
-    camera = cv2.VideoCapture(0)
+# def capture_image():
+#     # Initialize the camera (use the appropriate video device)
+#     camera = cv2.VideoCapture(0)
 
-    if not camera.isOpened():
-        print("Error: Camera not found or could not be opened.")
-        return None
+#     if not camera.isOpened():
+#         print("Error: Camera not found or could not be opened.")
+#         return None
 
-    # Capture a single frame from the camera
-    ret, frame = camera.read()
-    camera.release()
+#     # Capture a single frame from the camera
+#     ret, frame = camera.read()
+#     camera.release()
 
-    if ret:
-        return frame
-    else:
-        print("Error: Failed to capture an image.")
-        return None
+#     if ret:
+#         return frame
+#     else:
+#         print("Error: Failed to capture an image.")
+#         return None
 
-def calculate_sha256_hash(data):
-    sha256_hash = hashlib.sha256()
-    sha256_hash.update(data)
-    return sha256_hash.hexdigest()
+# def calculate_sha256_hash(data):
+#     sha256_hash = hashlib.sha256()
+#     sha256_hash.update(data)
+#     return sha256_hash.hexdigest()
 
-#def upload_image_to_cloud(image_filename, bucket_name, object_key):
-    # Initialize AWS S3 client (modify for your specific cloud storage)
-   # s3 = boto3.client('s3')
+# #def upload_image_to_cloud(image_filename, bucket_name, object_key):
+#     # Initialize AWS S3 client (modify for your specific cloud storage)
+#    # s3 = boto3.client('s3')
 
-    # Upload the image to the cloud storage
-   # s3.upload_file(image_filename, bucket_name, object_key)
+#     # Upload the image to the cloud storage
+#    # s3.upload_file(image_filename, bucket_name, object_key)
 
-def main():
-    # Capture an image from the USB camera
-    image = capture_image()
+# def main():
+#     # Capture an image from the USB camera
+#     image = capture_image()
 
-    if image is not None:
-        # Encode the image as a JPEG byte array
-        _, encoded_image = cv2.imencode(".jpg", image)
+#     if image is not None:
+#         # Encode the image as a JPEG byte array
+#         _, encoded_image = cv2.imencode(".jpg", image)
 
-        if encoded_image is not None:
-            # Calculate the SHA-256 hash of the image data
-            image_data = encoded_image.tobytes()
-            image_hash = calculate_sha256_hash(image_data)
+#         if encoded_image is not None:
+#             # Calculate the SHA-256 hash of the image data
+#             image_data = encoded_image.tobytes()
+#             image_hash = calculate_sha256_hash(image_data)
 
-            # Save the image as a JPEG file
-            image_filename = "captured_image.jpg"
-            cv2.imwrite(image_filename, image)
+#             # Save the image as a JPEG file
+#             image_filename = "captured_image.jpg"
+#             cv2.imwrite(image_filename, image)
 
-            # Upload the image to your cloud storage service
-            #bucket_name = 'your_bucket_name'  # Replace with your cloud storage bucket name
-           # object_key = 'captured_image.jpg'  # Replace with your preferred object key
+#             # Upload the image to your cloud storage service
+#             #bucket_name = 'your_bucket_name'  # Replace with your cloud storage bucket name
+#            # object_key = 'captured_image.jpg'  # Replace with your preferred object key
 
-          #  upload_image_to_cloud(image_filename, bucket_name, object_key)
+#           #  upload_image_to_cloud(image_filename, bucket_name, object_key)
 
-            # Fake time and location data (placeholders)
-            time_data = "2023-10-29 14:30:00"
-            location_data = "Latitude: 40.7128, Longitude: -74.0060"
+#             # Fake time and location data (placeholders)
+#             time_data = "2023-10-29 14:30:00"
+#             location_data = "Latitude: 40.7128, Longitude: -74.0060"
 
-            # Create a dictionary with metadata and image hash
-            metadata = {
-                "time": time_data,
-                "location": location_data,
-                "hash": image_hash
-            }
+#             # Create a dictionary with metadata and image hash
+#             metadata = {
+#                 "time": time_data,
+#                 "location": location_data,
+#                 "hash": image_hash
+#             }
 
-            # Print the metadata as JSON (without the image)
-            json_data = {
-                "metadata": metadata
-            }
+#             # Print the metadata as JSON (without the image)
+#             json_data = {
+#                 "metadata": metadata
+#             }
 
-            # Print the JSON object
-            print(json.dumps(json_data, indent=4))
+#             # Print the JSON object
+#             print(json.dumps(json_data, indent=4))
             
+
+import json
+
+data = {"name": "John", "age": 30, "city": "New York"}
+json_data = json.dumps(data)
+
+print(json_data)
