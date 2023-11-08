@@ -154,7 +154,7 @@ def calculate_sha256_hash(data):
 def main():
     print("Main")
     # Capture an image from the USB camera
-    image = capture_image()
+   # image = capture_image()
 
     # if image is not None:
     #     # Encode the image as a JPEG byte array
