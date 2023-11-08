@@ -152,6 +152,7 @@ def calculate_sha256_hash(data):
    # s3.upload_file(image_filename, bucket_name, object_key)
 
 def main():
+    print("Main")
     # Capture an image from the USB camera
     image = capture_image()
 
