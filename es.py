@@ -156,42 +156,42 @@ def main():
     # Capture an image from the USB camera
     image = capture_image()
 
-    if image is not None:
-        # Encode the image as a JPEG byte array
-        _, encoded_image = cv2.imencode(".jpg", image)
+    # if image is not None:
+    #     # Encode the image as a JPEG byte array
+    #     _, encoded_image = cv2.imencode(".jpg", image)
 
-        # if encoded_image is not None:
-        #     # Calculate the SHA-256 hash of the image data
-        #     image_data = encoded_image.tobytes()
-        #     image_hash = calculate_sha256_hash(image_data)
+    #     if encoded_image is not None:
+    #         # Calculate the SHA-256 hash of the image data
+    #         image_data = encoded_image.tobytes()
+    #         image_hash = calculate_sha256_hash(image_data)
 
-        #     # Save the image as a JPEG file
-        #     image_filename = "captured_image.jpg"
-        #     cv2.imwrite(image_filename, image)
+    #         # Save the image as a JPEG file
+    #         image_filename = "captured_image.jpg"
+    #         cv2.imwrite(image_filename, image)
 
-        #     # Upload the image to your cloud storage service
-        #     #bucket_name = 'your_bucket_name'  # Replace with your cloud storage bucket name
-        #    # object_key = 'captured_image.jpg'  # Replace with your preferred object key
+    #         # Upload the image to your cloud storage service
+    #         #bucket_name = 'your_bucket_name'  # Replace with your cloud storage bucket name
+    #        # object_key = 'captured_image.jpg'  # Replace with your preferred object key
 
-        #   #  upload_image_to_cloud(image_filename, bucket_name, object_key)
+    #       #  upload_image_to_cloud(image_filename, bucket_name, object_key)
 
-        #     # Fake time and location data (placeholders)
-        #     time_data = "2023-10-29 14:30:00"
-        #     location_data = "Latitude: 40.7128, Longitude: -74.0060"
+    #         # Fake time and location data (placeholders)
+    #         time_data = "2023-10-29 14:30:00"
+    #         location_data = "Latitude: 40.7128, Longitude: -74.0060"
 
-        #     # Create a dictionary with metadata and image hash
-        #     metadata = {
-        #         "time": time_data,
-        #         "location": location_data,
-        #         "hash": image_hash
-        #     }
+    #         # Create a dictionary with metadata and image hash
+    #         metadata = {
+    #             "time": time_data,
+    #             "location": location_data,
+    #             "hash": image_hash
+    #         }
 
-        #     # Print the metadata as JSON (without the image)
-        #     json_data = {
-        #         "metadata": metadata
-        #     }
+    #         # Print the metadata as JSON (without the image)
+    #         json_data = {
+    #             "metadata": metadata
+    #         }
 
-        #     # Print the JSON object
-        #     print(json.dumps(json_data, indent=4))
+    #         # Print the JSON object
+    #         print(json.dumps(json_data, indent=4))
             
 
