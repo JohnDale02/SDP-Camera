@@ -223,6 +223,7 @@ def capture_image():
     camera.release()
 
     if ret:
+        print(frame)
         return frame
     else:
         print("Error: Failed to capture an image.")
@@ -248,7 +249,7 @@ def main():
     if image is not None:
         # Encode the image as a JPEG byte array
         _, encoded_image = cv2.imencode(".jpg", image)
-
+        
         if encoded_image is not None:
             # Calculate the SHA-256 hash of the image data
             image_data = encoded_image.tobytes()
@@ -290,6 +291,8 @@ def main():
             # Print a message indicating the JSON file has been saved
             print(f"Metadata has been saved to {json_filename}")
             
+            #Print the JSON object
+            print(json.dumps(json_data, indent=4))
 
 if __name__ == "__main__":
     main()
