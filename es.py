@@ -249,12 +249,12 @@ def main():
     if image is not None:
         # Encode the image as a JPEG byte array
         _, encoded_image = cv2.imencode(".jpg", image)
-        
+        print("ec",encoded_image)
         if encoded_image is not None:
             # Calculate the SHA-256 hash of the image data
             image_data = encoded_image.tobytes()
             image_hash = calculate_sha256_hash(image_data)
-
+            print("id: " ,image_data)
             # Save the image as a JPEG file
             image_filename = "captured_image.jpg"
             cv2.imwrite(image_filename, image)
