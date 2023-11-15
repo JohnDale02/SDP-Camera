@@ -17,8 +17,9 @@ def upload_image(image, metadata):
 
     try:
         # Upload the file with metadata
+        print("\tTrying to upload...")
         response = s3_client.put_object(Bucket=bucket_name, Key=file_key, Body=file_content, Metadata=metadata)
-        print(response)
+        print(f"Response:{response}")
 
     except Exception as e:
-        print(f'We had an exception {e}')
+        print(f'\tWe had an exception {e}')

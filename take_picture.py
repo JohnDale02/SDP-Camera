@@ -8,7 +8,7 @@ def return_image():
     captured_image = capture_image()
 
     if captured_image is not None:
-        print("Image not None, now save")
+        print("\tImage not None, now save")
         image_filename = "NewImage.jpg"
         cv2.imwrite(image_filename, captured_image)
 
@@ -33,7 +33,7 @@ def capture_image():
     camera = cv2.VideoCapture(0)
 
     if not camera.isOpened():
-        print("Error: Camera not found or could not be opened.")
+        print("\tError: Camera not found or could not be opened.")
         return None
 
     # Capture a single frame from the camera
@@ -43,7 +43,7 @@ def capture_image():
     if ret:
         return frame
     else:
-        print("Error: Failed to capture an image.")
+        print("\tError: Failed to capture an image.")
         return None
 
 return_image()
