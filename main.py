@@ -53,3 +53,4 @@ def main():
 
 # --------------- Callback function for re-connecting to  Wi-Fi ----------------------
 	# check SD card and upload all photos
+main()
