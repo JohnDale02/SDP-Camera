@@ -1,9 +1,7 @@
-# capture_image.py
-
-from pynput.mouse import Listener
 import cv2
 
 def return_image():
+    '''Captures and image; returns data in cv2.imread()'''
 
     captured_image = capture_image()
 
@@ -18,15 +16,6 @@ def return_image():
         print("Image is None")
         return None
 
-
-'''
-def on_click(x, y, button, pressed):
-    global captured_image  # Declare the global variable
-    if pressed:
-        print("Capture an Image...")
-        captured_image = capture_image()
-'''
-        
 
 def capture_image():
     # Initialize the camera (use the appropriate video device)

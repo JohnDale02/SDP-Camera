@@ -4,6 +4,8 @@ import os
 from object_count import count_objects_in_bucket
 from get_public_key import get_public_key
 from verification2 import verify_signiture
+from recreate_cloud import recreate_image_and_metadata
+from send_to_verified import send_to_verified
 
 event = {
   "Records": [
@@ -66,75 +68,36 @@ def lambda_function(event, context):
 
         # Access the object's content
         image_content = response['Body'].read()
+        temp_image_path = 'image.jpg'   # recreate the jpg using the cv2 jpg object bytes recieved 
+        #temp_image_path = '/tmp/image.jpg'
 
         # Access the object's metadata
         metadata = response['Metadata']
 
-        # Process metadata
-        print("Metadata:", metadata)
-        camera_number = metadata.get('cameranumber')
-        time_data = metadata.get('time')
-        location_data = metadata.get('location')
-        signature = metadata.get('signature')
-
-            # Get public key
         try:
-            public_key = get_public_key(camera_number)
-            print(f"Public Key: {public_key}")
+            camera_number, time_data, location_data, signature = recreate_image_and_metadata(image_content, metadata, temp_image_path)
+
+        except Exception as e:
+            print(f"Cannot recreate time and metadata {e}")
+        
+
+        try:
+            public_key = get_public_key(camera_number)  # get the public key by using camera number string
             
         except Exception as e:
             print(f"Public key error: {e}")
 
-        temp_image_path = 'image.jpg'   # Recreate the jpg on the cloud 
-        #temp_image_path = '/tmp/image.jpg'
-        with open(temp_image_path, 'wb') as file:
-            file.write(image_content)
-
         print("Entered veryify signiture")
-        if verify_signiture(temp_image_path, time_data, location_data, signature, public_key) == True:
 
-            # Get S3 bucket for verified images(camera_number)
-            destination_bucket_name = f'camera{camera_number}verifiedimages'
+        try:
+            valid = verify_signiture(temp_image_path, time_data, location_data, signature, public_key)
 
-            try:
-                image_number = count_objects_in_bucket(destination_bucket_name) // 2
+        except Exception as e:
+            print(f"Error verifying or denying signature {e}")
 
-            except Exception as e:
-                print(f"Count objects in bucket error: {e}")
+        if valid == True:
 
-            image_file_name = image_number + '.jpg'  # Changes file extension to .json
-
-            try:
-                s3_client.upload_file(temp_image_path, destination_bucket_name, image_file_name)
-
-            except Exception as e:
-                print(f"Upload to verified bucket error: {e}")
-
-            # Create JSON data
-            json_data = {
-                "Time": time_data,
-                "Location": location_data,
-                "Signature": signature
-            }
-
-            # Save JSON data to a file with the same name as the image
-            json_file_name = image_number + '.json'  # Changes file extension to .json
-
-            #temp_json_path = f'/tmp/{json_file_name}'
-            temp_json_path = json_file_name
-
-            with open(temp_json_path, 'w') as json_file:
-                json.dump(json_data, json_file)
-
-            try:
-            # Upload JSON file to the same new S3 bucket
-                s3_client.upload_file(temp_json_path, destination_bucket_name, json_file_name)
-            except Exception as e:
-                print(f"Uploading JSON error : {e}")
-
-            # Clean up: Delete temporary files
-            os.remove(temp_image_path)
-            os.remove(temp_json_path)
+            send_to_verified(s3_client, camera_number, time_data, location_data, signature, temp_image_path)
 
         else:
             print("Signature is anything but valid")

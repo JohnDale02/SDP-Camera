@@ -22,7 +22,8 @@ def get_public_key(camera_number):
 
     # SQL query to retrieve the public key
     query = "SELECT PublicKey FROM Cameras WHERE CameraNumber = %s"
-    cursor.execute(query, (camera_number,))
+
+    cursor.execute(query, (int(camera_number),))
 
     # Fetch the result
     result = cursor.fetchone()
@@ -30,11 +31,12 @@ def get_public_key(camera_number):
     connection.close()
 
     if result:
-        public_key = result[0]
-        # print(encoded_public_key)
-        
+        encoded_public_key = result[0]
+        public_key = base64.b64decode(encoded_public_key)  # decode the base64 public key, ready for writing to PEM file
+    
         return public_key  # Return the public key
+    
     else:
         return 'Public key not found'
 
-get_public_key(1)
+get_public_key("1")

@@ -1,8 +1,12 @@
 import subprocess
 import tempfile
 import os
+import base64 
+
 
 def sign_hash(hash_string):
+    '''Takes in a hash; returns base64 encoded signature'''
+    
     # Write hash string to a temporary file
     with tempfile.NamedTemporaryFile(delete=False) as temp_hash_file:  # create a temporary hash file where we put our hash for signing
         temp_hash_file.write(bytearray.fromhex(hash_string))
@@ -35,9 +39,10 @@ def sign_hash(hash_string):
     os.remove(temp_hash_file_path)
 
     if result.returncode == 0 and signature:
-        # Convert the binary signature to a hexadecimal string
-        signature_hex = signature.hex()
-        return signature_hex
+        # Binary signature
+        signature_base64 = base64.b64encode(signature)
+
+        return signature_base64
     else:
         raise Exception("Error in generating signature: " + result.stderr.decode())
 
