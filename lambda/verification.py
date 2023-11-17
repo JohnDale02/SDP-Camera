@@ -14,6 +14,8 @@ def verify_signiture(temp_image_path, time_data, location_data, signature, publi
     with open(public_key_file_path, 'wb') as file:
         file.write(public_key)
 
+    image = cv2.imread(temp_image_path)
+
     combined_data = data_before_hash(temp_image_path, time_data, location_data)  # recreate hash we had on Raspi
 
     # Load the public key
