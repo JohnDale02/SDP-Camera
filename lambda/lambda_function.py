@@ -3,7 +3,7 @@ import json
 import os
 from object_count import count_objects_in_bucket
 from get_public_key import get_public_key
-from verification import verify_signiture
+from verification2 import verify_signiture
 
 event = {
   "Records": [
@@ -84,8 +84,10 @@ def lambda_function(event, context):
         except Exception as e:
             print(f"Public key error: {e}")
 
+        temp_image_path = 'image.jpg'   # Recreate the jpg on the cloud 
         #temp_image_path = '/tmp/image.jpg'
-        temp_image_path = 'image.jpg'
+        with open(temp_image_path, 'wb') as file:
+            file.write(image_content)
 
         print("Entered veryify signiture")
         if verify_signiture(temp_image_path, time_data, location_data, signature, public_key) == True:
@@ -100,9 +102,6 @@ def lambda_function(event, context):
                 print(f"Count objects in bucket error: {e}")
 
             image_file_name = image_number + '.jpg'  # Changes file extension to .json
-
-            with open(temp_image_path, 'wb') as file:
-                file.write(image_content)
 
             try:
                 s3_client.upload_file(temp_image_path, destination_bucket_name, image_file_name)
