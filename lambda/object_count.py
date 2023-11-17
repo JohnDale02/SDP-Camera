@@ -1,6 +1,7 @@
 import boto3
 
 def count_objects_in_bucket(bucket_name):
+    print("Called 'count objects")
     s3 = boto3.client('s3')
     total_objects = 0
 
