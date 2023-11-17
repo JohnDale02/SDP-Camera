@@ -124,6 +124,7 @@ def lambda_handler(event, context):
 
             # Upload JSON file to the same new S3 bucket
             s3_client.upload_file(temp_json_path, destination_bucket_name, json_file_name)
+            print("Uploaded that litte guy")
 
             # Clean up: Delete temporary files
             os.remove(temp_image_path)
