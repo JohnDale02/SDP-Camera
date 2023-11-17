@@ -3,8 +3,8 @@ def read_file(file_path):
         return file.read()
 
 # Paths to your .pem files
-file_path_1 = 'path/to/first_file.pem'
-file_path_2 = 'path/to/second_file.pem'
+file_path_1 = 'public_key.pem'
+file_path_2 = 'recreated_public_key.pem'
 
 # Read the contents of both files
 content_1 = read_file(file_path_1)
