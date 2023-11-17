@@ -30,10 +30,10 @@ def get_public_key(camera_number):
     connection.close()
 
     if result:
-        encoded_public_key = result[0]
+        public_key = result[0]
         # print(encoded_public_key)
-        binary_key = base64.b64decode(encoded_public_key)
-        return binary_key  # Return the public key
+        
+        return public_key  # Return the public key
     else:
         return 'Public key not found'
 
