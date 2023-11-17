@@ -8,7 +8,7 @@ from sign.py import sign_hash
 
 def main():
 #---------------------- Wait for Camera input and take picture ----------------------------
-
+	
 	image = return_image()
 	print("Took Image")
 
@@ -25,14 +25,16 @@ def main():
 	print(f"Hashed: {hash}")
 
 # ---------------- Send image to TPM for Signing ------------------------
-
-	signiture = hash
-	print(f"Signed Hash: {signiture}")
-	signiture = sign_hash(hash)
+	try:
+	    signature = sign_hash(hash)
+	    print(f"Signed Hash: {signature}")
+		
+	except Exception as e:
+	    print(str(e))
 
 #---------------- Create Metadata ------------------------------------
 	
-	metadata = create_metadata(time, location, signiture)
+	metadata = create_metadata(time, location, signature)
 	print(f"Metadata: {metadata}")
 
 #------------------ Check if we have Wi-FI -----------------------------
