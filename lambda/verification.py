@@ -19,10 +19,8 @@ def verify_signiture(temp_image_path, time_data, location_data, signature, publi
     combined_data = data_before_hash(image, time_data, location_data)  # recreate hash we had on Raspi
 
     # Load the public key
-    with open(public_key_file_path, "rb") as key_file:
-        print("Getting public key")
-        public_key = crypto.load_publickey(crypto.FILETYPE_PEM, key_file.read())
-        print(f"Got public key: {public_key}")
+   
+    print(f"Got public key: {public_key}")
 
     # Create a verification context and verify the signature
     try:
