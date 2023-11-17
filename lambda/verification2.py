@@ -25,17 +25,19 @@ def verify_signiture(image, time_data, location_data, signature, public_key):
         print("Serialization complete")
 
     # Compute hash of the data
+    print(f"Combined data: {combined_data}")
+
     digest = hashes.Hash(hashes.SHA256())
     digest.update(combined_data)
     data_hash = digest.finalize()
 
-    print(f"Hashed : {data_hash.hex()}")
+    print(f"Hashed : {data_hash}")
 
     # Verify the signature
     try:
         public_key_object.verify(
             base64.b64decode(signature),
-            data_hash.hex(),
+            data_hash,
             padding.PKCS1v15(),
             hashes.SHA256()
         )

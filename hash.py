@@ -10,6 +10,8 @@ def hash_all(image, time, location):
     encoded_location = location.encode('utf-8')
 
     combined_data = encoded_image + encoded_time + encoded_location
+    print(f"Combined data: {combined_data}")
+
     hash = calculate_sha256_hash(combined_data)
 
     return hash
@@ -20,13 +22,11 @@ def calculate_sha256_hash(data):
     sha256_hash = hashlib.sha256()
     sha256_hash.update(data)
 
-    print(f"SHa256 no hex: {sha256_hash}")
-
     return sha256_hash.hexdigest()
 
 
-image = cv2.imread('NewImage.jpg')
-time = "2023-10-29 14:30:00"
-location = "Latitude: 40.7128, Longitude: -74.0060"
+#image = cv2.imread('NewImage.jpg')
+#time = "2023-10-29 14:30:00"
+#location = "Latitude: 40.7128, Longitude: -74.0060"
 
-print(hash_all(image, time, location))
+#print(hash_all(image, time, location))
