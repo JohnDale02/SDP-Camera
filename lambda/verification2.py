@@ -19,7 +19,7 @@ def verify_signiture(image, time_data, location_data, signature, public_key):
     #with open(public_key_path, "rb") as key_file:
      #   public_key = serialization.load_pem_public_key(key_file.read())
     
-    with open('public_key.pem', "r") as key_file:
+    with open('public_key.pem', "rb") as key_file:
         public_key_object = serialization.load_pem_public_key(key_file.read())
         print("Serialization complete")
 
