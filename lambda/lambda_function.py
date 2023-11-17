@@ -48,7 +48,7 @@ event = {
   ]
 }
 
-def lambda_handler(event, context):
+def lambda_function(event, context):
     # Create an S3 client
     s3_client = boto3.client('s3')
 
@@ -161,3 +161,5 @@ def lambda_handler(event, context):
     }
 
 
+
+lambda_function(event)
