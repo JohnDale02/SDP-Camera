@@ -22,13 +22,14 @@ def lambda_handler(event, context):
         # Process your content and metadata as needed
         print("Image Data: ", content)
         print("Metadata:", metadata)
-        # ... additional processing ...
+
+        camera_number = metadata["CameraNumber"]
 
             # Get public key
-        # public_key = get_public_key(camera_number)
+        public_key = get_public_key(camera_number)
 
             # Get S3 bucket for verified images(camera_number)
-        # destination_bucket_name = get_s3_bucket(camera_number)
+        destination_bucket_name = f'camera{camera_number}verifiedimages'
 
             # Verify the data is authentic
         # verify_signature(image, time, location, signature, public_key)
@@ -36,7 +37,6 @@ def lambda_handler(event, context):
             # IF verified send to camera bucket
         response = s3_client.put_object(Bucket=destination_bucket_name, Key=object_key)
         
-
 
     except Exception as e:
         print(f'There was an exeption: {e}')

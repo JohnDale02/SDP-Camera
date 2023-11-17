@@ -26,14 +26,14 @@ def main():
 
 # ---------------- Send image to TPM for Signing ------------------------
 	try:
-	    signature = sign_hash(hash)
-	    print(f"Signed Hash: {signature}")
+		signature = sign_hash(hash)
+		print(f"Signed Hash: {signature}")
 		
 	except Exception as e:
-	    print(str(e))
+		print(str(e))
 
 #---------------- Create Metadata ------------------------------------
-	
+
 	metadata = create_metadata(time, location, signature)
 	print(f"Metadata: {metadata}")
 
