@@ -14,6 +14,8 @@ def verify_signiture(temp_image_path, time_data, location_data, signature, publi
     with open(public_key_file_path, 'wb') as file:
         file.write(public_key)
 
+    
+
     hash = hash_all(temp_image_path, time_data, location_data)  # recreate hash we had on Raspi
 
     hash_file_path = 'hash.txt'
@@ -63,3 +65,5 @@ time = "2023-10-29 14:30:00"
 location = "Latitude: 40.7128, Longitude: -74.0060"
 
 print(hash_all(image, time, location))
+
+
