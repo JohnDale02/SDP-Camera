@@ -13,3 +13,6 @@ lambda/_*
 
 # Ignore Pycache
 /__pycache__
+
+# ignore recreated public key 
+*.pem
