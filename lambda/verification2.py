@@ -6,17 +6,20 @@ import base64
 import cv2
 
 def verify_signiture(image, time_data, location_data, signature, public_key):
-    
+
     image_data = cv2.imread(image)
     combined_data = data_before_hash(image_data, time_data, location_data)  # recreate hash we had on Raspi
 
     public_key_path = 'recreated_public_key.pem'
 
     # Create the public_key.PEM file on the cloud
-    with open(public_key_path, 'w') as file:
-        file.write(public_key)
+    #with open(public_key_path, 'w') as file:
+     #   file.write(public_key)
 
-    with open(public_key_path, "rb") as key_file:
+    #with open(public_key_path, "rb") as key_file:
+     #   public_key = serialization.load_pem_public_key(key_file.read())
+    
+    with open('public_key.pem', "rb") as key_file:
         public_key = serialization.load_pem_public_key(key_file.read())
 
     # Compute hash of the data
