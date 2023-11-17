@@ -87,6 +87,7 @@ def lambda_function(event, context):
         #temp_image_path = '/tmp/image.jpg'
         temp_image_path = 'image.jpg'
 
+        print("Entered veryify signiture")
         if verify_signiture(temp_image_path, time_data, location_data, signature, public_key) == True:
 
             # Get S3 bucket for verified images(camera_number)
