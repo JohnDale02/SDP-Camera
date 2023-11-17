@@ -128,6 +128,10 @@ def lambda_handler(event, context):
             # Clean up: Delete temporary files
             os.remove(temp_image_path)
             os.remove(temp_json_path)
+
+        else:
+            print("Signature is anything but valid")
+        
         
 
     except Exception as e:
