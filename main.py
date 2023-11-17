@@ -6,9 +6,9 @@ from hash import hash_all
 from upload_image import upload_image
 from sign import sign_hash
 
-def main(camera_number):
+def main():
 #---------------------- Wait for Camera input and take picture ----------------------------
-
+	camera_number = "1"
 	image = return_image()
 	print("Took Image")
 
@@ -56,6 +56,6 @@ def main(camera_number):
 # --------------- Callback function for re-connecting to  Wi-Fi ----------------------
 	# check SD card and upload all photos
 
-camera_number = 1
-main(1)
+
+main()
 
