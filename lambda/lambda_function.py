@@ -84,8 +84,6 @@ def lambda_function(event, context):
         except Exception as e:
             print(f"Public key error: {e}")
 
-        image_file_name = image_number + '.jpg'  # Changes file extension to .json
-
         #temp_image_path = '/tmp/image.jpg'
         temp_image_path = 'image.jpg'
 
