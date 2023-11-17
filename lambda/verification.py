@@ -1,19 +1,65 @@
 import base64
+import openssl
+import subprocess
+import opencv
+import hashlib
 
-def verify_signiture():
-    # Base64 encoded content of your PEM file
-    encoded_content = "ARYAAQALAAYAcgAAABAAEAgAAAAAAAEAvaHHo4zyskOAZT2cdEbHnH6K0/Wn2/55U5UVCr9NJAZqH6D8CwUkgHyEcyHEpsNsG2Pz/Wfp4twBXvY+54mPXdTCG+eoynY6Ua/iRMDGoicsc8acTcasP/lCZ/kWAsyl+4Zwxpiz79pZeqnervz3T80QQKFLE8Ri3rbse1R/AdUsKAQkRFcr/YSFjdJZVKbixBw9Xgs5LDFfO4N6j6wXVO1vRt/6WEkDyrBCVFtXgUArIW1N7+HWl0jf59du/93ZbVK0l33Y9HRRuGODonuB0UZp3xfOOO1bBl7fyq/Gzt1FV+zIEIukBivNoyG/cdGhYPLGD2xrsNadcUOgP5xCfw=="
+def verify_signiture(temp_image_path, time_data, location_data, signature, public_key):
 
     # Decode the Base64 content back to binary
-    binary_content = base64.b64decode(encoded_content)
+    public_key = base64.b64decode(public_key)
 
     # Write the binary content back to a PEM file
-    output_file_path = 'recreated_public_key.pem'
-    with open(output_file_path, 'wb') as file:
-        file.write(binary_content)
-    # verify_signature(image, time, location, signature, public_key)
-            # Decrypt digital signiture with public key
-            # Combine Image + Time + Location
-            # Hash Combined data
-            # Compare with hash
-            # Return True or false
+    public_key_file_path = 'recreated_public_key.pem'
+    with open(public_key_file_path, 'wb') as file:
+        file.write(public_key)
+
+    hash = hash_all(temp_image_path, time_data, location_data)  # recreate hash we had on Raspi
+
+    hash_file_path = 'hash.txt'
+    with open(hash_file_path, 'wb') as file:
+        file.write(hash)
+
+    signature_file_path = 'recreated_signature.bin'
+    with open(signature_file_path) as file:
+        file.write(signature)
+
+    result = subprocess.run(
+        ['openssl', 'dgst', '-sha256', '-verify', 'recreated_public_key.pem',
+         '-signature', 'recreated_signature.bin', 'hash.txt'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    
+    if 'Verified OK' in result.stdout.decode():
+        print('Signature is valid') 
+        return True
+    else:
+        print('Signature verification failed')
+        return False
+
+
+def hash_all(image, time, location):
+    # Encode the image as a JPEG byte array
+    _, encoded_image = cv2.imencode(".jpg", image)
+    encoded_image = encoded_image.tobytes()
+
+    encoded_time = time.encode('utf-8')
+    encoded_location = location.encode('utf-8')
+
+    combined_data = encoded_image + encoded_time + encoded_location
+    hash = calculate_sha256_hash(combined_data)
+
+    return hash
+
+
+def calculate_sha256_hash(data):
+    
+    sha256_hash = hashlib.sha256()
+    sha256_hash.update(data)
+
+    return sha256_hash.hexdigest()
+
+
+image = cv2.imread('NewImage.jpg')
+time = "2023-10-29 14:30:00"
+location = "Latitude: 40.7128, Longitude: -74.0060"
+
+print(hash_all(image, time, location))
