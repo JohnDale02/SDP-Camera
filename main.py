@@ -6,9 +6,8 @@ from hash import hash_all
 from upload_image import upload_image
 from sign import sign_hash
 
-def main():
+def main(camera_number):
 #---------------------- Wait for Camera input and take picture ----------------------------
-	number = 1 # camera number 
 
 	image = return_image()
 	print("Took Image")
@@ -35,7 +34,7 @@ def main():
 
 #---------------- Create Metadata ------------------------------------
 
-	metadata = create_metadata(number, time, location, signature)
+	metadata = create_metadata(camera_number, time, location, signature)
 	print(f"Metadata: {metadata}")
 
 #------------------ Check if we have Wi-FI -----------------------------
@@ -57,5 +56,6 @@ def main():
 # --------------- Callback function for re-connecting to  Wi-Fi ----------------------
 	# check SD card and upload all photos
 
-main()
+camera_number = 1
+main(1)
 
