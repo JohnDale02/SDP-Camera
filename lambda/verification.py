@@ -54,6 +54,6 @@ image = cv2.imread('NewImage.jpg')
 time = "2023-10-29 14:30:00"
 location = "Latitude: 40.7128, Longitude: -74.0060"
 
-print(data_before_hash(image, time, location))
+#print(data_before_hash(image, time, location))
 
 
