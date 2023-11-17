@@ -87,9 +87,6 @@ def lambda_function(event, context):
         #temp_image_path = '/tmp/image.jpg'
         temp_image_path = 'image.jpg'
 
-        with open(temp_image_path, 'wb') as file:
-            file.write(image_content)
-
         if verify_signiture(temp_image_path, time_data, location_data, signature, public_key) == True:
 
             # Get S3 bucket for verified images(camera_number)
@@ -119,12 +116,11 @@ def lambda_function(event, context):
                 "Signature": signature
             }
 
-                # Save JSON data to a file with the same name as the image
+            # Save JSON data to a file with the same name as the image
             json_file_name = image_number + '.json'  # Changes file extension to .json
 
             #temp_json_path = f'/tmp/{json_file_name}'
             temp_json_path = json_file_name
-
 
             with open(temp_json_path, 'w') as json_file:
                 json.dump(json_data, json_file)
@@ -142,7 +138,6 @@ def lambda_function(event, context):
         else:
             print("Signature is anything but valid")
         
-        
 
     except Exception as e:
         print(f'There was an exeption: {e}')
@@ -151,7 +146,6 @@ def lambda_function(event, context):
         'statusCode': 200,
         'body': json.dumps('Function executed successfully!')
     }
-
 
 
 lambda_function(event, None)
