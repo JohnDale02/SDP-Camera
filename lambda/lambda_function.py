@@ -71,10 +71,10 @@ def lambda_function(event, context):
         metadata = response['Metadata']
 
         # Process metadata
-        camera_number = metadata.get('cameranumber')
-        time_data = metadata.get('time')
-        location_data = metadata.get('location')
-        signature = metadata.get('signature')
+        camera_number = metadata.get('CameraNumber')
+        time_data = metadata.get('Time')
+        location_data = metadata.get('Location')
+        signature = metadata.get('Signature')
 
 
         # Process your content and metadata as needed
