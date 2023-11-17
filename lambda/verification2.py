@@ -7,6 +7,7 @@ import cv2
 
 def verify_signiture(image, time_data, location_data, signature, public_key):
 
+    print(public_key)
     image_data = cv2.imread(image)
     combined_data = data_before_hash(image_data, time_data, location_data)  # recreate hash we had on Raspi
 
