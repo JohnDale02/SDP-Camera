@@ -80,7 +80,7 @@ def lambda_function(event, context):
             # Get public key
         try:
             public_key = get_public_key(camera_number)
-            print("Public Key: {public_key}")
+            print(f"Public Key: {public_key}")
             
         except Exception as e:
             print(f"Public key error: {e}")
