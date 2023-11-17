@@ -162,4 +162,4 @@ def lambda_function(event, context):
 
 
 
-lambda_function(event)
+lambda_function(event, None)
