@@ -71,6 +71,7 @@ def lambda_function(event, context):
         metadata = response['Metadata']
 
         # Process metadata
+        print("Metadata:", metadata)
         camera_number = metadata.get('CameraNumber')
         time_data = metadata.get('Time')
         location_data = metadata.get('Location')
@@ -79,7 +80,6 @@ def lambda_function(event, context):
 
         # Process your content and metadata as needed
         #print("Image Data: ", image_content)
-        #print("Metadata:", metadata)
 
         camera_number = metadata["CameraNumber"]
 
