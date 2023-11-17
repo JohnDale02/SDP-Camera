@@ -5,7 +5,8 @@ import cv2
 import hashlib
 
 def verify_signiture(temp_image_path, time_data, location_data, signature, public_key):
-
+    
+    print(f"public Key {public_key}")
     # Decode the Base64 content back to binary
     public_key = base64.b64decode(public_key)
 
