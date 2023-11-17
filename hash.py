@@ -20,6 +20,8 @@ def calculate_sha256_hash(data):
     sha256_hash = hashlib.sha256()
     sha256_hash.update(data)
 
+    print(f"SHa256 no hex: {sha256_hash}")
+
     return sha256_hash.hexdigest()
 
 
