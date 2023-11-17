@@ -15,7 +15,7 @@ def generate_signature(hash_string):
     # Use the temporary files in the tpm2_sign command
     tpm2_sign_command = [
         "tpm2_sign",
-        "-c", "key.ctx",
+        "-c", "0x81010001",
         "-g", "sha256",
         "-o", temp_signature_file_path,
         temp_hash_file_path
