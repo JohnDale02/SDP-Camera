@@ -8,7 +8,8 @@ from sign import sign_hash
 
 def main():
 #---------------------- Wait for Camera input and take picture ----------------------------
-	
+	number = 1 # camera number 
+
 	image = return_image()
 	print("Took Image")
 
@@ -34,7 +35,7 @@ def main():
 
 #---------------- Create Metadata ------------------------------------
 
-	metadata = create_metadata(time, location, signature)
+	metadata = create_metadata(number, time, location, signature)
 	print(f"Metadata: {metadata}")
 
 #------------------ Check if we have Wi-FI -----------------------------
@@ -47,7 +48,6 @@ def main():
 	else: 
 		print("No wifi")
         
-
 	# ---------------- Save the image and metadata to files -------------------
 
 #------------- Callback Functions for recieving Success or Failure messages for each image from cloud ------------
@@ -56,5 +56,6 @@ def main():
 
 # --------------- Callback function for re-connecting to  Wi-Fi ----------------------
 	# check SD card and upload all photos
+
 main()
 
