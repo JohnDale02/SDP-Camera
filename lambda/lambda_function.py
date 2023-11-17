@@ -72,16 +72,10 @@ def lambda_function(event, context):
 
         # Process metadata
         print("Metadata:", metadata)
-        camera_number = metadata.get('CameraNumber')
-        time_data = metadata.get('Time')
-        location_data = metadata.get('Location')
-        signature = metadata.get('Signature')
-
-
-        # Process your content and metadata as needed
-        #print("Image Data: ", image_content)
-
-        camera_number = metadata["CameraNumber"]
+        camera_number = metadata.get('cameranumber')
+        time_data = metadata.get('time')
+        location_data = metadata.get('location')
+        signature = metadata.get('signature')
 
             # Get public key
         try:
