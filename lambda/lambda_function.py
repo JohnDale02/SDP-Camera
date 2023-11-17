@@ -84,7 +84,8 @@ def lambda_handler(event, context):
 
         image_file_name = image_number + '.jpg'  # Changes file extension to .json
 
-        temp_image_path = '/tmp/image.jpg'
+        #temp_image_path = '/tmp/image.jpg'
+        temp_image_path = 'image.jpg'
 
         with open(temp_image_path, 'wb') as file:
             file.write(image_content)
@@ -97,8 +98,6 @@ def lambda_handler(event, context):
             image_number = count_objects_in_bucket(destination_bucket_name) // 2
 
             image_file_name = image_number + '.jpg'  # Changes file extension to .json
-
-            temp_image_path = '/tmp/image.jpg'
 
             with open(temp_image_path, 'wb') as file:
                 file.write(image_content)
@@ -114,7 +113,12 @@ def lambda_handler(event, context):
 
                 # Save JSON data to a file with the same name as the image
             json_file_name = image_number + '.json'  # Changes file extension to .json
-            temp_json_path = f'/tmp/{json_file_name}'
+
+            #temp_json_path = f'/tmp/{json_file_name}'
+            temp_json_path = json_file_name
+
+
+
             with open(temp_json_path, 'w') as json_file:
                 json.dump(json_data, json_file)
 
