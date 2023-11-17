@@ -7,7 +7,8 @@ import cv2
 
 def verify_signiture(image, time_data, location_data, signature, public_key):
 
-    combined_data = data_before_hash(image, time_data, location_data)  # recreate hash we had on Raspi
+    image_data = cv2.imread(image)
+    combined_data = data_before_hash(image_data, time_data, location_data)  # recreate hash we had on Raspi
 
     binary_public_key = base64.b64decode(public_key)
     public_key_path = 'public_key.pem'
@@ -24,7 +25,7 @@ def verify_signiture(image, time_data, location_data, signature, public_key):
     digest.update(combined_data)
     data_hash = digest.finalize()
 
-    print(data_hash)
+    print(f"Hashed : {data_hash}")
 
     # Verify the signature
     try:
