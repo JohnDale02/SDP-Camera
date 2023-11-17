@@ -58,7 +58,11 @@ def lambda_handler(event, context):
 
     try:
         # Get the object from S3
-        response = s3_client.get_object(Bucket=bucket_name, Key=object_key)
+        try:
+            response = s3_client.get_object(Bucket=bucket_name, Key=object_key)
+            
+        except Exception as e:
+            print(f"Get object error : {e}")
 
         # Access the object's content
         image_content = response['Body'].read()
@@ -74,13 +78,17 @@ def lambda_handler(event, context):
 
 
         # Process your content and metadata as needed
-        print("Image Data: ", image_content)
-        print("Metadata:", metadata)
+        #print("Image Data: ", image_content)
+        #print("Metadata:", metadata)
 
         camera_number = metadata["CameraNumber"]
 
             # Get public key
-        public_key = get_public_key(camera_number)
+        try:
+            public_key = get_public_key(camera_number)
+
+        except Exception as e:
+            print(f"Public key error: {e}")
 
         image_file_name = image_number + '.jpg'  # Changes file extension to .json
 
@@ -95,14 +103,22 @@ def lambda_handler(event, context):
             # Get S3 bucket for verified images(camera_number)
             destination_bucket_name = f'camera{camera_number}verifiedimages'
 
-            image_number = count_objects_in_bucket(destination_bucket_name) // 2
+            try:
+                image_number = count_objects_in_bucket(destination_bucket_name) // 2
+
+            except Exception as e:
+                print(f"Count objects in bucket error: {e}")
 
             image_file_name = image_number + '.jpg'  # Changes file extension to .json
 
             with open(temp_image_path, 'wb') as file:
                 file.write(image_content)
 
-            s3_client.upload_file(temp_image_path, destination_bucket_name, image_file_name)
+            try:
+                s3_client.upload_file(temp_image_path, destination_bucket_name, image_file_name)
+
+            except Exception as e:
+                print(f"Upload to verified bucket error: {e}")
 
             # Create JSON data
             json_data = {
@@ -118,13 +134,14 @@ def lambda_handler(event, context):
             temp_json_path = json_file_name
 
 
-
             with open(temp_json_path, 'w') as json_file:
                 json.dump(json_data, json_file)
 
+            try:
             # Upload JSON file to the same new S3 bucket
-            s3_client.upload_file(temp_json_path, destination_bucket_name, json_file_name)
-            print("Uploaded that litte guy")
+                s3_client.upload_file(temp_json_path, destination_bucket_name, json_file_name)
+            except Exception as e:
+                print(f"Uploading JSON error : {e}")
 
             # Clean up: Delete temporary files
             os.remove(temp_image_path)
