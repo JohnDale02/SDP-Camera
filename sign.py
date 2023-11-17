@@ -2,7 +2,7 @@ import subprocess
 import tempfile
 import os
 
-def generate_signature(hash_string):
+def sign_hash(hash_string):
     # Write hash string to a temporary file
     with tempfile.NamedTemporaryFile(delete=False) as temp_hash_file:  # create a temporary hash file where we put our hash for signing
         temp_hash_file.write(bytearray.fromhex(hash_string))

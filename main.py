@@ -4,7 +4,7 @@ from wifi_check import is_internet_available
 from create_metadata import create_metadata
 from hash import hash_all
 from upload_image import upload_image
-from sign.py import sign_hash
+from sign import sign_hash
 
 def main():
 #---------------------- Wait for Camera input and take picture ----------------------------
