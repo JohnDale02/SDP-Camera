@@ -1,5 +1,5 @@
 import base64
-import openssl
+import pyopenssl
 import subprocess
 import opencv
 import hashlib
@@ -27,7 +27,7 @@ def verify_signiture(temp_image_path, time_data, location_data, signature, publi
         file.write(signature)
 
     result = subprocess.run(
-        ['openssl', 'dgst', '-sha256', '-verify', 'recreated_public_key.pem',
+        ['pyopenssl', 'dgst', '-sha256', '-verify', 'recreated_public_key.pem',
          '-signature', 'recreated_signature.bin', 'hash.txt'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     
     if 'Verified OK' in result.stdout.decode():
