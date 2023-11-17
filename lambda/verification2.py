@@ -20,7 +20,8 @@ def verify_signiture(image, time_data, location_data, signature, public_key):
      #   public_key = serialization.load_pem_public_key(key_file.read())
     
     with open('public_key.pem', "rb") as key_file:
-        public_key_object = serialization.load_pem_public_key(key_file.read())
+        public_key_data = key_file.read()
+        public_key_object = serialization.load_pem_public_key(public_key_data)
         print("Serialization complete")
 
     # Compute hash of the data
@@ -28,13 +29,13 @@ def verify_signiture(image, time_data, location_data, signature, public_key):
     digest.update(combined_data)
     data_hash = digest.finalize()
 
-    print(f"Hashed : {data_hash}")
+    print(f"Hashed : {data_hash.hex()}")
 
     # Verify the signature
     try:
         public_key_object.verify(
             base64.b64decode(signature),
-            data_hash,
+            data_hash.hex(),
             padding.PKCS1v15(),
             hashes.SHA256()
         )
