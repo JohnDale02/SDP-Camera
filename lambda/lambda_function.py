@@ -60,7 +60,7 @@ def lambda_handler(event, context):
         # Get the object from S3
         try:
             response = s3_client.get_object(Bucket=bucket_name, Key=object_key)
-            
+
         except Exception as e:
             print(f"Get object error : {e}")
 
@@ -159,3 +159,5 @@ def lambda_handler(event, context):
         'statusCode': 200,
         'body': json.dumps('Function executed successfully!')
     }
+
+
