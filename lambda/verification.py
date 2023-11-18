@@ -14,8 +14,8 @@ def verify_signiture(temp_image_path, time_data, location_data, signature_encode
     combined_data = recreate_combined_data(image, time_data, location_data)
 
     public_key_path = 'recreated_public_key.pem'
-    public_key_decoded = base64.b64decode(public_key_encoded)
-    signature_decoded = base64.b64decode(signature_encoded)
+    public_key_decoded = base64.b64decode(public_key_encoded.encode('utf-8'))
+    signature_decoded = base64.b64decode(signature_encoded.encode('utf-8'))
 
     with open(public_key_path, "wb") as file:   # write our decoded public key data back to a pem file
             file.write(public_key_decoded)
