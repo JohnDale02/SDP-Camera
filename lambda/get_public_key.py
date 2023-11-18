@@ -33,6 +33,7 @@ def get_public_key(camera_number):
     if result:
         encoded_public_key = result[0]
         public_key = base64.b64decode(encoded_public_key)  # decode the base64 public key, ready for writing to PEM file
+
     
         return public_key  # Return the public key
     
