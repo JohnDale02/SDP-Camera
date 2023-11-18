@@ -1,9 +1,7 @@
 import boto3
 import json
-import os
-from object_count import count_objects_in_bucket
 from get_public_key import get_public_key
-from verification2 import verify_signiture
+from verification import verify_signiture
 from recreate_cloud import recreate_image_and_metadata
 from send_to_verified import send_to_verified
 

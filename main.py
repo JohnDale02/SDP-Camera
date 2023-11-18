@@ -33,7 +33,6 @@ def main():
 # ---------------- Send image to TPM for Signing ------------------------
 	try:
 		signature = sign_hash(hash)  # byte64 encoded signature
-		print(f"Signed Hash: {signature}")
 		
 	except Exception as e:
 		print(str(e))
@@ -42,6 +41,8 @@ def main():
 
 	metadata = create_metadata(camera_number, time, location, signature)   # creates a dictionary for the strings [string, string, string, byte64]
 	print(f"Metadata: {metadata}")
+
+	print(f"Signature: {signature}")
 
 #------------------ Check if we have Wi-FI -----------------------------
 

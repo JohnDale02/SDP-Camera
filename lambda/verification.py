@@ -1,61 +1,45 @@
+from cryptography.hazmat.primitives import hashes
+from cryptography.hazmat.primitives.asymmetric import padding
+from cryptography.hazmat.primitives import serialization
+from cryptography.exceptions import InvalidSignature
+from recreate_hash import recreate_hash
 import base64
-from OpenSSL import crypto
-import subprocess
 import cv2
-import hashlib
 
-def verify_signiture(temp_image_path, time_data, location_data, signature, public_key):
+def verify_signiture(image, time_data, location_data, signature_encoded, public_key_decoded):
+
+    hash = recreate_hash(image, time_data, location_data)
+
+    public_key_path = 'recreated_public_key.pem'
     
-    print(f"public Key {public_key}")
-    # Decode the Base64 content back to binary
-    public_key = base64.b64decode(public_key)
+    with open(public_key_path, "wb") as file:   # write our decoded public key data back to a pem file
+            file.write(public_key_decoded)
 
-    # Write the binary content back to a PEM file
-    public_key_file_path = 'recreated_public_key.pem'
-    with open(public_key_file_path, 'wb') as file:
-        file.write(public_key)
+    with open(public_key_path, "rb") as key_file:  # read the public key pem file
+        public_key_data = key_file.read()
+        public_key_object = serialization.load_pem_public_key(public_key_data)
+        print("Serialization complete")
 
-    image = cv2.imread(temp_image_path)
-
-    combined_data = data_before_hash(image, time_data, location_data)  # recreate hash we had on Raspi
-
-    # Load the public key
-   
-    print(f"Got public key: {public_key}")
-
-    # Create a verification context and verify the signature
+    # Verify the signature
+    signature = base64.b64decode(signature_encoded)
     try:
-        # The verify function expects the data itself, not the hash
-        # Here we assume you have the original data that was hashed
-        # If you only have the hash, you need to adjust the approach
-        print(f"Calling verify")
-        crypto.verify(public_key, signature, combined_data, 'sha256')
+        public_key_object.verify(
+            signature,
+            hash,
+            padding.PKCS1v15(),
+            hashes.SHA256()
+        )
         print('Signature is valid')
         return True
-    except crypto.Error as e:
-        print('Signature verification failed:', e)
+    
+    except InvalidSignature:
+        print('Signature verification failed')
         return False
 
 
-
-def data_before_hash(image, time, location):
-    # Encode the image as a JPEG byte array
-    _, encoded_image = cv2.imencode(".jpg", image)
-    encoded_image = encoded_image.tobytes()
-
-    encoded_time = time.encode('utf-8')
-    encoded_location = location.encode('utf-8')
-
-    combined_data = encoded_image + encoded_time + encoded_location
-
-
-    return combined_data
-
-
-image = cv2.imread('NewImage.jpg')
+image = cv2.imread('test.jpg')
 time = "2023-10-29 14:30:00"
 location = "Latitude: 40.7128, Longitude: -74.0060"
-
-#print(data_before_hash(image, time, location))
-
-
+signature = "this"
+public_key = "test2"
+verify_signiture(image, time, location, signature, public_key)
