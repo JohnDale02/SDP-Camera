@@ -31,13 +31,9 @@ def get_public_key(camera_number):
     connection.close()
 
     if result:
-        encoded_public_key = result[0]
-        public_key = base64.b64decode(encoded_public_key)  # decode the base64 public key, ready for writing to PEM file
-
+        public_key = result[0]
     
         return public_key  # Return the public key
     
     else:
         return 'Public key not found'
-
-get_public_key("1")

@@ -15,7 +15,7 @@ def main():
 	
 	# image = return_image()  bring this back ###################################################
 
-	image = cv2.imread('test.jpg')    # cv2 jpg object  DELETE ONLY FOR DEBUGGING PURPOSES -#####################################
+	image = cv2.imread('test.jpg')    # cv2 jpg object  DELETE ONLY FOR DEBUGGING PURPOSES 
 	image_string = base64.b64encode(image)
 
 	print("Took Image")

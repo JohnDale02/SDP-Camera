@@ -51,6 +51,7 @@ event = {
 def lambda_function(event, context):
     # Create an S3 client
     s3_client = boto3.client('s3')
+    temp_image_path = 'image.jpg'   # recreate the jpg using the cv2 jpg object bytes recieved
 
     # Extract bucket name and object key from the event
     bucket_name = event['Records'][0]['s3']['bucket']['name']
@@ -65,22 +66,21 @@ def lambda_function(event, context):
             print(f"Get object error : {e}")
 
         # Access the object's content
-        image_content = response['Body'].read()   # this is the encoded_image
-        temp_image_path = 'image.jpg'   # recreate the jpg using the cv2 jpg object bytes recieved 
+        image_content = response['Body'].read()   # this is the base64 encoded image
+ 
         #temp_image_path = '/tmp/image.jpg'
 
         # Access the object's metadata
         metadata = response['Metadata']
 
         try:
-            camera_number, time_data, location_data, signature = recreate_image_and_metadata(image_content, metadata, temp_image_path)
+            camera_number, time_data, location_data, signature_encoded = recreate_image_and_metadata(image_content, metadata, temp_image_path)
 
         except Exception as e:
             print(f"Cannot recreate time and metadata {e}")
         
-
         try:
-            public_key = get_public_key(camera_number)  # get the public key by using camera number string
+            public_key_encoded = get_public_key(camera_number)  # get the public key by using camera number string
             
         except Exception as e:
             print(f"Public key error: {e}")
@@ -88,7 +88,7 @@ def lambda_function(event, context):
         print("Entered veryify signiture")
 
         try:
-            valid = verify_signiture(temp_image_path, time_data, location_data, signature, public_key)
+            valid = verify_signiture(temp_image_path, time_data, location_data, signature_encoded, public_key_encoded)
 
         except Exception as e:
             print(f"Error verifying or denying signature {e}")

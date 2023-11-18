@@ -1,3 +1,5 @@
+import base64
+import cv2
 
 
 def recreate_image_and_metadata(image_content, metadata, temp_image_path):
@@ -9,8 +11,8 @@ def recreate_image_and_metadata(image_content, metadata, temp_image_path):
     location_data = metadata.get('location')
     signature = metadata.get('signature')
 
-    with open(temp_image_path, 'wb') as file:
-        file.write(image_content)
+    image = base64.b64decode(image_content)
+    cv2.imwrite(temp_image_path, image)
 
     return camera_number, time_data, location_data, signature
 
