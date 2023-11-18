@@ -6,7 +6,7 @@ import cv2
 import hashlib
 
 
-def recreate_hash(image, time, location):
+def recreate_combined_data(image, time, location):
     # Encode the image as a JPEG byte array
     _, encoded_image = cv2.imencode(".jpg", image)
     encoded_image = encoded_image.tobytes()

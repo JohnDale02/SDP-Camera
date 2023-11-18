@@ -2,7 +2,7 @@
 from take_picture import return_image
 from wifi_check import is_internet_available
 from create_metadata import create_metadata
-from hash import hash_all
+from combined import combine
 from upload_image import upload_image
 from sign import sign_hash
 import cv2
@@ -33,12 +33,12 @@ def main():
 
 #-------------- Hash image + Time + Location ----------------------------------------------
 
-	hash = hash_all(image, time, location)   # returns hash digest (bytes)
-	print(f"Hashed: {hash}")
+	combined_data = combine(image, time, location)   # returns hash digest (bytes)
+	print(f"Made combined_data")
 
 # ---------------- Send image to TPM for Signing ------------------------
 	try:
-		signature = sign_hash(hash)  # byte64 encoded signature
+		signature = sign_hash(combined_data)  # byte64 encoded signature
 		
 	except Exception as e:
 		print(str(e))

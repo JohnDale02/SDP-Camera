@@ -4,13 +4,13 @@ import os
 import base64 
 
 
-def sign_hash(hash_string):
+def sign_hash(combined_string):
     '''Takes in a hash; returns base64 encoded signature'''
     
     # Write hash string to a temporary file
-    with tempfile.NamedTemporaryFile(delete=False) as temp_hash_file:  # create a temporary hash file where we put our hash for signing
-        temp_hash_file.write(hash_string)
-        temp_hash_file_path = temp_hash_file.name
+    with tempfile.NamedTemporaryFile(delete=False) as temp_combined_file:  # create a temporary hash file where we put our hash for signing
+        temp_combined_file.write(combined_string)
+        temp_combined_file_path = temp_combined_file.name
 
     # Create a temporary file for the signature
     with tempfile.NamedTemporaryFile(delete=False) as temp_signature_file:  # create a temporary output file for the signature
@@ -23,7 +23,7 @@ def sign_hash(hash_string):
         "-g", "sha256",
         "-s", "rsassa",
         "-o", temp_signature_file_path,
-        temp_hash_file_path
+        temp_combined_file_path
     ]
 
     # Execute the command
@@ -37,7 +37,7 @@ def sign_hash(hash_string):
         os.remove(temp_signature_file_path)
 
     # Delete the temporary hash file
-    os.remove(temp_hash_file_path)
+    os.remove(temp_combined_file_path)
 
     if result.returncode == 0 and signature:
         # Binary signature

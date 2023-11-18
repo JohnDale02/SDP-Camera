@@ -2,7 +2,7 @@ from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.asymmetric import padding
 from cryptography.hazmat.primitives import serialization
 from cryptography.exceptions import InvalidSignature
-from recreate_hash import recreate_hash
+from recreate_combined import recreate_combined_data
 import base64
 import cv2
 
@@ -11,7 +11,7 @@ def verify_signiture(temp_image_path, time_data, location_data, signature_encode
     image = cv2.imread(temp_image_path)
     print(f"REading image type for recreating hash: {type(image)}")
 
-    combined_data = recreate_hash(image, time_data, location_data)
+    combined_data = recreate_combined_data(image, time_data, location_data)
 
     public_key_path = 'recreated_public_key.pem'
     public_key_decoded = base64.b64decode(public_key_encoded)
