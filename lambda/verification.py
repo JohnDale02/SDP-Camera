@@ -10,6 +10,7 @@ import cv2
 def verify_signiture(temp_image_path, time_data, location_data, signature_encoded, public_key_encoded):
 
     image = cv2.imread(temp_image_path)
+    print(image)
     print(f"REading image type for recreating hash: {type(image)}")
 
     combined_data = recreate_combined_data(image, time_data, location_data)
