@@ -80,12 +80,12 @@ def sign_hash(combined_string):
     if result.returncode == 0 and signature:
         # Binary signature
         
-        #print("Signature:", signature)
-        signature_base64 = base64.b64encode(signature).decode('utf-8')
+        print("Signature:", signature)
+        #\signature_base64 = base64.b64encode(signature).decode('utf-8')
         #print("Signature64:", signature_base64)
 
-        #return signature
-        return signature_base64
+        return signature
+        #return signature_base64
     else:
         raise Exception("Error in generating signature: " + result.stderr.decode())
 
