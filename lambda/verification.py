@@ -2,6 +2,7 @@ from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.asymmetric import padding
 from cryptography.hazmat.primitives import serialization
 from cryptography.exceptions import InvalidSignature
+from cryptography.hazmat.backends import default_backend
 from recreate_combined import recreate_combined_data
 import base64
 import cv2
@@ -23,15 +24,16 @@ def verify_signiture(temp_image_path, time_data, location_data, signature_encode
     with open(public_key_path, "wb") as file:   # write our decoded public key data back to a pem file
             file.write(public_key_decoded)
 
-    with open(public_key_path, "rb") as key_file:  # read the public key pem file
-        public_key_data = key_file.read()
-        public_key_object = serialization.load_pem_public_key(public_key_data)
-        print("Serialization complete")
+    with open(public_key_path, "rb") as key_file:
+            public_key = serialization.load_pem_public_key(
+                key_file.read(),
+                backend=default_backend()
+            )
 
     # Verify the signature
 
     try:
-        public_key_object.verify(
+        public_key.verify(
             signature_decoded,
             combined_data,
             padding.PKCS1v15(),
