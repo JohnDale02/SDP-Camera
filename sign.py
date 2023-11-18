@@ -9,7 +9,7 @@ def sign_hash(hash_string):
     
     # Write hash string to a temporary file
     with tempfile.NamedTemporaryFile(delete=False) as temp_hash_file:  # create a temporary hash file where we put our hash for signing
-        temp_hash_file.write(bytearray.fromhex(hash_string))
+        temp_hash_file.write(hash_string)
         temp_hash_file_path = temp_hash_file.name
 
     # Create a temporary file for the signature
@@ -40,9 +40,8 @@ def sign_hash(hash_string):
 
     if result.returncode == 0 and signature:
         # Binary signature
-        signature_base64 = base64.b64encode(signature)
-
-        return signature_base64
+        signature_base64_string = base64.b64encode(signature).decode('utf-8')
+        return signature_base64_string
     else:
         raise Exception("Error in generating signature: " + result.stderr.decode())
 
