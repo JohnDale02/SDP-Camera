@@ -65,7 +65,7 @@ def lambda_function(event, context):
             print(f"Get object error : {e}")
 
         # Access the object's content
-        image_content = response['Body'].read()
+        image_content = response['Body'].read()   # this is the encoded_image
         temp_image_path = 'image.jpg'   # recreate the jpg using the cv2 jpg object bytes recieved 
         #temp_image_path = '/tmp/image.jpg'
 
