@@ -16,9 +16,8 @@ def main():
 	# image = return_image()  bring this back ###################################################
 
 	image = cv2.imread('test.jpg')    # cv2 jpg object  DELETE ONLY FOR DEBUGGING PURPOSES -#####################################
-	_, encoded_image = cv2.imencode(".jpg", image)
+	image_string = base64.b64encode(image)
 
-	print("Image ecoded", encoded_image)
 	print("Took Image")
 
 
@@ -31,7 +30,7 @@ def main():
 
 #-------------- Hash image + Time + Location ----------------------------------------------
 
-	hash = hash_all(encoded_image, time, location)   # returns hash digest (bytes)
+	hash = hash_all(image, time, location)   # returns hash digest (bytes)
 	print(f"Hashed: {hash}")
 
 # ---------------- Send image to TPM for Signing ------------------------
@@ -53,7 +52,7 @@ def main():
 	if is_internet_available():
 		print(f"Internet is available...Uploading")
 
-		upload_image(encoded_image, metadata)   # cv2 jpg object, metadat
+		upload_image(image_string, metadata)   # cv2 jpg object, metadat
 
 		print(f"Uploaded Image")
 	
