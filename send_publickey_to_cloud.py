@@ -9,5 +9,8 @@ with open(file_path, 'rb') as file:
 
 # Encode the binary data to a Base64 string for easy handling and display
 encoded_content = base64.b64encode(binary_content).decode('utf-8')
+encoded_bytes = base64.b64encode(binary_content)
+decoded = base64.b64decode(encoded_content)
+assert binary_content == encoded_bytes
 
 print(encoded_content)
