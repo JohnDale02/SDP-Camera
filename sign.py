@@ -21,6 +21,7 @@ def sign_hash(hash_string):
         "tpm2_sign",
         "-c", "0x81010001",
         "-g", "sha256",
+        "-s", "rsassa",
         "-o", temp_signature_file_path,
         temp_hash_file_path
     ]
