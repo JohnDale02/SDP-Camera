@@ -11,7 +11,7 @@ def verify_signiture(temp_image_path, time_data, location_data, signature_encode
     image = cv2.imread(temp_image_path)
     print(f"REading image type for recreating hash: {type(image)}")
 
-    hash = recreate_hash(image, time_data, location_data)
+    combined_data = recreate_hash(image, time_data, location_data)
 
     public_key_path = 'recreated_public_key.pem'
     public_key_decoded = base64.b64decode(public_key_encoded)
@@ -30,7 +30,7 @@ def verify_signiture(temp_image_path, time_data, location_data, signature_encode
     try:
         public_key_object.verify(
             signature_decoded,
-            hash,
+            combined_data,
             padding.PKCS1v15(),
             hashes.SHA256()
         )

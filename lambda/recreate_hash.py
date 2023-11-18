@@ -16,10 +16,4 @@ def recreate_hash(image, time, location):
 
     combined_data = encoded_image + encoded_time + encoded_location
 
-    digest = hashes.Hash(hashes.SHA256())
-    digest.update(combined_data)
-    data_hash = digest.finalize()
-
-    print(f"Hashed : {data_hash}")
-
-    return data_hash
+    return combined_data
