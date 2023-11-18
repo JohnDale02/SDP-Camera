@@ -29,7 +29,7 @@ def verify_signiture(temp_image_path, time_data, location_data, signature_encode
 
     try:
         public_key_object.verify(
-            signature,
+            signature_decoded,
             hash,
             padding.PKCS1v15(),
             hashes.SHA256()
