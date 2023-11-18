@@ -95,7 +95,7 @@ def lambda_function(event, context):
 
         if valid == True:
 
-            send_to_verified(s3_client, camera_number, time_data, location_data, signature, temp_image_path)
+            send_to_verified(s3_client, camera_number, time_data, location_data, signature_encoded, temp_image_path)
 
         else:
             print("Signature is anything but valid")

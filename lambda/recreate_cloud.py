@@ -12,6 +12,9 @@ def recreate_image_and_metadata(image_content, metadata, temp_image_path):
     signature = metadata.get('signature')
 
     image = base64.b64decode(image_content)
+
+    print(f"recreate jpg: {type(image)}")
+    
     cv2.imwrite(temp_image_path, image)
 
     return camera_number, time_data, location_data, signature
