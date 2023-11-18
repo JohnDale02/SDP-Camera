@@ -3,7 +3,6 @@ import hashlib
 
 def hash_all(encoded_image, time, location):
     # Encode the image as a JPEG byte array
-    _, encoded_image = cv2.imencode(".jpg", image)
     encoded_image = encoded_image.tobytes()
 
     encoded_time = time.encode('utf-8')

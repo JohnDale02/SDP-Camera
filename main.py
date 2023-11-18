@@ -53,7 +53,7 @@ def main():
 	if is_internet_available():
 		print(f"Internet is available...Uploading")
 
-		upload_image(image_encoded, metadata)   # cv2 jpg object, metadat
+		upload_image(encoded_image, metadata)   # cv2 jpg object, metadat
 
 		print(f"Uploaded Image")
 	
