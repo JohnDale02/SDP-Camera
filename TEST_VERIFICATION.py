@@ -21,7 +21,7 @@ def sign_verify(image_name):
     public_key_path = 'public_key.pem'
 
 
-    with open(public_key_path, "rb") as key_file:
+    with open(public_key_path, "r") as key_file:
             public_key = serialization.load_pem_public_key(
                 key_file.read(),
                 backend=default_backend()
