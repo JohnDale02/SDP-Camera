@@ -24,8 +24,7 @@ def calculate_sha256_hash(data):
     return sha256_hash.digest()
 
 
-image = cv2.imread('test.jpg')
-time = "2023-10-29 14:30:00"
-location = "Latitude: 40.7128, Longitude: -74.0060"
+#image = cv2.imread('test.jpg')
+#time = "2023-10-29 14:30:00"
+#location = "Latitude: 40.7128, Longitude: -74.0060"
 
-print(hash_all(image, time, location))
