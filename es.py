@@ -232,7 +232,8 @@ def capture_image():
 def calculate_sha256_hash(data):
     sha256_hash = hashlib.sha256()
     sha256_hash.update(data)
-    return sha256_hash.hexdigest()
+    
+    return sha256_hash.digest()
 
 #def upload_image_to_cloud(image_filename, bucket_name, object_key):
     # Initialize AWS S3 client (modify for your specific cloud storage)
