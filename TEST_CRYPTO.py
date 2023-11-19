@@ -16,8 +16,8 @@ def sign_verify(image_name):
     time = "2023-10-29 14:30:00"
     location = "Latitude: 40.7128, Longitude: -74.0060"
 
-    combined_data = combine(image, time, location)
-    signature = sign_hash(combined_data)
+    #combined_data = combine(image, time, location)
+    #signature = sign_hash(combined_data)
 
     public_key_file_path = 'public_key.pem'
 
@@ -27,7 +27,7 @@ def sign_verify(image_name):
     # Deserialize the public key from PEM format
     public_key = serialization.load_pem_public_key(public_key_data)
 
-    with open('signature.file', 'rb') as signature_file:
+    with open('data.out.signed', 'rb') as signature_file:
         signature = signature_file.read()
 
     with open('combined.file', 'rb') as combined_file:
@@ -114,8 +114,9 @@ def combine(image, time, location):
 
     combined_data = encoded_image + encoded_time + encoded_location
 
-    return combined_data
-
+    return combined_data 
+    
+    
 
 
 print(sign_verify("test.jpg"))
