@@ -57,8 +57,8 @@ def sign_verify(image_name):
 
         return True
     
-    except InvalidSignature:
-        print('Signature verification failed')
+    except Exception as e:
+        print(f'Signature verification failed {e}')
         return False
     
 
