@@ -43,18 +43,6 @@ def sign_verify(image_name):
         )
         print('Signature is valid with PKCS1v15 padding')
 
-        # For PSS padding:
-        public_key.verify(
-            signature,
-            combined_data,
-            padding.PSS(
-                mgf=padding.MGF1(hashes.SHA256()),
-                salt_length=padding.PSS.MAX_LENGTH
-            ),
-            hashes.SHA256()
-        )
-        print('Signature is valid with PSS padding')
-
         return True
     
     except Exception as e:

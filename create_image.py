@@ -1,16 +1,16 @@
 import cv2
 
-def return_image():
-    '''Captures and image; returns data in cv2.imread()'''
+def create_image():
+    '''Captures Image file; returns data as a frame (cv2.imread())'''
 
-    captured_image = capture_image()
+    image = capture_image()
 
-    if captured_image is not None:
-        print("\tImage not None, now save")
+    if image is not None:
+        print("\tImage not None, Saving...")
         image_filename = "NewImage.jpg"
-        cv2.imwrite(image_filename, captured_image)
+        cv2.imwrite(image_filename, image)
 
-        return captured_image
+        return image
     
     else:
         print("Image is None")
@@ -18,6 +18,8 @@ def return_image():
 
 
 def capture_image():
+    ''' Initialized camera and takes picture'''
+    
     # Initialize the camera (use the appropriate video device)
     camera = cv2.VideoCapture(0)
 
@@ -34,5 +36,3 @@ def capture_image():
     else:
         print("\tError: Failed to capture an image.")
         return None
-
-return_image()
