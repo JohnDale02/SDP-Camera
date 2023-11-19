@@ -14,10 +14,15 @@ def sign_verify():
 
     # Define the command and its arguments as a list
     tpm2_verify_command = [
-        "tss2_verifysignature",
-        "--keyPath=public.pem",
-        "--digest=digest.file",
-        "--signature=signature.file"
+        "tpm2_verifysignature",
+        "-c",
+        "0x81010001",
+        "-g",
+        "sha256",
+        "-m",
+        "combined.file",
+        "-s",
+        "signature.file"
     ]
 
     try:

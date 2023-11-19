@@ -32,3 +32,4 @@ def hash(image_name): # will output hashed data to a file
     print(result.stderr)
 
 
+hash("test'.jpg")
