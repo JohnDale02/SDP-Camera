@@ -16,23 +16,22 @@ def sign_verify(image_name):
     time = "2023-10-29 14:30:00"
     location = "Latitude: 40.7128, Longitude: -74.0060"
 
-    combined_data = combine(image, time, location)
-    signature = sign_hash(combined_data)
+    #combined_data = combine(image, time, location)
+    #signature = sign_hash(combined_data)
 
-    digest_data_filepath = 'digest.file'
-    with open(digest_data_filepath, 'r') as digest_file:
-        digest_data = digest_file.read()    # POSSIBLY TEST IF DIGEST WORKS??
+    public_key_file_path = 'public_key.pem'
 
+    with open(public_key_file_path, "rb") as key_file:
+        public_key_data = key_file.read()
 
+    # Deserialize the public key from PEM format
+    public_key = serialization.load_pem_public_key(public_key_data)
 
-    public_key_path = 'public_key.pem'
+    with open('signature.file', 'rb') as signature_file:
+        signature = signature_file.read()
 
-
-    with open(public_key_path, "rb") as key_file:
-            public_key = serialization.load_pem_public_key(
-                key_file.read(),
-                backend=default_backend()
-            )
+    with open('combined.file', 'rb') as combined_file:
+        combined_data = combined_file.read()
 
     try:
         public_key.verify(
