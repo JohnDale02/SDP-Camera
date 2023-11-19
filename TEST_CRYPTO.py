@@ -17,13 +17,13 @@ def sign_verify(image_name):
     location = "Latitude: 40.7128, Longitude: -74.0060"
 
     combined_data = combine(image, time, location)
+    signature = sign_hash(combined_data)
 
     digest_data_filepath = 'digest.file'
     with open(digest_data_filepath, 'r') as digest_file:
         digest_data = digest_file.read()    # POSSIBLY TEST IF DIGEST WORKS??
 
 
-    signature = sign_hash(combined_data)
 
     public_key_path = 'public_key.pem'
 
@@ -56,7 +56,7 @@ def sign_hash(combined_string):
     combined_file_path = 'combined.file'
 
     # Write hash string to a temporary file
-    with open(combined_file_path, "w") as combined_file:  # create a temporary hash file where we put our hash for signing
+    with open(combined_file_path, "wb") as combined_file:  # create a temporary hash file where we put our hash for signing
         combined_file.write(combined_string)
 
     # Use the temporary files in the tpm2_sign command
