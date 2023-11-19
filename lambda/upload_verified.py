@@ -1,9 +1,9 @@
-from object_count import count_objects_in_bucket
 import json
 import os
+import boto3
 
 
-def send_to_verified(s3_client, camera_number, time_data, location_data, signature, temp_image_path):
+def upload_verified(s3_client, camera_number, time_data, location_data, signature, temp_image_path):
 # Get S3 bucket for verified images(camera_number)
     destination_bucket_name = f'camera{int(camera_number)}verifiedimages'
 
@@ -46,3 +46,17 @@ def send_to_verified(s3_client, camera_number, time_data, location_data, signatu
     # Clean up: Delete temporary files
     os.remove(temp_image_path)
     os.remove(temp_json_path)
+
+
+
+def count_objects_in_bucket(bucket_name):
+    print("Called 'count objects")
+    s3 = boto3.client('s3')
+    total_objects = 0
+
+    # Use paginator to handle buckets with more than 1000 objects
+    paginator = s3.get_paginator('list_objects_v2')
+    for page in paginator.paginate(Bucket=bucket_name):
+        total_objects += len(page.get('Contents', []))
+
+    return total_objects

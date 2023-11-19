@@ -1,10 +1,13 @@
-def create_metadata(camera_number, time_data, location_data, signiture):
+
+
+def create_metadata(camera_number : str, time_data : str, location_data : str, signature : bytes):
+    '''Cretes dictionary with all metadata; Strings for number, time, location, base64 (bytes) for signature'''
 
     metadata = {}
     metadata['CameraNumber'] = camera_number
     metadata['Time'] = time_data
     metadata['Location'] = location_data
-    metadata['Signature'] = signiture
+    metadata['Signature'] = signature
 
     return metadata
 

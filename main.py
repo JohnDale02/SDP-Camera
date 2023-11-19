@@ -1,28 +1,20 @@
 # Outline for Main function
-from take_picture import return_image
-from wifi_check import is_internet_available
+from create_image import create_image
+from check_wifi import is_internet_available
 from create_metadata import create_metadata
-from combined import combine
+from create_combined import create_combined
 from upload_image import upload_image
-from sign import sign_hash
+from create_digest import create_digest
+from create_signature import create_signature
 import cv2
 import base64
 
-def main():
+def main(camera_number_string):
 #---------------------- Wait for Camera input and take picture ----------------------------
-
-	camera_number = "1"  # camera number used to search for public key
 	
-	# image = return_image()  bring this back ###################################################
-
-	image = cv2.imread('test.jpg')    # cv2 jpg object  DELETE ONLY FOR DEBUGGING PURPOSES 
-
-	print("Image type of test.jpg: {type(image)}")
-	
-	image_string = base64.b64encode(image)
-
+	# image = create_image()  # take the image
+	image = cv2.imread('test.jpg')
 	print("Took Image")
-
 
 #---------- Capture GNSS Data (Time and Location) ------------------------
 
@@ -31,35 +23,45 @@ def main():
 	location = "Latitude: 40.7128, Longitude: -74.0060"
 	print(f"Recieved Time and GNSS Data: {time}{location}")
 
-#-------------- Hash image + Time + Location ----------------------------------------------
+#-------------- combine number + image + Time + Location ----------------------------------------------
 
-	combined_data = combine(image, time, location)   # returns hash digest (bytes)
-	print(f"Made combined_data")
+	combined_data = create_combined(camera_number_string, image, time, location)   # returns combined data as a 
+	print(f"Made combined_data: {combined_data}")
+
+# ---------------- Create digest for signing --------------------------
+	try:
+		digest = create_digest(combined_data)
+		print("Created Digest: ", digest)
+
+	except Exception as e:
+		print(str(e))
 
 # ---------------- Send image to TPM for Signing ------------------------
 	try:
-		signature = sign_hash(combined_data)  # byte64 encoded signature
+		signature_base64 = create_signature(digest)  # byte64 encoded signature
+		print("Created signature_base64: ", signature_base64)
 		
 	except Exception as e:
 		print(str(e))
 
 #---------------- Create Metadata ------------------------------------
 
-	metadata = create_metadata(camera_number, time, location, signature)   # creates a dictionary for the strings [string, string, string, byte64]
+	metadata = create_metadata(camera_number_string, time, location, signature_base64)   # creates a dictionary for the strings [string, string, string, byte64]
 	print(f"Metadata: {metadata}")
 
-	print(f"Signature: {signature}")
+	print(f"Signature: {signature_base64}")
 
 #------------------ Check if we have Wi-FI -----------------------------
 
 	if is_internet_available():
 		print(f"Internet is available...Uploading")
 
-		upload_image(image_string, metadata)   # cv2 jpg object, metadat
-
+		image_base64 = base64.b64encode(image)  # create a bytes object for sending
+		upload_image(image_base64, metadata)   # cv2 jpg object, metadat
 		print(f"Uploaded Image")
 	
 	else: 
+
 		print("No wifi")
         
 	# ---------------- Save the image and metadata to files -------------------
@@ -71,6 +73,6 @@ def main():
 # --------------- Callback function for re-connecting to  Wi-Fi ----------------------
 	# check SD card and upload all photos
 
-
-main()
+camera_number_string = "1"  # camera number used to search for public key
+main(camera_number_string)
 
