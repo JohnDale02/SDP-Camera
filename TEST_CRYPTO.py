@@ -17,6 +17,12 @@ def sign_verify(image_name):
     location = "Latitude: 40.7128, Longitude: -74.0060"
 
     combined_data = combine(image, time, location)
+
+    digest_data_filepath = 'digest.file'
+    with open(digest_data_filepath, 'r') as digest_file:
+        digest_data = digest_file.read()    # POSSIBLY TEST IF DIGEST WORKS??
+
+
     signature = sign_hash(combined_data)
 
     public_key_path = 'public_key.pem'
@@ -79,7 +85,7 @@ def sign_hash(combined_string):
         #\signature_base64 = base64.b64encode(signature).decode('utf-8')
         #print("Signature64:", signature_base64)
         print(f"SIgnature here: check signature.file for comparison: {signature}")
-        
+
         return signature
         #return signature_base64
     else:
