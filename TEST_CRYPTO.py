@@ -34,13 +34,27 @@ def sign_verify(image_name):
         combined_data = combined_file.read()
 
     try:
+        # For PKCS1v15 padding:
         public_key.verify(
             signature,
             combined_data,
             padding.PKCS1v15(),
             hashes.SHA256()
         )
-        print('Signature is valid')
+        print('Signature is valid with PKCS1v15 padding')
+
+        # For PSS padding:
+        public_key.verify(
+            signature,
+            combined_data,
+            padding.PSS(
+                mgf=padding.MGF1(hashes.SHA256()),
+                salt_length=padding.PSS.MAX_LENGTH
+            ),
+            hashes.SHA256()
+        )
+        print('Signature is valid with PSS padding')
+
         return True
     
     except InvalidSignature:
