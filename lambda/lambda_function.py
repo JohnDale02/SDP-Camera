@@ -45,7 +45,7 @@ def lambda_function(event, context):
             print(f"Public key error: {e}")
 
         try:
-            valid = verify_signature(temp_image_path, time_data, location_data, signature_encoded, public_key_base64)
+            valid = verify_signature(temp_image_path, time_data, location_data, signature_encoded, public_key)
 
         except Exception as e:
             print(f"Error verifying or denying signature {e}")
