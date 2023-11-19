@@ -16,8 +16,8 @@ def sign_verify(image_name):
     time = "2023-10-29 14:30:00"
     location = "Latitude: 40.7128, Longitude: -74.0060"
 
-    #combined_data = combine(image, time, location)
-    #signature = sign_hash(combined_data)
+    combined_data = combine(image, time, location)
+    signature = sign_hash(combined_data)
 
     public_key_file_path = 'public_key.pem'
 
