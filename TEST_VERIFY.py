@@ -32,6 +32,7 @@ def sign_verify():
         print(result.stdout)
         print("stderr:")
         print(result.stderr)
+        print("Exit Code:", result.returncode)
 
     except subprocess.CalledProcessError as e:
         print(f"Error: Command returned non-zero exit status {e.returncode}")
