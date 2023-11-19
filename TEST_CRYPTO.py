@@ -15,6 +15,7 @@ def sign_verify(image_name):
     image = cv2.imread(image_name)
     time = "2023-10-29 14:30:00"
     location = "Latitude: 40.7128, Longitude: -74.0060"
+
     combined_data = combine(image, time, location)
     signature = sign_hash(combined_data)
 
@@ -44,15 +45,13 @@ def sign_verify(image_name):
 
 def sign_hash(combined_string):
     '''Takes in a hash; returns base64 encoded signature'''
-    
-    # Write hash string to a temporary file
-    with tempfile.NamedTemporaryFile(delete=False) as temp_combined_file:  # create a temporary hash file where we put our hash for signing
-        temp_combined_file.write(combined_string)
-        temp_combined_file_path = temp_combined_file.name
 
-    # Create a temporary file for the signature
-    with tempfile.NamedTemporaryFile(delete=False) as temp_signature_file:  # create a temporary output file for the signature
-        temp_signature_file_path = temp_signature_file.name
+    signature_file_path = 'signature.file'
+    combined_file_path = 'combined.file'
+
+    # Write hash string to a temporary file
+    with open(combined_file_path, "w") as combined_file:  # create a temporary hash file where we put our hash for signing
+        combined_file.write(combined_string)
 
     # Use the temporary files in the tpm2_sign command
     tpm2_sign_command = [
@@ -60,22 +59,18 @@ def sign_hash(combined_string):
         "-c", "0x81010001",
         "-g", "sha256",
         "-s", "rsassa",
-        "-o", temp_signature_file_path,
-        temp_combined_file_path
+        "-o", signature_file_path,
+        combined_file_path
     ]
 
     # Execute the command
     result = subprocess.run(tpm2_sign_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
     # Read and delete the temporary signature file
-    signature = None
-    if os.path.exists(temp_signature_file_path):
-        with open(temp_signature_file_path, 'rb') as file:
-            signature = file.read()
-        os.remove(temp_signature_file_path)
 
-    # Delete the temporary hash file
-    os.remove(temp_combined_file_path)
+    if os.path.exists(signature_file_path):
+        with open(signature_file_path, 'rb') as file:
+            signature = file.read()
 
     if result.returncode == 0 and signature:
         # Binary signature
@@ -83,7 +78,8 @@ def sign_hash(combined_string):
         print("Signature:", signature)
         #\signature_base64 = base64.b64encode(signature).decode('utf-8')
         #print("Signature64:", signature_base64)
-
+        print(f"SIgnature here: check signature.file for comparison: {signature}")
+        
         return signature
         #return signature_base64
     else:
