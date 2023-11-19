@@ -16,7 +16,7 @@ def sign_verify():
     tpm2_verify_command = [
         "tpm2_verifysignature",
         "-c",
-        "public_key.pem",
+        "0x81010001",
         "-g",
         "sha256",
         "-m",
