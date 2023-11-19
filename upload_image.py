@@ -10,9 +10,6 @@ def upload_image(image, metadata):
     bucket_name = 'unverifiedimages'
     file_key = 'NewImage.jpg'
 
-    # Path to your downloaded image
-    image_path = 'NewImage.jpg'
-
     try:
         # Upload the file with metadata
         print("\tTrying to upload...")

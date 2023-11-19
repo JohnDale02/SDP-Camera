@@ -23,7 +23,7 @@ def are_files_equal(file1_path, file2_path):
 # Read the PEM file and convert it to a string
 with open('public_key.pem', 'rb') as pem_file:
     pem_data = pem_file.read()
-    print("Pem Data", pem_data)
+    #print("Pem Data", pem_data)
     
     pem_string = base64.b64encode(pem_data).decode('utf-8')
     print("Pem string to be sent: ", pem_string)
@@ -41,7 +41,7 @@ pem_data_from_db = base64.b64decode(pem_string)
 # Recreate the PEM file from the bytes
 with open('recreated_public_key.pem', 'wb') as pem_file:
     pem_file.write(pem_data_from_db)
-    print("Recreated PEM data", pem_data_from_db)
+    #print("Recreated PEM data", pem_data_from_db)
 
 print("Check recreated_public_key.pem vs public_key.pem")
 print("Are they equal: " , print(are_files_equal("recreated_public_key.pem", "public_key.pem")))

@@ -56,8 +56,8 @@ def main(camera_number_string):
 	if is_internet_available():
 		print(f"Internet is available...Uploading")
 
-		image_base64 = base64.b64encode(image)  # create a bytes object for sending
-		upload_image(image_base64, metadata)   # cv2 jpg object, metadat
+		image_string = image.decode('utf-8') # create a bytes object for sending
+		upload_image(image_string, metadata)   # cv2 jpg object, metadat
 		print(f"Uploaded Image")
 	
 	else: 
