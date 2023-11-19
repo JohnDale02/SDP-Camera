@@ -19,9 +19,10 @@ def sign_verify():
         "public_key.pem",
         "-g",
         "sha256",
+        "-m",
+        "combined.file",
         "-s",
-        "signature.file",
-        "combined.file"
+        "signature.file"
     ]
 
     try:
