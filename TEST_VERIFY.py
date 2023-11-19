@@ -32,6 +32,8 @@ def sign_verify():
         print(f"Error: Command returned non-zero exit status {e.returncode}")
     except FileNotFoundError:
         print("Error: The tss2_verifysignature command was not found. Make sure it's in your system's PATH.")
+    except Exception as e:
+        print(f"there was an error: {e}")
 
 
    
