@@ -3,7 +3,7 @@ import numpy as np
 
 # Read the images
 try:
-    image1 = cv2.imread('test.jpg')
+    image1 = cv2.imread('TempNewImage.jpg')
 except Exception as e:
     print(e)
 
