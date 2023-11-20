@@ -12,24 +12,21 @@ def verify_signature(temp_image_path, camera_number, time_data, location_data, s
 
     combined_data = create_combined(camera_number, image, time_data, location_data)
 
-    with open('combined.file', "rb") as key_file:
-        combined_data_2 = key_file.read()
-
     public_key_path = 'recreated_public_key.pem'
 
     with open(public_key_path, "wb") as file:   # write our decoded public key data back to a pem file
             file.write(public_key)
 
     with open(public_key_path, "rb") as key_file:
-            public_key = serialization.load_pem_public_key(
-                key_file.read(),
-                backend=default_backend()
-            )
+            public_key_data = key_file.read()
+
+    # Deserialize the public key from PEM format
+    public_key = serialization.load_pem_public_key(public_key_data)
 
     try:
         public_key.verify(
             signature,
-            combined_data_2,
+            combined_data,
             padding.PKCS1v15(),
             hashes.SHA256()
         )
