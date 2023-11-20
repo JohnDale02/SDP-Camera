@@ -15,19 +15,6 @@ def verify_signature(temp_image_path, camera_number, time_data, location_data, s
     with open('combined.file', "rb") as key_file:
         combined_data_2 = key_file.read()
 
-    with open('combined.file2', 'wb') as key_file:
-         key_file.write(combined_data)
-
-    with open('combined.file2', "rb") as key_file:
-        combined_data_3 = key_file.read()
-
-    
-    if combined_data_3 == combined_data_2:
-         print("Yay they are the smase")
-    print(type(combined_data_3), print(type(combined_data_2)))
-
-    
-
     public_key_path = 'recreated_public_key.pem'
 
     with open(public_key_path, "wb") as file:   # write our decoded public key data back to a pem file
@@ -42,7 +29,7 @@ def verify_signature(temp_image_path, camera_number, time_data, location_data, s
     try:
         public_key.verify(
             signature,
-            combined_data,
+            combined_data_2,
             padding.PKCS1v15(),
             hashes.SHA256()
         )
@@ -57,7 +44,7 @@ def verify_signature(temp_image_path, camera_number, time_data, location_data, s
 def create_combined(camera_number: str, image: bytes, time: str, location: str) -> bytes:
     '''Takes in camera number, image, time, location and encodes then combines to form one byte object'''
     print(camera_number, time, location)
-    
+
     # Encode the image as a JPEG byte array
     _, encoded_image = cv2.imencode(".jpg", image)
     encoded_image = encoded_image.tobytes()
