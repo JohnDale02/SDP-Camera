@@ -15,9 +15,16 @@ def verify_signature(temp_image_path, camera_number, time_data, location_data, s
     with open('combined.file', "rb") as key_file:
         combined_data_2 = key_file.read()
 
-    if combined_data == combined_data_2:
+    with open('combined.file2', 'wb') as key_file:
+         key_file.write(combined_data)
+
+    with open('combined.file2', "rb") as key_file:
+        combined_data_3 = key_file.read()
+
+    
+    if combined_data_3 == combined_data_2:
          print("Yay they are the smase")
-    print(type(combined_data), print(type(combined_data_2)))
+    print(type(combined_data_3), print(type(combined_data_2)))
 
     
 
