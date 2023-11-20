@@ -49,6 +49,7 @@ def main(camera_number_string):
 
 	metadata = create_metadata(camera_number_string, time, location, signature_string)   # creates a dictionary for the strings [string, string, string, byte64]
 	#print(f"Metadata: {metadata}")
+	print(metadata)
 
 #------------------ Check if we have Wi-FI -----------------------------
 
