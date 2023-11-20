@@ -14,7 +14,7 @@ def main(camera_number_string):
 	
 	# image = create_image()  # take the image
 	image = cv2.imread('test.jpg')
-	_, image_bytes = cv2.imencode('.jpg', image)
+	_, encoded_image = cv2.imencode('.jpg', image)
 	print("Took Image")
 
 #---------- Capture GNSS Data (Time and Location) ------------------------
@@ -56,8 +56,7 @@ def main(camera_number_string):
 	if is_internet_available():
 		print(f"Internet is available...Uploading")
 
-		image_string = base64.b64encode(image_bytes).decode('utf-8') # create a bytes object for sending
-		upload_image(image_string, metadata)   # cv2 jpg object, metadat
+		upload_image(encoded_image.tobytes(), metadata)   # cv2 jpg object, metadat
 		print(f"Uploaded Image")
 	
 	else: 

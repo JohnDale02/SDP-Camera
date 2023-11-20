@@ -2,14 +2,25 @@ import base64
 import cv2
 
 
+import boto3
 
+# Initialize the S3 client
+s3_client = boto3.client('s3')
 
-with open('public_key.pem', 'rb') as file:
-    signature_base64 = file.read()
-    print(signature_base64)
+# Define the bucket name and the key of the file you want to download
+bucket_name = 'unverifiedimages'
+file_key = 'NewImage.jpg'
 
-signature_string = base64.b64encode(signature_base64).decode('utf-8')
+# Define the path where you want to save the downloaded file
+save_path = 'test_receated.jpg'
 
-# Convert the Base64 string back to bytes
-signature_bytes = base64.b64decode(signature_string)
-print(signature_bytes)
+# Download the file from S3 and save it
+s3_client.download_file(bucket_name, file_key, save_path)
+
+print(f"File downloaded and saved at {save_path}")
+
+image1 = cv2.imread('test.jpg')
+image2 = cv2.imread('test_receated.jpg')
+
+if image1 == image2:
+    print("equal alas")
