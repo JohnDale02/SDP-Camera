@@ -32,7 +32,7 @@ def lambda_function(event, context):
         image_bytes = response['Body'].read()   # this is the base64 encoded image
         temp_image_path = 'NewImage.jpg'   # recreate the jpg using the cv2 jpg object bytes recieved
         #temp_image_path = '/tmp/image.jpg'
-        image = cv2.imdecode(np.frombuffer(image_bytes, np.uint8), cv2.IMREAD_COLOR)
+        image = cv2.imread(temp_image_path)
         # Save the decoded image
         print(image, "ended Image")
 
