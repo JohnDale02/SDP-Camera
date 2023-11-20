@@ -7,7 +7,7 @@ def create_image():
 
     if image is not None:
         print("\tImage not None, Saving...")
-        image_filename = "NewImage.jpg"
+        image_filename = "NewImage.png"
         cv2.imwrite(image_filename, image)
 
         return image

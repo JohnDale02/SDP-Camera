@@ -24,8 +24,8 @@ def lambda_function(event, context):
 
         # Access the object's content
         image_base64 = response['Body'].read()   # this is the base64 encoded image
-        temp_image_path = 'NewImage.jpg'   # recreate the jpg using the cv2 jpg object bytes recieved
-        #temp_image_path = '/tmp/image.jpg'
+        temp_image_path = 'NewImage.png'   # recreate the png using the cv2 png object bytes recieved
+        #temp_image_path = '/tmp/image.png'
 
         # Access the object's metadata
         metadata = response['Metadata']

@@ -3,12 +3,12 @@ import numpy as np
 
 # Read the images
 try:
-    image1 = cv2.imread('TempNewImage.jpg')
+    image1 = cv2.imread('TempNewImage.png')
 except Exception as e:
     print(e)
 
 try:
-    image2 = cv2.imread('NewImage.jpg')
+    image2 = cv2.imread('NewImage.png')
 except Exception as e:
     print(e)
 

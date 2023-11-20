@@ -4,6 +4,7 @@ from get_public_key import get_public_key
 from verify_signature import verify_signature
 from recreate_data import recreate_data
 from upload_verified import upload_verified
+from create_combined import create_combined
 import base64
 import cv2
 import numpy as np
@@ -21,7 +22,7 @@ def lambda_function(event, context):
         # Get the object from S3
         try:
             bucket_name = 'unverifiedimages'
-            object_key = 'NewImage.jpg'
+            object_key = 'NewImage.png'
             response = s3_client.get_object(Bucket=bucket_name, Key=object_key)
             print("got an object")
 
@@ -29,9 +30,9 @@ def lambda_function(event, context):
             print(f"Get object error : {e}")
 
        # Access the image content
-        temp_image_path = 'TempNewImage.jpg'   # recreate the jpg using the cv2 jpg object bytes recieved
+        temp_image_path = 'TempNewImage.png'   # recreate the png using the cv2 png object bytes recieved
         s3_client.download_file(bucket_name, object_key, temp_image_path)
-        #temp_image_path = '/tmp/image.jpg'
+        #temp_image_path = '/tmp/image.png'
         image = cv2.imread(temp_image_path)
 
         # Access the object's metadata
@@ -51,7 +52,13 @@ def lambda_function(event, context):
             print(f"Public key error: {e}")
 
         try:
-            valid = verify_signature(image, camera_number, time_data, location_data, signature, public_key)
+            combined_data = create_combined(camera_number, image, time_data, location_data)
+
+        except Exception as e:
+            print(f"Couldnt combine Data: {e}")
+        try:
+            
+            valid = verify_signature(combined_data, signature, public_key)
 
         except Exception as e:
             print(f"Error verifying or denying signature {e}")

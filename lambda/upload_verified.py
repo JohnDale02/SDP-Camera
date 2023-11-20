@@ -13,7 +13,7 @@ def upload_verified(s3_client, camera_number, time_data, location_data, signatur
     except Exception as e:
         print(f"Count objects in bucket error: {e}")
 
-    image_file_name = str(image_number) + '.jpg'  # Changes file extension to .json
+    image_file_name = str(image_number) + '.png'  # Changes file extension to .json
 
     # Create JSON data
     json_data = {
@@ -35,18 +35,17 @@ def upload_verified(s3_client, camera_number, time_data, location_data, signatur
         s3_client.upload_file(temp_image_path, destination_bucket_name, image_file_name)
 
     except Exception as e:
-        print(f"Upload to verified bucket error: {e}")
+        print(f"Upload Image to verified bucket error: {e}")
         
-    try:
-    # Upload JSON file to the same new S3 bucket
+    try:     # Upload JSON file to the same new S3 bucket
         s3_client.upload_file(temp_json_path, destination_bucket_name, json_file_name)
+        
     except Exception as e:
         print(f"Uploading JSON error : {e}")
 
     # Clean up: Delete temporary files
     os.remove(temp_image_path)
     os.remove(temp_json_path)
-
 
 
 def count_objects_in_bucket(bucket_name):
