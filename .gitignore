@@ -3,8 +3,8 @@
 *.png
 
 # Ignore folders inside lambda folder
-lambda/*/
-lambda/_*
+#lambda/*/
+#lambda/_*
 
 # Ignore .txt files
 *.txt
