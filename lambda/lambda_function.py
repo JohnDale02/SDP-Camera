@@ -5,6 +5,7 @@ from verify_signature import verify_signature
 from recreate_data import recreate_data
 from upload_verified import upload_verified
 import base64
+from send_text import send_text
 
 def lambda_function(event, context):
     # Create an S3 client
@@ -55,6 +56,8 @@ def lambda_function(event, context):
 
         else:
             print("Signature is anything but valid")
+        
+        send_text(valid)
         
 
     except Exception as e:
