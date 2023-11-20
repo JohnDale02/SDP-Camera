@@ -30,9 +30,12 @@ def lambda_function(event, context):
 
        # Access the object's content
         image_bytes = response['Body'].read()   # this is the base64 encoded image
-        temp_image_path = 'NewImage.jpg'   # recreate the jpg using the cv2 jpg object bytes recieved
+        temp_image_path = 'TempNewImage.jpg'   # recreate the jpg using the cv2 jpg object bytes recieved
+        s3_client.download_file(bucket_name, object_key, temp_image_path)
         #temp_image_path = '/tmp/image.jpg'
         image = cv2.imread(temp_image_path)
+        # Download the file from S3 and save it
+
         # Save the decoded image
         print(image, "ended Image")
 
