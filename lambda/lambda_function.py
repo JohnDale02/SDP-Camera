@@ -6,13 +6,11 @@ from recreate_data import recreate_data
 from upload_verified import upload_verified
 from create_combined import create_combined
 import base64
-<<<<<<< HEAD
 from send_text import send_text
-=======
 import cv2
 import numpy as np
 
->>>>>>> c6c11074cbe193949772176b831aa2e307439209
+
 
 def lambda_function(event, context):
     # Create an S3 client
