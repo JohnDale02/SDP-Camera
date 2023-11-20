@@ -23,7 +23,7 @@ def upload_verified(s3_client, camera_number, time_data, location_data, signatur
     }
 
     # Save JSON data to a file with the same name as the image
-    json_file_name = image_number + '.json'  # Changes file extension to .json
+    json_file_name = str(image_number) + '.json'  # Changes file extension to .json
 
     #temp_json_path = f'/tmp/{json_file_name}'
     temp_json_path = json_file_name
