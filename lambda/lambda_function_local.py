@@ -15,14 +15,14 @@ def lambda_function(event, context):
     s3_client = boto3.client('s3')
 
     # Extract bucket name and object key from the event
-    #bucket_name = event['Records'][0]['s3']['bucket']['name']
-    #object_key = event['Records'][0]['s3']['object']['key']
+    bucket_name = event['Records'][0]['s3']['bucket']['name']
+    object_key = event['Records'][0]['s3']['object']['key']
 
     try:
         # Get the object from S3
         try:
-            bucket_name = 'unverifiedimages'
-            object_key = 'NewImage.png'
+            #bucket_name = 'unverifiedimages'
+            #object_key = 'NewImage.png'
             response = s3_client.get_object(Bucket=bucket_name, Key=object_key)
             print("got an object")
 
@@ -77,7 +77,3 @@ def lambda_function(event, context):
         'statusCode': 200,
         'body': json.dumps('Function executed successfully!')
     }
-
-
-
-lambda_function(None, None)
