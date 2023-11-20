@@ -12,8 +12,8 @@ import base64
 def main(camera_number_string):
 #---------------------- Wait for Camera input and take picture ----------------------------
 	
-	# image = create_image()  # take the image
-	image = cv2.imread('test.jpg')
+	image = create_image()  # take the image
+	_, encoded_image = cv2.imencode('.png', image)  # we send the encoded image to the cloud 
 	print("Took Image")
 
 #---------- Capture GNSS Data (Time and Location) ------------------------
@@ -21,43 +21,41 @@ def main(camera_number_string):
 	#time, location, = capture_time_location()  # time and location both returned as strings
 	time = "2023-10-29 14:30:00"
 	location = "Latitude: 40.7128, Longitude: -74.0060"
-	print(f"Recieved Time and GNSS Data: {time}{location}")
+	#print(f"Recieved Time and GNSS Data: {time}{location}")
 
 #-------------- combine number + image + Time + Location ----------------------------------------------
 
 	combined_data = create_combined(camera_number_string, image, time, location)   # returns combined data as a 
-	print(f"Made combined_data: {combined_data}")
+	#print(f"Made combined_data: {combined_data}")
 
 # ---------------- Create digest for signing --------------------------
 	try:
 		digest = create_digest(combined_data)
-		print("Created Digest: ", digest)
+		#print("Created Digest: ", digest)
 
 	except Exception as e:
 		print(str(e))
 
 # ---------------- Send image to TPM for Signing ------------------------
 	try:
-		signature_base64 = create_signature(digest)  # byte64 encoded signature
-		print("Created signature_base64: ", signature_base64)
+		signature_string = create_signature(digest)  # byte64 encoded signature
+		#print("Created signature_base64 string: ", signature_string)
 		
 	except Exception as e:
 		print(str(e))
 
 #---------------- Create Metadata ------------------------------------
 
-	metadata = create_metadata(camera_number_string, time, location, signature_base64)   # creates a dictionary for the strings [string, string, string, byte64]
-	print(f"Metadata: {metadata}")
-
-	print(f"Signature: {signature_base64}")
+	metadata = create_metadata(camera_number_string, time, location, signature_string)   # creates a dictionary for the strings [string, string, string, byte64]
+	#print(f"Metadata: {metadata}")
+	print(metadata)
 
 #------------------ Check if we have Wi-FI -----------------------------
 
 	if is_internet_available():
 		print(f"Internet is available...Uploading")
 
-		image_base64 = base64.b64encode(image)  # create a bytes object for sending
-		upload_image(image_base64, metadata)   # cv2 jpg object, metadat
+		upload_image(encoded_image.tobytes(), metadata)   # cv2 png object, metadat
 		print(f"Uploaded Image")
 	
 	else: 

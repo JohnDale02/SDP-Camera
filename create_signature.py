@@ -5,7 +5,7 @@ import base64
 
 
 def create_signature(digest):
-    '''Takes in a digest; returns base64 encoded signature'''
+    '''Takes in a digest; returns signature as base64 string'''
     
     # Write hash string to a temporary file
     with tempfile.NamedTemporaryFile(delete=False) as temp_digest_file:  # create a temporary digest file where we put our digest for intput to sign
@@ -51,10 +51,10 @@ def create_signature(digest):
         # Binary signature
         
         print("Signature:", signature)
-        signature_base64 = base64.b64encode(signature)
-        print("Signature64:", signature_base64)
+        signature_string = base64.b64encode(signature).decode('utf-8')
+        print("Signature String:", signature_string)
 
-        return signature_base64
+        return signature_string
     else:
         raise Exception("Error in generating signature: " + result.stderr.decode())
 

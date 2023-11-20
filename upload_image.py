@@ -8,10 +8,7 @@ def upload_image(image, metadata):
 
     # Bucket and file details
     bucket_name = 'unverifiedimages'
-    file_key = 'NewImage.jpg'
-
-    # Path to your downloaded image
-    image_path = 'NewImage.jpg'
+    file_key = 'NewImage.png'
 
     try:
         # Upload the file with metadata
