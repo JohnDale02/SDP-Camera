@@ -9,12 +9,13 @@ import cv2
 def verify_signature(temp_image_path, camera_number, time_data, location_data, signature, public_key):
 
     image = cv2.imread(temp_image_path)
-
+    print(signature)
+    
     combined_data = create_combined(camera_number, image, time_data, location_data)
 
     print(type(combined_data), "SHould be bytes")
 
-    public_key_path = 'public_key.pem'
+    public_key_path = 'recreated_public_key.pem'
 
     with open(public_key_path, "wb") as file:   # write our decoded public key data back to a pem file
             file.write(public_key)

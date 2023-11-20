@@ -15,4 +15,3 @@ def create_combined(camera_number: str, image: bytes, time: str, location: str) 
     combined_data = encoded_number + encoded_image + encoded_time + encoded_location
 
     return combined_data
-
