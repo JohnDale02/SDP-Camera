@@ -25,14 +25,13 @@ def lambda_function(event, context):
         # Access the object's content
         image_base64 = response['Body'].read()   # this is the base64 encoded image
         temp_image_path = 'NewImage.jpg'   # recreate the jpg using the cv2 jpg object bytes recieved
- 
         #temp_image_path = '/tmp/image.jpg'
 
         # Access the object's metadata
         metadata = response['Metadata']
 
         try:
-            camera_number, time_data, location_data, signature_encoded = recreate_data(image_base64, metadata, temp_image_path)
+            camera_number, time_data, location_data, signature = recreate_data(image_base64, metadata, temp_image_path)
 
         except Exception as e:
             print(f"Cannot recreate time and metadata {e}")
@@ -45,13 +44,13 @@ def lambda_function(event, context):
             print(f"Public key error: {e}")
 
         try:
-            valid = verify_signature(temp_image_path, time_data, location_data, signature_encoded, public_key)
+            valid = verify_signature(temp_image_path, time_data, location_data, signature, public_key)
 
         except Exception as e:
             print(f"Error verifying or denying signature {e}")
 
         if valid == True:
-            upload_verified(s3_client, camera_number, time_data, location_data, signature_encoded, temp_image_path)
+            upload_verified(s3_client, camera_number, time_data, location_data, signature, temp_image_path)
 
         else:
             print("Signature is anything but valid")
@@ -64,4 +63,6 @@ def lambda_function(event, context):
         'statusCode': 200,
         'body': json.dumps('Function executed successfully!')
     }
+
+
 

@@ -14,6 +14,7 @@ def main(camera_number_string):
 	
 	# image = create_image()  # take the image
 	image = cv2.imread('test.jpg')
+	_, image_bytes = cv2.imencode('.jpg', image)
 	print("Took Image")
 
 #---------- Capture GNSS Data (Time and Location) ------------------------
@@ -38,26 +39,24 @@ def main(camera_number_string):
 
 # ---------------- Send image to TPM for Signing ------------------------
 	try:
-		signature_base64 = create_signature(digest)  # byte64 encoded signature
-		print("Created signature_base64: ", signature_base64)
+		signature_string = create_signature(digest)  # byte64 encoded signature
+		print("Created signature_base64 string: ", signature_string)
 		
 	except Exception as e:
 		print(str(e))
 
 #---------------- Create Metadata ------------------------------------
 
-	metadata = create_metadata(camera_number_string, time, location, signature_base64)   # creates a dictionary for the strings [string, string, string, byte64]
+	metadata = create_metadata(camera_number_string, time, location, signature_string)   # creates a dictionary for the strings [string, string, string, byte64]
 	print(f"Metadata: {metadata}")
-
-	print(f"Signature: {signature_base64}")
 
 #------------------ Check if we have Wi-FI -----------------------------
 
 	if is_internet_available():
 		print(f"Internet is available...Uploading")
 
-		#image_string = base64.b64encode(image).decode('utf-8') # create a bytes object for sending
-		upload_image(image, metadata)   # cv2 jpg object, metadat
+		image_string = base64.b64encode(image_bytes).decode('utf-8') # create a bytes object for sending
+		upload_image(image_string, metadata)   # cv2 jpg object, metadat
 		print(f"Uploaded Image")
 	
 	else: 

@@ -1,7 +1,7 @@
 import json
 import os
 import boto3
-
+import base64
 
 def upload_verified(s3_client, camera_number, time_data, location_data, signature, temp_image_path):
 # Get S3 bucket for verified images(camera_number)
@@ -19,7 +19,7 @@ def upload_verified(s3_client, camera_number, time_data, location_data, signatur
     json_data = {
         "Time": time_data,  # string
         "Location": location_data,   # string
-        "Signature": signature  # signature is in base64 encoded (string)
+        "Signature_Base64": base64.b64encode(signature).decode('utf-8')  # signature is in base64 encoded (string)
     }
 
     # Save JSON data to a file with the same name as the image
