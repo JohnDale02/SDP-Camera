@@ -22,6 +22,7 @@ def lambda_function(event, context):
             bucket_name = 'unverifiedimages'
             object_key = 'NewImage.jpg'
             response = s3_client.get_object(Bucket=bucket_name, Key=object_key)
+            print("got an object")
 
         except Exception as e:
             print(f"Get object error : {e}")
@@ -55,7 +56,7 @@ def lambda_function(event, context):
 
         if valid == True:
             upload_verified(s3_client, camera_number, time_data, location_data, signature, temp_image_path)
-
+            print("valid signature")
         else:
             print("Signature is anything but valid")
         
@@ -70,4 +71,4 @@ def lambda_function(event, context):
 
 
 
-signature = 'aEsyPeQVLBp47t1y9yqP5q64jNHOlQ0lVOCcKKmiyRvMjDOEPISY9dcKnm+ujL8LfuVsVJt4j4K7PJQN5S/RMytHj6xXgzn3LGVNL6b5GqKe1/d16LImCSC+vtqsMFTsFKDzylF461Q/nKpYSVHi2G6HaBYCN0qj69qbciBOZjJWPagEAAvOs8rHbImybruKhFj5Q3MgiyeDOzeKCS5EvNK2jOWkZdOuQNFFrJQSAalOClTk9RHEdpTh4/VZdONTsSMOjm56JCoqIKW+D0475hPb4t8A4sXbYGITK1VR2n90OvxadMM6Gv21oXA9zalqU5hzCp6EahK/opLER7vYGg=='
+lambda_function(None, None)
