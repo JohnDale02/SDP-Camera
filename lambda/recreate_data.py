@@ -2,13 +2,8 @@ import base64
 import cv2
 
 
-def recreate_data(image_base64, metadata, temp_image_path):
+def recreate_data(metadata):
     '''Intakes cv2 image data and metadata; returns camera number, time, location, signature, creates image file'''
-
-    
-    image_bytes = base64.b64decode(image_base64)
-    with open(temp_image_path, 'wb') as file:
-        file.write(image_bytes)
 
     camera_number = metadata.get('cameranumber')
     time_data = metadata.get('time')

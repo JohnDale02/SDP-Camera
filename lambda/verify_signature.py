@@ -6,9 +6,8 @@ from cryptography.hazmat.backends import default_backend
 import base64
 import cv2
 
-def verify_signature(temp_image_path, camera_number, time_data, location_data, signature, public_key):
+def verify_signature(image, camera_number, time_data, location_data, signature, public_key):
 
-    image = cv2.imread('test.jpg')
     print(signature)
 
     combined_data = create_combined(camera_number, image, time_data, location_data)

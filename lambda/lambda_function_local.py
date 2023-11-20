@@ -6,6 +6,7 @@ from recreate_data import recreate_data
 from upload_verified import upload_verified
 import base64
 import cv2
+import numpy as np
 
 
 def lambda_function(event, context):
@@ -28,15 +29,18 @@ def lambda_function(event, context):
             print(f"Get object error : {e}")
 
        # Access the object's content
-        image_base64 = response['Body'].read()   # this is the base64 encoded image
+        image_bytes = response['Body'].read()   # this is the base64 encoded image
         temp_image_path = 'NewImage.jpg'   # recreate the jpg using the cv2 jpg object bytes recieved
         #temp_image_path = '/tmp/image.jpg'
+        image = cv2.imdecode(np.frombuffer(image_bytes, np.uint8), cv2.IMREAD_COLOR)
+        # Save the decoded image
+        print(image)
 
         # Access the object's metadata
         metadata = response['Metadata']
 
         try:
-            camera_number, time_data, location_data, signature = recreate_data(image_base64, metadata, temp_image_path)
+            camera_number, time_data, location_data, signature = recreate_data(metadata)
 
         except Exception as e:
             print(f"Cannot recreate time and metadata {e}")
@@ -50,7 +54,7 @@ def lambda_function(event, context):
             print(f"Public key error: {e}")
 
         try:
-            valid = verify_signature(temp_image_path, camera_number, time_data, location_data, signature, public_key)
+            valid = verify_signature(image, camera_number, time_data, location_data, signature, public_key)
 
         except Exception as e:
             print(f"Error verifying or denying signature {e}")
