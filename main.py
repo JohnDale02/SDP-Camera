@@ -12,10 +12,9 @@ import base64
 def main(camera_number_string):
 #---------------------- Wait for Camera input and take picture ----------------------------
 	
-	
-	image = cv2.imread('NewImage.jpg')
+	image = create_image()  # take the image
 	print(image)
-	_, encoded_image = cv2.imencode('.jpg', image)
+	_, encoded_image = cv2.imencode('.png', image)
 	print("Took Image")
 
 #---------- Capture GNSS Data (Time and Location) ------------------------

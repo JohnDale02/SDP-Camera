@@ -39,8 +39,8 @@ def verify_signature(image, camera_number, time_data, location_data, signature, 
 def create_combined(camera_number: str, image: bytes, time: str, location: str) -> bytes:
     '''Takes in camera number, image, time, location and encodes then combines to form one byte object'''
 
-    # Encode the image as a JPEG byte array
-    _, encoded_image = cv2.imencode(".jpg", image)
+    # Encode the image as a PNG byte array
+    _, encoded_image = cv2.imencode(".png", image)
     encoded_image = encoded_image.tobytes()
 
     encoded_number = camera_number.encode('utf-8')
