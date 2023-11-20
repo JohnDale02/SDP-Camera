@@ -48,7 +48,6 @@ def lambda_function(event, context):
         try:
             public_key_base64 = get_public_key(int(camera_number))
             public_key = base64.b64decode(public_key_base64)
-            print(public_key)
 
         except Exception as e:
             print(f"Public key error: {e}")

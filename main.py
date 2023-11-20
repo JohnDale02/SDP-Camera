@@ -14,6 +14,7 @@ def main(camera_number_string):
 	
 	# image = create_image()  # take the image
 	image = cv2.imread('test.jpg')
+	print(image)
 	_, encoded_image = cv2.imencode('.jpg', image)
 	print("Took Image")
 
