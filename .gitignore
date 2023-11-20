@@ -4,7 +4,7 @@
 
 # Ignore folders inside lambda folder
 #lambda/*/
-#lambda/_*
+lambda/_*
 
 # Ignore .txt files
 *.txt
