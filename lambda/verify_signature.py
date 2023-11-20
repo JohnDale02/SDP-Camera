@@ -17,6 +17,7 @@ def verify_signature(temp_image_path, camera_number, time_data, location_data, s
 
     if combined_data == combined_data_2:
          print("Yay they are the smase")
+    print(type(combined_data), print(type(combined_data_2)))
 
     
 
