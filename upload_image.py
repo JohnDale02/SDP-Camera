@@ -10,10 +10,13 @@ def upload_image(image, metadata):
     bucket_name = 'unverifiedimages'
     file_key = 'NewImage.jpg'
 
+    # Path to your downloaded image
+    image_path = 'NewImage.jpg'
+
     try:
         # Upload the file with metadata
         print("\tTrying to upload...")
-        response = s3_client.upload_file(Filename='NewImage', Bucket=bucket_name, Key=file_key, Metadata=metadata)
+        response = s3_client.put_object(Bucket=bucket_name, Key=file_key, Body=image, Metadata=metadata)
         print(f"Response:{response}")
 
     except Exception as e:

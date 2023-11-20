@@ -23,4 +23,4 @@ image1 = cv2.imread('test.jpg')
 image2 = cv2.imread('test_receated.jpg')
 
 if image1 == image2:
-    print("equal alas")
+    print("equal als")
