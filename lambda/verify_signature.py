@@ -11,10 +11,14 @@ def verify_signature(temp_image_path, camera_number, time_data, location_data, s
     image = cv2.imread(temp_image_path)
 
     combined_data = create_combined(camera_number, image, time_data, location_data)
-    print(combined_data)
+
     with open('combined.file', "rb") as key_file:
         combined_data_2 = key_file.read()
-        print(combined_data_2)
+
+    if combined_data == combined_data_2:
+         print("Yay they are the smase")
+
+    
 
     public_key_path = 'recreated_public_key.pem'
 
