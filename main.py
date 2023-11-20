@@ -12,8 +12,8 @@ import base64
 def main(camera_number_string):
 #---------------------- Wait for Camera input and take picture ----------------------------
 	
-	image = create_image()  # take the image
-	#image = cv2.imread('test.jpg')
+	
+	image = cv2.imread('NewImage.jpg')
 	print(image)
 	_, encoded_image = cv2.imencode('.jpg', image)
 	print("Took Image")

@@ -11,8 +11,7 @@ def recreate_data(metadata):
     
     signature_string = metadata.get('signature')
     signature = base64.b64decode(signature_string)
-
-    print(camera_number, time_data, location_data, signature)
+    
     return camera_number, time_data, location_data, signature
 
 

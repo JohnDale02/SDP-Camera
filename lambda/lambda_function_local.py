@@ -28,16 +28,11 @@ def lambda_function(event, context):
         except Exception as e:
             print(f"Get object error : {e}")
 
-       # Access the object's content
-        image_bytes = response['Body'].read()   # this is the base64 encoded image
+       # Access the image content
         temp_image_path = 'TempNewImage.jpg'   # recreate the jpg using the cv2 jpg object bytes recieved
         s3_client.download_file(bucket_name, object_key, temp_image_path)
         #temp_image_path = '/tmp/image.jpg'
         image = cv2.imread(temp_image_path)
-        # Download the file from S3 and save it
-
-        # Save the decoded image
-        print(image, "ended Image")
 
         # Access the object's metadata
         metadata = response['Metadata']
