@@ -34,7 +34,7 @@ def lambda_function(event, context):
         #temp_image_path = '/tmp/image.jpg'
         image = cv2.imdecode(np.frombuffer(image_bytes, np.uint8), cv2.IMREAD_COLOR)
         # Save the decoded image
-        print(image)
+        print(image, "ended Image")
 
         # Access the object's metadata
         metadata = response['Metadata']

@@ -8,11 +8,7 @@ import cv2
 
 def verify_signature(image, camera_number, time_data, location_data, signature, public_key):
 
-    print(signature)
-
     combined_data = create_combined(camera_number, image, time_data, location_data)
-
-    print(combined_data)
 
     public_key_path = 'recreated_public_key.pem'
 
