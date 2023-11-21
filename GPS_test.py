@@ -12,7 +12,7 @@ spi = spidev.SpiDev()
 spi.open(spi_bus, spi_device)
 spi.max_speed_hz = spi_speed
 
-gps = UbloxGps(spi)
+gps = UbloxGps(spi_device)
 
 try:
     print("Listening for UBX Messages.")
