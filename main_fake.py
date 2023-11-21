@@ -17,9 +17,11 @@ def main(camera_number_string):
 	
 	#image = create_image()  # take the image
 	image = cv2.imread('test.png')
+	
 	image_blurred = cv2.blur(image,(5,5))
 	_, encoded_image = cv2.imencode('.png', image_blurred)  # we send the encoded baltered image to the cloud 
-	print("Took Image")
+	
+	print("Took Image; Using Sending Blurred")
 	
 #---------- Capture GNSS Data (Time and Location) ------------------------
 
