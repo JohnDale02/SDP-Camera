@@ -43,9 +43,9 @@ def handler(event, context):
             errors = errors + "Error:" + f"Get object error : {e}"
 
        # Access the image content
-        temp_image_path = 'TempNewImage.png'   # recreate the png using the cv2 png object bytes recieved
+        temp_image_path = '/tmp/TempNewImage.png'   # recreate the png using the cv2 png object bytes recieved
         s3_client.download_file(bucket_name, object_key, temp_image_path)
-        #temp_image_path = '/tmp/image.png'
+
         image = cv2.imread(temp_image_path)
 
         # Access the object's metadata
