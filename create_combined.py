@@ -1,5 +1,4 @@
 import cv2
-import hashlib
 
 def create_combined(camera_number: str, image: bytes, time: str, location: str) -> bytes:
     '''Takes in camera number, image, time, location and encodes then combines to form one byte object'''
