@@ -45,14 +45,18 @@ def handler(event, context):
        # Access the image content
         temp_image_path = '/tmp/TempNewImage.png'   # recreate the png using the cv2 png object bytes recieved
         s3_client.download_file(bucket_name, object_key, temp_image_path)
+        print("downloaded file (image)")
 
         image = cv2.imread(temp_image_path)
+        print("reading image")
 
         # Access the object's metadata
         metadata = response['Metadata']
+        print("got metadata")
 
         try:
             camera_number, time_data, location_data, signature = recreate_data(metadata)
+            print("recreated all data")
 
         except Exception as e:
             print(f"Cannot recreate time and metadata {e}")
@@ -61,6 +65,7 @@ def handler(event, context):
         try:
             public_key_base64 = get_public_key(int(camera_number))
             public_key = base64.b64decode(public_key_base64)
+            print("got public key")
 
         except Exception as e:
             print(f"Public key error: {e}")
@@ -68,6 +73,7 @@ def handler(event, context):
 
         try:
             combined_data = create_combined(camera_number, image, time_data, location_data)
+            print("combined data")
 
         except Exception as e:
             print(f"Couldnt combine Data: {e}")
@@ -75,6 +81,7 @@ def handler(event, context):
         try:
             
             valid = verify_signature(combined_data, signature, public_key)
+            print("verify signature done")
 
         except Exception as e:
             print(f"Error verifying or denying signature {e}")
@@ -82,7 +89,7 @@ def handler(event, context):
 
         if valid == True:
             upload_verified(s3_client, camera_number, time_data, location_data, signature, temp_image_path)
-            print("valid signature")
+            print("uploading to correct bucket")
         else:
             print("Signature is anything but valid")
             errors = errors + "Signature is invalid"
@@ -232,12 +239,13 @@ def count_objects_in_bucket(bucket_name):
 
 def verify_signature(combined_data, signature, public_key):
 
-    public_key_path = 'recreated_public_key.pem'
 
-    with open(public_key_path, "wb") as file:   # write our decoded public key data back to a pem file
+    temp_public_key_path = '/tmp/recreated_public_key.pem'
+
+    with open(temp_public_key_path, "wb") as file:   # write our decoded public key data back to a pem file
             file.write(public_key)
 
-    with open(public_key_path, "rb") as key_file:
+    with open(temp_public_key_path, "rb") as key_file:
             public_key_data = key_file.read()
 
     # Deserialize the public key from PEM format
@@ -251,8 +259,12 @@ def verify_signature(combined_data, signature, public_key):
             hashes.SHA256()
         )
         print('Signature is valid')
+        os.remove(temp_public_key_path)
         return True
     
     except InvalidSignature:
         print('Signature verification failed')
+        os.remove(temp_public_key_path)
         return False
+    
+
