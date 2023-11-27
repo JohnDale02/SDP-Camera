@@ -6,6 +6,8 @@ import os
 import base64
 import cv2
 import numpy as np
+import os
+from twilio.rest import Client
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.asymmetric import padding
 from cryptography.hazmat.primitives import serialization
@@ -74,11 +76,15 @@ def handler(event, context):
             errors = errors + "Error:" + f"Error verifying or denying signature {e}"
 
         if valid == True:
-            upload_verified(s3_client, camera_number, time_data, location_data, signature, temp_image_path)
+            image_save_name = upload_verified(s3_client, camera_number, time_data, location_data, signature, temp_image_path)
         else:
             errors = errors + "Signature is invalid"
         
-        #send_text(valid)
+        try:
+            send_text(valid, image_save_name)
+
+        except Exception as e:
+            errors = errors + "Issue Sending text" + e
 
 
     except Exception as e:
@@ -207,6 +213,8 @@ def upload_verified(s3_client, camera_number, time_data, location_data, signatur
     os.remove(temp_image_path)
     os.remove(temp_json_path)
 
+    return image_file_name
+
 
 def count_objects_in_bucket(bucket_name):
     s3 = boto3.client('s3')
@@ -249,4 +257,22 @@ def verify_signature(combined_data, signature, public_key):
         os.remove(temp_public_key_path)
         return False
     
+
+def send_text(valid, image_save_name):
+
+    account_sid = 'AC8010fcf8a7c9217f2e222a62cc0e49cf'
+    auth_token = 'f22570831a4f18bacf905f997392924c'
+    client = Client(account_sid, auth_token)
+
+    if valid == True:
+        Body = f"Your Image was Successfully Authenticated. Stored as {image_save_name}"
+
+    else:
+        Body = f"Your Image failed to be Authenticated. Deleted"
+
+    message = client.messages.create(
+    from_='+18573664416',
+    body=Body,
+    to='+17819159187'
+    )
 
