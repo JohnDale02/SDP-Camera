@@ -36,69 +36,52 @@ def handler(event, context):
             #bucket_name = 'unverifiedimages'
             #object_key = 'NewImage.png'
             response = s3_client.get_object(Bucket=bucket_name, Key=object_key)
-            print("got an object")
 
         except Exception as e:
-            print(f"Get object error : {e}")
             errors = errors + "Error:" + f"Get object error : {e}"
 
        # Access the image content
         temp_image_path = '/tmp/TempNewImage.png'   # recreate the png using the cv2 png object bytes recieved
         s3_client.download_file(bucket_name, object_key, temp_image_path)
-        print("downloaded file (image)")
 
         image = cv2.imread(temp_image_path)
-        print("reading image")
 
         # Access the object's metadata
         metadata = response['Metadata']
-        print("got metadata")
 
         try:
             camera_number, time_data, location_data, signature = recreate_data(metadata)
-            print("recreated all data")
 
         except Exception as e:
-            print(f"Cannot recreate time and metadata {e}")
             errors = errors + "Error:" + f"Cannot recreate time and metadata {e}"
         
         try:
             public_key_base64 = get_public_key(int(camera_number))
             public_key = base64.b64decode(public_key_base64)
-            print("got public key")
 
         except Exception as e:
-            print(f"Public key error: {e}")
             errors = errors + "Error:" + f"Public key error: {e}"
 
         try:
             combined_data = create_combined(camera_number, image, time_data, location_data)
-            print("combined data")
 
         except Exception as e:
-            print(f"Couldnt combine Data: {e}")
             errors = errors + "Error:" + f"Couldnt combine Data: {e}"
-        try:
-            
+        try: 
             valid = verify_signature(combined_data, signature, public_key)
-            print("verify signature done")
 
         except Exception as e:
-            print(f"Error verifying or denying signature {e}")
             errors = errors + "Error:" + f"Error verifying or denying signature {e}"
 
         if valid == True:
             upload_verified(s3_client, camera_number, time_data, location_data, signature, temp_image_path)
-            print("uploading to correct bucket")
         else:
-            print("Signature is anything but valid")
             errors = errors + "Signature is invalid"
         
         #send_text(valid)
-        
+
 
     except Exception as e:
-        print(f'There was an exeption: {e}')
         errors = errors + f'There was an exeption: {e}'
 
     return {
@@ -186,12 +169,13 @@ def upload_verified(s3_client, camera_number, time_data, location_data, signatur
         image_number = count_objects_in_bucket(destination_bucket_name) // 2
 
     except Exception as e:
-        print(f"Count objects in bucket error: {e}")
+        pass
 
     image_file_name = str(image_number) + '.png'  # Changes file extension to .json
 
     # Create JSON data
     json_data = {
+        "Camera Number": camera_number,
         "Time": time_data,  # string
         "Location": location_data,   # string
         "Signature_Base64": base64.b64encode(signature).decode('utf-8')  # signature is in base64 encoded (string)
@@ -210,13 +194,14 @@ def upload_verified(s3_client, camera_number, time_data, location_data, signatur
         s3_client.upload_file(temp_image_path, destination_bucket_name, image_file_name)
 
     except Exception as e:
-        print(f"Upload Image to verified bucket error: {e}")
+        pass
         
     try:     # Upload JSON file to the same new S3 bucket
         s3_client.upload_file(temp_json_path, destination_bucket_name, json_file_name)
         
     except Exception as e:
-        print(f"Uploading JSON error : {e}")
+        pass
+        #print(f"Uploading JSON error : {e}")
 
     # Clean up: Delete temporary files
     os.remove(temp_image_path)
@@ -224,7 +209,6 @@ def upload_verified(s3_client, camera_number, time_data, location_data, signatur
 
 
 def count_objects_in_bucket(bucket_name):
-    print("Called 'count objects")
     s3 = boto3.client('s3')
     total_objects = 0
 
@@ -258,12 +242,10 @@ def verify_signature(combined_data, signature, public_key):
             padding.PKCS1v15(),
             hashes.SHA256()
         )
-        print('Signature is valid')
         os.remove(temp_public_key_path)
         return True
     
     except InvalidSignature:
-        print('Signature verification failed')
         os.remove(temp_public_key_path)
         return False
     
