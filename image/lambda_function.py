@@ -76,15 +76,19 @@ def handler(event, context):
             errors = errors + "Error:" + f"Error verifying or denying signature {e}"
 
         if valid == True:
-            image_save_name = upload_verified(s3_client, camera_number, time_data, location_data, signature, temp_image_path)
-        else:
-            errors = errors + "Signature is invalid"
-        
-        try:
-            send_text(valid, image_save_name)
+            try:
+                image_save_name = upload_verified(s3_client, camera_number, time_data, location_data, signature, temp_image_path)
+                send_text(valid, image_save_name)
 
-        except Exception as e:
-            errors = errors + "Issue Sending text" + e
+            except Exception as e:
+                errors = errors + "Issue Sending text or uploading to verified bucket" + e
+            
+        else:
+            try:
+                send_text(valid)
+
+            except Exception as e:
+                errors = errors + "Issue Sending text after failing verification" + e
 
 
     except Exception as e:
@@ -95,7 +99,6 @@ def handler(event, context):
         'body': json.dumps('Function executed successfully!'),
         'errors': errors,
     }
-
 
 
 def recreate_data(metadata):
@@ -258,7 +261,7 @@ def verify_signature(combined_data, signature, public_key):
         return False
     
 
-def send_text(valid, image_save_name):
+def send_text(valid, image_save_name=None):
 
     account_sid = 'AC8010fcf8a7c9217f2e222a62cc0e49cf'
     auth_token = 'f22570831a4f18bacf905f997392924c'

@@ -11,4 +11,4 @@ def create_metadata(camera_number : str, time_data : str, location_data : str, s
 
     return metadata
 
-#print(create_metadata(1, "10:45", "east of ur moms house", "SIGNEDJOHNIDFN"))
+
