@@ -62,9 +62,12 @@ def run():
             try:
                 # Replace with appropriate methods from your library.
                 geo = gps.geo_coords()
-                print("Latitude: {0:.6f}, Longitude: {1:.6f}".format(geo.lat, geo.lon))
+                if geo is not None:
+                    print("Latitude: {0:.6f}, Longitude: {1:.6f}".format(geo.lat, geo.lon))
+                else:
+                    print("No GPS data received. Trying again...")
             except (ValueError, IOError) as err:
-                print(err)
+                print("Error:", err)
             
             time.sleep(1)
 
