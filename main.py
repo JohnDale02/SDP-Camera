@@ -8,8 +8,11 @@ from create_digest import create_digest
 from create_signature import create_signature
 import cv2
 import base64
+from upload_saved_images import upload_saved_images
+from save_image import save_image
+import os
 
-def main(camera_number_string):
+def main(camera_number_string, save_image_filepath):
 #---------------------- Wait for Camera input and take picture ----------------------------
 	
 	image = create_image()  # take the image
@@ -48,7 +51,6 @@ def main(camera_number_string):
 
 	metadata = create_metadata(camera_number_string, time, location, signature_string)   # creates a dictionary for the strings [string, string, string, byte64]
 	#print(f"Metadata: {metadata}")
-	print("Camera Number: ", metadata['CameraNumber'])
 
 #------------------ Check if we have Wi-FI -----------------------------
 
@@ -59,7 +61,7 @@ def main(camera_number_string):
 		print(f"Uploaded Image")
 	
 	else: 
-
+		save_image(encoded_image.tobytes(), metadata, save_image_filepath)
 		print("No wifi")
         
 	# ---------------- Save the image and metadata to files -------------------
@@ -72,5 +74,12 @@ def main(camera_number_string):
 	# check SD card and upload all photos
 
 camera_number_string = "1"  # camera number used to search for public key
-main(camera_number_string)
+
+if not os.path.exists(os.path.join(os.getcwd(), "tmpImages")): # make a directory for tmpImages if it doesnt exist
+    os.makedirs(os.path.join(os.getcwd(), "tmpImages"))
+
+save_image_filepath = os.path.join(os.getcwd(), "tmpImages")
+main(camera_number_string, save_image_filepath)
+
+upload_saved_images(save_image_filepath)
 
