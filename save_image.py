@@ -1,12 +1,13 @@
 import os
 import cv2
 import numpy as np
+import json
 
 def save_image(encoded_image_bytes, metadata, save_image_filepath):
 
     object_count = count_files(save_image_filepath)
     image_filepath = os.path.join(save_image_filepath, f'{object_count}.png')
-    metadata_filepath = os.path.join(save_image_filepath, f"{object_count}.txt")
+    metadata_filepath = os.path.join(save_image_filepath, f"{object_count}.json")
 
     encoded_image_np = np.frombuffer(encoded_image_bytes, dtype=np.uint8)  # Convert the bytes back into a numpy array
     decoded_image = cv2.imdecode(encoded_image_np, cv2.IMREAD_UNCHANGED)   # Decode the image from the numpy array
@@ -15,7 +16,7 @@ def save_image(encoded_image_bytes, metadata, save_image_filepath):
     cv2.imwrite(image_filepath, decoded_image)
 
     with open(metadata_filepath, 'w') as file:
-        file.write(metadata)
+        json.dump(metadata, file)
 
 def count_files(directory_path):
     '''Helper function for returning number of PNG files in the directory'''

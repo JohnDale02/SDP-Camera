@@ -2,6 +2,7 @@
 import os
 from upload_image import upload_image
 import cv2
+import json
 
 def upload_saved_images(save_image_filepath):
 
@@ -19,7 +20,7 @@ def upload_saved_images(save_image_filepath):
             image = cv2.imread(file_path) 
             _, encoded_image = cv2.imencode(".png", image)
             
-            file_path_metadata = os.path.join(save_image_filepath, file_name[:-3]+'txt') # get matching json
+            file_path_metadata = os.path.join(save_image_filepath, file_name[:-3]+'json') # get matching json
             metadata = read_metadata(file_path_metadata)
 
             try:
@@ -33,4 +34,5 @@ def upload_saved_images(save_image_filepath):
 
 def read_metadata(file_path_metadata):
      with open(file_path_metadata, 'r') as file:
-        return file.read()
+        metadata = json.load(file)
+        return metadata
