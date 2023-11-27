@@ -82,6 +82,7 @@ def main(camera_number_string):
 	plt.title("Blurred Image")
 	plt.axis("off")
 		
+	plt.show()
 	# ---------------- Save the image and metadata to files -------------------
 
 #------------- Callback Functions for recieving Success or Failure messages for each image from cloud ------------
