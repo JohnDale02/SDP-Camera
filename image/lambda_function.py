@@ -40,7 +40,7 @@ def handler(event, context):
             response = s3_client.get_object(Bucket=bucket_name, Key=object_key)
 
         except Exception as e:
-            errors = errors + "Error:" + f"Get object error : {e}"
+            errors = errors + "Error:" + f"Get object error : {str(e)}"
 
        # Access the image content
         temp_image_path = '/tmp/TempNewImage.png'   # recreate the png using the cv2 png object bytes recieved
@@ -55,25 +55,25 @@ def handler(event, context):
             camera_number, time_data, location_data, signature = recreate_data(metadata)
 
         except Exception as e:
-            errors = errors + "Error:" + f"Cannot recreate time and metadata {e}"
+            errors = errors + "Error:" + f"Cannot recreate time and metadata {str(e)}"
         
         try:
             public_key_base64 = get_public_key(int(camera_number))
             public_key = base64.b64decode(public_key_base64)
 
         except Exception as e:
-            errors = errors + "Error:" + f"Public key error: {e}"
+            errors = errors + "Error:" + f"Public key error: {str(e)}"
 
         try:
             combined_data = create_combined(camera_number, image, time_data, location_data)
 
         except Exception as e:
-            errors = errors + "Error:" + f"Couldnt combine Data: {e}"
+            errors = errors + "Error:" + f"Couldnt combine Data: {str(e)}"
         try: 
             valid = verify_signature(combined_data, signature, public_key)
 
         except Exception as e:
-            errors = errors + "Error:" + f"Error verifying or denying signature {e}"
+            errors = errors + "Error:" + f"Error verifying or denying signature {str(e)}"
 
         if valid == True:
             try:
@@ -81,18 +81,18 @@ def handler(event, context):
                 send_text(valid, image_save_name)
 
             except Exception as e:
-                errors = errors + "Issue Sending text or uploading to verified bucket" + e
+                errors = errors + "Issue Sending text or uploading to verified bucket" + str(e)
             
         else:
             try:
                 send_text(valid)
 
             except Exception as e:
-                errors = errors + "Issue Sending text after failing verification" + e
+                errors = errors + "Issue Sending text after failing verification" + str(e)
 
 
     except Exception as e:
-        errors = errors + f'There was an exeption: {e}'
+        errors = errors + f'There was an exeption: {str(e)}'
 
     return {
         'statusCode': 200,
@@ -261,10 +261,10 @@ def verify_signature(combined_data, signature, public_key):
         return False
     
 
-def send_text(valid, image_save_name=None):
+def send_text(valid, image_save_name="default"):
 
     account_sid = 'AC8010fcf8a7c9217f2e222a62cc0e49cf'
-    auth_token = 'f22570831a4f18bacf905f997392924c'
+    auth_token = 'AUTH TOKEN'
     client = Client(account_sid, auth_token)
 
     if valid == True:
