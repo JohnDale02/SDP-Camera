@@ -1,10 +1,6 @@
 # Ignore .jpg files
-#*.jpg
-#*.png
-
-# Ignore folders inside lambda folder
-#lambda/*/
-#lambda/_*
+*.jpg
+*.png
 
 # Ignore .txt files
 #*.txt

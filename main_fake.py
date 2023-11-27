@@ -15,8 +15,7 @@ from matplotlib import pyplot as plt
 def main(camera_number_string):
 #---------------------- Wait for Camera input and take picture ----------------------------
 	
-	#image = create_image()  # take the image
-	image = cv2.imread('test.png')
+	image = create_image()  # take the image
 	
 	image_blurred = cv2.blur(image,(5,5))
 	_, encoded_image = cv2.imencode('.png', image_blurred)  # we send the encoded baltered image to the cloud 
@@ -83,6 +82,7 @@ def main(camera_number_string):
 	plt.title("Blurred Image")
 	plt.axis("off")
 		
+	plt.show()
 	# ---------------- Save the image and metadata to files -------------------
 
 #------------- Callback Functions for recieving Success or Failure messages for each image from cloud ------------
