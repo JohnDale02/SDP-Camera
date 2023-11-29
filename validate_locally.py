@@ -106,9 +106,8 @@ def verify_signature(combined_data, signature, public_key):
         return False
 
 # Usage
-image_path = "1.png"
-json_path = "1.json"
-#public_key = "LS0tLS1CRUdJTiBQVUJMSUMgS0VZLS0tLS0NCk1JSUJJakFOQmdrcWhraUc5dzBCQVFFRkFBT0NBUThBTUlJQkNnS0NBUUVBNFk2NENWbE9tLytSRzVpa2g4WDQNCmlHN05odWVEUGZQNlFXcFdvSFFYcWRIWSs1K3pCdENZcWFSY1VNSlFybEdpRU1CYkE3bUg2d0R4UktEMUxINVUNCklaVWZtWTN0cm1VSzRUaG9IRGIzaDJ5MGVvNWFnWWZDektEQ3g3MXNCMmlMU0I3NXJzYnNLc09rUklYcklVaGINCll3ZjhPUm41WWJBQllRb0RoeGtJSzZMMktMZnYrU1lsWFFiREFKQnJOOGhXUGhoMVlST3JTRExzbjcxU2NvcVkNCmFiMm1jNFJBemJxOHkvbEN5YVVKUmttdnJ6RU41cHF4VUxKTkU3aGlpT2JPY20zQS9uekdsRmljYnMycUtVU0oNCjA2My80b0grOCtjZ0tJWjJkNXRPSjBheTYwcUdkdUsyNXc1Vkc2dnZBQTlFRjQwcFFTOFpjRG1GRmtIMUcvL2cNCkR3SURBUUFCDQotLS0tLUVORCBQVUJMSUMgS0VZLS0tLS0NCg=="  # You should provide the public key here in PEM format
+image_path = "6.png"
+json_path = "6.json"
 
 valid = verify_image_and_metadata(image_path, json_path)
 print(f"Verification result: {valid}")
