@@ -81,5 +81,5 @@ if not os.path.exists(os.path.join(os.getcwd(), "tmpImages")): # make a director
 save_image_filepath = os.path.join(os.getcwd(), "tmpImages")
 main(camera_number_string, save_image_filepath)
 
-upload_saved_images(save_image_filepath)
+#upload_saved_images(save_image_filepath)
 
