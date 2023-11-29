@@ -7,14 +7,9 @@ sys.path.append(module_path)
 
 # Now you can import your module and class
 from ublox_gps import UbloxGps
-
-# Use the class
-gps = UbloxGps(...)
-
+from sfeSpiWrapper import sfeSpiWrapper
 
 import spidev
-
-from ublox_gps import UbloxGps
 
 port = spidev.SpiDev()
 gps = UbloxGps(port)
