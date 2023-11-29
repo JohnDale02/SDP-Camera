@@ -2,8 +2,6 @@ import smbus
 import time
 from ublox_gps import UbloxGps  # Replace with your actual library import
 
-import smbus
-
 class sfeI2cWrapper(object):
     """
     sfeI2cWrapper
@@ -18,7 +16,9 @@ class sfeI2cWrapper(object):
 
     def __init__(self, bus_number, address):
         self.bus = smbus.SMBus(bus_number)
+        time.sleep(0.5)  # Delay of 0.5 seconds
         self.address = address
+        
 
     def read(self, num_bytes=1):
         """
