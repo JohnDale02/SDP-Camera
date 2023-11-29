@@ -1,13 +1,6 @@
-import sys
-import os
-
-# Add the directory containing your module to the Python path
-module_path = os.path.expanduser('~/Qwiic_Ublox_Gps_Py/ublox_gps_module')
-sys.path.append(module_path)
 
 # Now you can import your module and class
 from ublox_gps import UbloxGps
-from sfeSpiWrapper import sfeSpiWrapper
 
 import spidev
 
