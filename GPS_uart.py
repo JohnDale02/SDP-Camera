@@ -15,24 +15,24 @@ def parse_nmea_sentence(sentence):
 
         if valid:
             # Parse latitude
-            lat_value = float(parts[2])
-            lat_hemisphere = parts[3]
-            lat_degrees = int(lat_value / 100)
-            lat_minutes = lat_value - (lat_degrees * 100)
-            latitude = lat_degrees + (lat_minutes / 60)
-            if lat_hemisphere == 'S':
-                latitude *= -1
+            lat_value = (parts[2])
+            #lat_hemisphere = parts[3]
+            #lat_degrees = int(lat_value / 100)
+            #lat_minutes = lat_value - (lat_degrees * 100)
+            #latitude = lat_degrees + (lat_minutes / 60)
+            #if lat_hemisphere == 'S':
+            #    latitude *= -1
 
             # Parse longitude
-            lon_value = float(parts[4])
-            lon_hemisphere = parts[5]
-            lon_degrees = int(lon_value / 100)
-            lon_minutes = lon_value - (lon_degrees * 100)
-            longitude = lon_degrees + (lon_minutes / 60)
-            if lon_hemisphere == 'W':
-                longitude *= -1
-
-            return latitude, longitude
+            lon_value = (parts[4])
+           # lon_hemisphere = parts[5]
+            #lon_degrees = int(lon_value / 100)
+            #lon_minutes = lon_value - (lon_degrees * 100)
+            #longitude = lon_degrees + (lon_minutes / 60)
+            #if lon_hemisphere == 'W':
+            #    longitude *= -1
+            return lat_value, lon_value
+            #return latitude, longitude
     return None, None
 
 # Set up the serial connection (adjust the port and baud rate according to your setup)
