@@ -16,6 +16,7 @@ def parse_nmea_sentence(sentence):
         if valid:
             # Parse latitude
             lat_value = (parts[2])
+            print(f"Lat value: {lat_value}")
             #lat_hemisphere = parts[3]
             #lat_degrees = int(lat_value / 100)
             #lat_minutes = lat_value - (lat_degrees * 100)
@@ -25,6 +26,7 @@ def parse_nmea_sentence(sentence):
 
             # Parse longitude
             lon_value = (parts[4])
+            print(f"Long value: {lon_value}")
            # lon_hemisphere = parts[5]
             #lon_degrees = int(lon_value / 100)
             #lon_minutes = lon_value - (lon_degrees * 100)
