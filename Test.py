@@ -10,7 +10,6 @@ save_image_filepath = os.path.join(os.getcwd(), "tmpImages")
 start_time = time.time()
 for i in range(50): 
   main(camera_number_string, save_image_filepath)
-
 end_time = time.time()
 Total_time = start_time - end_time
 print(Total_time)
