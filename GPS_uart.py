@@ -71,21 +71,21 @@ ser = serial.Serial('/dev/ttyS0', 9600, timeout=1)
 #         ser.close()
 
 
-# read_gps_data()
 
-try: 
-    while True:
-            sentence = ser.readline().decode('utf-8', errors='ignore').strip()
-            latitude, longitude, formatted_time = parse_nmea_sentence(sentence)
-            if latitude is not None and longitude is not None:
-                print(f"Latitude: {latitude}, Longitude: {longitude}, time: {formatted_time}")
-except KeyboardInterrupt:
-    print("Program terminated!")
-finally:
-    ser.close()
-
-
+def read_gps_data():
+    try: 
+        while True:
+                sentence = ser.readline().decode('utf-8', errors='ignore').strip()
+                latitude, longitude, formatted_time = parse_nmea_sentence(sentence)
+                if latitude is not None and longitude is not None:
+                    print(f"Latitude: {latitude}, Longitude: {longitude}, time: {formatted_time}")
+    except KeyboardInterrupt:
+        print("Program terminated!")
+    finally:
+        ser.close()
 
 
+
+read_gps_data()
 
 
