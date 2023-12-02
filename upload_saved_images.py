@@ -4,11 +4,12 @@ from upload_image import upload_image
 import cv2
 import json
 
-def upload_saved_images(save_image_filepath):
+def upload_saved_images():
 
-    # get all png files in a folder
-    # for each png file (and matching json file)
-    # Iterate over all files in the folder
+    if not os.path.exists(os.path.join(os.getcwd(), "tmpImages")): # make a directory for tmpImages if it doesnt exist
+        os.makedirs(os.path.join(os.getcwd(), "tmpImages"))
+        save_image_filepath = os.path.join(os.getcwd(), "tmpImages")
+
     count = 0
     for file_name in os.listdir(save_image_filepath):
         count += 1
@@ -37,4 +38,4 @@ def read_metadata(file_path_metadata):
         metadata = json.load(file)
         return metadata
 
-upload_saved_images("~/SDP-Camera/tmpImages")
+upload_saved_images()
