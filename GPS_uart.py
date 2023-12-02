@@ -15,7 +15,7 @@ def parse_nmea_sentence(sentence):
         print(f"valid: {valid}")
         if valid:
             time_value = parts[1]
-            print(time_value)
+            print(f"time: {time_value}")
             # Parse latitude
             lat_value = (parts[2])
             print(f"Lat value: {lat_value}")
