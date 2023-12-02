@@ -1,4 +1,5 @@
 import serial
+from datetime import datetime, timedelta
 
 def parse_nmea_sentence(sentence):
     """Parse GNGGA or GNRMC sentence to extract latitude and longitude."""
@@ -16,7 +17,20 @@ def parse_nmea_sentence(sentence):
         print(f"valid: {valid}")
         if valid:
             time_value = parts[1]
-            print(f"time: {time_value}")
+
+            # Time string from the NMEA sentence
+            nmea_time_str = time_value
+
+            # Convert to a datetime object
+            time_object = datetime.strptime(nmea_time_str, "%H%M%S.%f")
+
+            # Subtract 5 hours
+            new_time_object = time_object - timedelta(hours=5)
+
+            # Format the time
+            formatted_time = new_time_object.strftime("%H:%M:%S")
+
+            print(f"time: {formatted_time}")
             # Parse latitude
             lat_value = float(parts[2])
             print(f"parts: {parts}")
@@ -69,3 +83,9 @@ except KeyboardInterrupt:
     print("Program terminated!")
 finally:
     ser.close()
+
+
+
+
+
+
