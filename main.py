@@ -27,7 +27,7 @@ def main(camera_number_string, save_image_filepath):
 	#location = "Latitude: 40.7128, Longitude: -74.0060"
 	lat_value, long_value, time_value =  read_gps_data()
 	location = (f"{lat_value}, {long_value}")
-	time = (f"{time}")
+	time = (f"{time_value}")
 	print(f"Recieved Time and GNSS Data: {time}{location}")
 
 #-------------- combine number + image + Time + Location ----------------------------------------------
