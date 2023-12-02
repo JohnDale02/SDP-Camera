@@ -20,7 +20,7 @@ def parse_nmea_sentence(sentence):
             lat_value = (parts[2])
             print(f"Lat value: {lat_value}")
             lat_hemisphere = parts[3]
-            lat_degrees = int(lat_value / 100)
+            lat_degrees = int(float(lat_value) / 100)
             lat_minutes = lat_value - (lat_degrees * 100)
             latitude = lat_degrees + (lat_minutes / 60)
             if lat_hemisphere == 'S':
@@ -30,7 +30,7 @@ def parse_nmea_sentence(sentence):
             lon_value = (parts[4])
             print(f"Long value: {lon_value}")
             lon_hemisphere = parts[5]
-            lon_degrees = int(lon_value / 100)
+            lon_degrees = int(float(lon_value) / 100)
             lon_minutes = lon_value - (lon_degrees * 100)
             longitude = lon_degrees + (lon_minutes / 60)
             if lon_hemisphere == 'W':
