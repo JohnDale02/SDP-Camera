@@ -15,6 +15,7 @@ def parse_nmea_sentence(sentence):
 
         if valid:
             time_value = parts[1]
+            print(time_value)
             # Parse latitude
             lat_value = (parts[2])
             print(f"Lat value: {lat_value}")
@@ -52,3 +53,6 @@ def read_gps_data():
         print("Program terminated!")
     finally:
         ser.close()
+
+
+read_gps_data()
