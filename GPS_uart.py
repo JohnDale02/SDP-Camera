@@ -37,7 +37,7 @@ def parse_nmea_sentence(sentence):
                longitude *= -1
             #return lat_value, lon_value, time_value
             return latitude, longitude, time_value
-    #return None, None, None
+    return None, None, None
 
 # Set up the serial connection (adjust the port and baud rate according to your setup)
 ser = serial.Serial('/dev/ttyS0', 9600, timeout=1)
