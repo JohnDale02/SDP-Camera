@@ -6,6 +6,7 @@ from create_combined import create_combined
 from upload_image import upload_image
 from create_digest import create_digest
 from create_signature import create_signature
+from GPS_uart import parse_nmea_sentence, read_gps_data
 import cv2
 import base64
 from upload_saved_images import upload_saved_images
@@ -23,7 +24,11 @@ def main(camera_number_string, save_image_filepath):
 
 	#time, location, = capture_time_location()  # time and location both returned as strings
 	time = "2023-10-29 14:30:00"
-	location = "Latitude: 40.7128, Longitude: -74.0060"
+	#location = "Latitude: 40.7128, Longitude: -74.0060"
+	Location_data = read_gps_data()
+	print(Location_data)
+	location = Location_data	
+	#print(f"Latitude: {lat_value}, Longitude: {long_value}")
 	#print(f"Recieved Time and GNSS Data: {time}{location}")
 
 #-------------- combine number + image + Time + Location ----------------------------------------------
