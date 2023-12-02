@@ -12,7 +12,7 @@ def parse_nmea_sentence(sentence):
             valid = True
         else:
             valid = False
-
+        print(f"valid: {valid}")
         if valid:
             time_value = parts[1]
             print(time_value)
