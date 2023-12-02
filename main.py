@@ -23,13 +23,12 @@ def main(camera_number_string, save_image_filepath):
 #---------- Capture GNSS Data (Time and Location) ------------------------
 
 	#time, location, = capture_time_location()  # time and location both returned as strings
-	time = "2023-10-29 14:30:00"
+	#time = "2023-10-29 14:30:00"
 	#location = "Latitude: 40.7128, Longitude: -74.0060"
-	Location_data = read_gps_data()
-	print(Location_data)
-	location = Location_data	
-	#print(f"Latitude: {lat_value}, Longitude: {long_value}")
-	#print(f"Recieved Time and GNSS Data: {time}{location}")
+	lat_value, long_value, time_value =  read_gps_data()
+	location = (f"{lat_value}, {long_value}")
+	time = (f"{time}")
+	print(f"Recieved Time and GNSS Data: {time}{location}")
 
 #-------------- combine number + image + Time + Location ----------------------------------------------
 
