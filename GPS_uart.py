@@ -4,7 +4,8 @@ def parse_nmea_sentence(sentence):
     """Parse GNGGA or GNRMC sentence to extract latitude and longitude."""
     parts = sentence.split(',')
 
-    if parts[0] in ['$GNGGA', '$GNRMC']:
+    #if parts[0] in ['$GNGGA', '$GNRMC']:
+    if parts[0] in ['$GNGGA']:
         # Check if the data is valid
         if parts[0] == '$GNGGA' and parts[6] != '0':
             valid = True
