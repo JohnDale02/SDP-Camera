@@ -78,7 +78,7 @@ try:
             sentence = ser.readline().decode('utf-8', errors='ignore').strip()
             latitude, longitude, formatted_time = parse_nmea_sentence(sentence)
             if latitude is not None and longitude is not None:
-                print(f"Latitude: {latitude}, Longitude: {longitude}, time: {time_value}")
+                print(f"Latitude: {latitude}, Longitude: {longitude}, time: {formatted_time}")
 except KeyboardInterrupt:
     print("Program terminated!")
 finally:
