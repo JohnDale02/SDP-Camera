@@ -36,3 +36,5 @@ def read_metadata(file_path_metadata):
      with open(file_path_metadata, 'r') as file:
         metadata = json.load(file)
         return metadata
+
+upload_saved_images("~/SDP-Camera/tmpImages")
