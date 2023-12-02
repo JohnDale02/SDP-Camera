@@ -1,5 +1,6 @@
 import serial
 from datetime import datetime, timedelta
+import time 
 
 def parse_nmea_sentence(sentence):
     """Parse GNGGA or GNRMC sentence to extract latitude and longitude."""
@@ -56,7 +57,7 @@ def parse_nmea_sentence(sentence):
     return None, None, None
 
 # Set up the serial connection (adjust the port and baud rate according to your setup)
-ser = serial.Serial('/dev/ttyS0', 9600, timeout=1)
+ser = serial.Serial('/dev/ttyS0', 9600, timeout=5)
 # def read_gps_data():
 #     try:
 #         while True:
@@ -70,20 +71,40 @@ ser = serial.Serial('/dev/ttyS0', 9600, timeout=1)
 #     finally:
 #         ser.close()
 
-
-
 def read_gps_data():
+
+    # try: 
+    #     sentence = ser.readline().decode('utf-8', errors='ignore').strip()
+    #     latitude, longitude, formatted_time = parse_nmea_sentence(sentence)
+    #     if latitude is not None and longitude is not None and formatted_time is not None:
+    #         print(f"Latitude: {latitude}, Longitude: {longitude}, time: {formatted_time}")
+    #         return latitude, longitude, formatted_time
+    # except KeyboardInterrupt:
+    #     print("Program terminated!")
+    # finally:
+    #     ser.close()
+    # return "None","None","None"
+
+
     try: 
-        sentence = ser.readline().decode('utf-8', errors='ignore').strip()
-        latitude, longitude, formatted_time = parse_nmea_sentence(sentence)
-        if latitude is not None and longitude is not None and formatted_time is not None:
-            print(f"Latitude: {latitude}, Longitude: {longitude}, time: {formatted_time}")
-            return latitude, longitude, formatted_time
+        start_time = time.time()
+        while True:
+            sentence = ser.readline().decode('utf-8', errors='ignore').strip()
+            if sentence:
+                latitude, longitude, formatted_time = parse_nmea_sentence(sentence)
+                if latitude is not None and longitude is not None and formatted_time is not None:
+                    print(f"Latitude: {latitude}, Longitude: {longitude}, time: {formatted_time}")
+                    return latitude, longitude, formatted_time
+            # Check if timeout is reached
+            if time.time() - start_time > ser.timeout:
+                print("Timeout reached. No GPS data received.")
+                break
     except KeyboardInterrupt:
         print("Program terminated!")
     finally:
         ser.close()
-    return "None","None","None"
+    return "None", "None", "None"
+
     
 
 #read_gps_data()
