@@ -18,21 +18,21 @@ def parse_nmea_sentence(sentence):
             time_value = parts[1]
             print(f"time: {time_value}")
             # Parse latitude
-            lat_value = (parts[2])
+            lat_value = float(parts[2])
             print(f"parts: {parts}")
             print(f"Lat value: {lat_value}")
             lat_hemisphere = parts[3]
-            lat_degrees = int(float(lat_value) / 100)
+            lat_degrees = int(lat_value / 100)
             lat_minutes = lat_value - (lat_degrees * 100)
             latitude = lat_degrees + (lat_minutes / 60)
             if lat_hemisphere == 'S':
                latitude *= -1
 
             # Parse longitude
-            lon_value = (parts[4])
+            lon_value = float(parts[4])
             print(f"Long value: {lon_value}")
             lon_hemisphere = parts[5]
-            lon_degrees = int(float(lon_value) / 100)
+            lon_degrees = int(lon_value / 100)
             lon_minutes = lon_value - (lon_degrees * 100)
             longitude = lon_degrees + (lon_minutes / 60)
             if lon_hemisphere == 'W':
