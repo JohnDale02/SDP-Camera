@@ -56,5 +56,12 @@ def main(camera_number_string, save_image_filepath):
             print(f"Frames per second after 10 seconds: {fps:.2f}")
             break
 
-# Rest of your code remains the same
-main()
+
+camera_number_string = "1"  # camera number used to search for public key
+
+if not os.path.exists(os.path.join(os.getcwd(), "tmpImages")): # make a directory for tmpImages if it doesnt exist
+    os.makedirs(os.path.join(os.getcwd(), "tmpImages"))
+
+save_image_filepath = os.path.join(os.getcwd(), "tmpImages")
+
+main(camera_number_string, save_image_filepath)
