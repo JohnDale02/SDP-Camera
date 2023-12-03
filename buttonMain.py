@@ -10,9 +10,6 @@ if not os.path.exists(os.path.join(os.getcwd(), "tmpImages")): # make a director
     os.makedirs(os.path.join(os.getcwd(), "tmpImages"))
 save_image_filepath = os.path.join(os.getcwd(), "tmpImages")
 
-
-
-
 GPIO.setmode(GPIO.BOARD)
 
 button_pin = 37  # BCM pin number for GPIO 26
