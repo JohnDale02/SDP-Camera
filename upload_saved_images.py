@@ -29,7 +29,7 @@ def upload_saved_images():
                 except Exception as e:
                     print(f"Error uploading saved image: {str(e)}")
         
-        print(f"Done uploading {count} saved images")
+        print(f"Done uploading {count//2} saved images")
     
     else:
         print("There is no tmpImage directory")
