@@ -1,12 +1,12 @@
 import RPi.GPIO as GPIO
 import time
 
-GPIO.setmode(GPIO.BOARD)
+GPIO.setmode(GPIO.BCM)
 
-button_pin = 26  # Change this to the GPIO pin you connected the button to
+button_pin = 26  # BCM pin number for GPIO 26
 
 # Use internal pull-up resistor
-GPIO.setup(button_pin, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+GPIO.setup(button_pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
 try:
     while True:
