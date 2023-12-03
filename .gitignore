@@ -6,10 +6,11 @@
 #*.txt
 
 # Ignore .json files
-#*.json
+*.json
 
 # Ignore Pycache
 *__pycache__
 
 # ignore recreated public key 
 *.pem
+

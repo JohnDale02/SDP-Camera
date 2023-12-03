@@ -9,13 +9,11 @@ from create_signature import create_signature
 from GPS_uart import parse_nmea_sentence, read_gps_data
 import cv2
 import base64
-from upload_saved_images import upload_saved_images
 from save_image import save_image
 import os
 
 def main(camera_number_string, save_image_filepath):
 #---------------------- Wait for Camera input and take picture ----------------------------
-	
 	image = create_image()  # take the image
 	_, encoded_image = cv2.imencode('.png', image)  # we send the encoded image to the cloud 
 	print("Took Image")
@@ -83,7 +81,5 @@ if not os.path.exists(os.path.join(os.getcwd(), "tmpImages")): # make a director
     os.makedirs(os.path.join(os.getcwd(), "tmpImages"))
 
 save_image_filepath = os.path.join(os.getcwd(), "tmpImages")
-main(camera_number_string, save_image_filepath)
 
-#upload_saved_images(save_image_filepath)
-
+#main(camera_number_string, save_image_filepath)
