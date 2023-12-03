@@ -15,7 +15,7 @@ def parse_nmea_sentence(sentence):
             valid = True
         else:
             valid = False
-        print(f"valid: {valid}")
+        #print(f"valid: {valid}")
         if valid:
             time_value = parts[1]
 
@@ -31,11 +31,11 @@ def parse_nmea_sentence(sentence):
             # Format the time
             formatted_time = new_time_object.strftime("%H:%M:%S")
 
-            print(f"time: {formatted_time}")
+            #print(f"time: {formatted_time}")
             # Parse latitude
             lat_value = float(parts[2])
-            print(f"parts: {parts}")
-            print(f"Lat value: {lat_value}")
+            #print(f"parts: {parts}")
+            #print(f"Lat value: {lat_value}")
             lat_hemisphere = parts[3]
             lat_degrees = int(lat_value / 100)
             lat_minutes = lat_value - (lat_degrees * 100)
@@ -45,7 +45,7 @@ def parse_nmea_sentence(sentence):
 
             # Parse longitude
             lon_value = float(parts[4])
-            print(f"Long value: {lon_value}")
+            #print(f"Long value: {lon_value}")
             lon_hemisphere = parts[5]
             lon_degrees = int(lon_value / 100)
             lon_minutes = lon_value - (lon_degrees * 100)

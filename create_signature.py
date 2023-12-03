@@ -33,9 +33,9 @@ def create_signature(digest):
 
     # Execute the command
     result = subprocess.run(tpm2_sign_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, encoding="utf-8")
-    print("Signature stdout: ", result.stdout)
-    print("Signature stderr: ", result.stderr)
-    print("Exit Code:", result.returncode)
+    #print("Signature stdout: ", result.stdout)
+    #print("Signature stderr: ", result.stderr)
+    #print("Exit Code:", result.returncode)
 
     # Delete the temporary hash file
     os.remove(digest_file)
