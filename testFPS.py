@@ -28,25 +28,13 @@ def main(camera_number_string, save_image_filepath):
         
         combined_data = create_combined(camera_number_string, image, time_str, location)
         
-        try:
-            digest = create_digest(combined_data)
-        except Exception as e:
-            print(str(e))
+        digest = create_digest(combined_data)
 
-        try:
-            signature_string = create_signature(digest)
-        except Exception as e:
-            print(str(e))
+        signature_string = create_signature(digest)
 
         metadata = create_metadata(camera_number_string, time_str, location, signature_string)
         
-        if is_internet_available():
-            print(f"Internet is available...Uploading")
-            upload_image(encoded_image.tobytes(), metadata)
-            print(f"Uploaded Image")
-        else:
-            save_image(encoded_image.tobytes(), metadata, save_image_filepath)
-            print("No wifi")
+        save_image(encoded_image.tobytes(), metadata, save_image_filepath)
         
         frame_count += 1
         

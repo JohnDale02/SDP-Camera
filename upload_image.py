@@ -12,7 +12,7 @@ def upload_image(image, metadata):
 
     try:
         # Upload the file with metadata
-        print("\tTrying to upload...")
+        #print("\tTrying to upload...")
         response = s3_client.put_object(Bucket=bucket_name, Key=file_key, Body=image, Metadata=metadata)
         #print(f"Response:{response}")
 

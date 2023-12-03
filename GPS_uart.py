@@ -67,7 +67,7 @@ def read_gps_data():
             if sentence:
                 latitude, longitude, formatted_time = parse_nmea_sentence(sentence)
                 if latitude is not None and longitude is not None and formatted_time is not None:
-                    print(f"Latitude: {latitude}, Longitude: {longitude}, time: {formatted_time}")
+                    #print(f"Latitude: {latitude}, Longitude: {longitude}, time: {formatted_time}")
                     return latitude, longitude, formatted_time
             # Check if timeout is reached
             if time.time() - start_time > ser.timeout:
