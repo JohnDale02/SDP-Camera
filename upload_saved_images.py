@@ -15,7 +15,7 @@ def upload_saved_images():
 
     while True:
         if is_internet_available :
-            #print(f"Internet is available...Uploading")
+            print(f"Internet is available...Uploading")
             count = 0
             for file_name in os.listdir(save_image_filepath):
                 count += 1
