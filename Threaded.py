@@ -2,7 +2,6 @@ import RPi.GPIO as GPIO
 import time
 import os
 from main import main
-from check_wifi import is_internet_available
 from upload_saved_images import upload_saved_images
 import threading
 

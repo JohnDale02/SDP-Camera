@@ -3,7 +3,7 @@ import os
 from upload_image import upload_image
 import cv2
 import json
-from check_wifi import is_internet_available
+from check_wifi import is_internet_availableTwo
 
 def upload_saved_images():
 
@@ -14,7 +14,7 @@ def upload_saved_images():
         print("There is no tmpImage directory")
 
     while True:
-        if is_internet_available():
+        if is_internet_availableTwo():
             #print(f"Internet is available...Uploading")
             count = 0
             for file_name in os.listdir(save_image_filepath):
