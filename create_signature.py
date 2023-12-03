@@ -50,9 +50,9 @@ def create_signature(digest):
     if result.returncode == 0 and signature:
         # Binary signature
         
-        print("Signature:", signature)
+        #print("Signature:", signature)
         signature_string = base64.b64encode(signature).decode('utf-8')
-        print("Signature String:", signature_string)
+        #print("Signature String:", signature_string)
 
         return signature_string
     else:
