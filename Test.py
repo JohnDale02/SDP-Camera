@@ -24,7 +24,7 @@ save_image_filepath = os.path.join(os.getcwd(), "tmpImages")
 while True: 
   if(checkButtonPressed):
     main(camera_number_string, save_image_filepath)
-  
+    time.sleep(5)
   
   
   # elif(check_wifi() && (there exists files in save_image_filepath)):
