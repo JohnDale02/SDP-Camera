@@ -24,7 +24,7 @@ import time
 
 GPIO.setmode(GPIO.BOARD)
 
-button_pin = 26  # Change this to the GPIO pin you connected the button to
+button_pin = 37  # Change this to the GPIO pin you connected the button to
 
 # Use internal pull-up resistor
 GPIO.setup(button_pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
