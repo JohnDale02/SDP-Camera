@@ -32,6 +32,7 @@ def upload_saved_images():
 
                     try:
                         upload_image(encoded_image.tobytes(), metadata)   # cv2 png object, metadat
+                        print(f"------------------------------------------------------")
                         print(f"Uploaded Saved Image")
                         os.remove(file_path)
                         print(file_path_metadata)
