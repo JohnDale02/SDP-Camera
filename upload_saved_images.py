@@ -38,7 +38,7 @@ def upload_saved_images():
                         print(f"Error uploading saved image: {str(e)}")
 
                     
-            print(f"Done uploading {count} saved images")
+            #print(f"Done uploading {count} saved images")
     
     
                 
