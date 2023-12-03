@@ -25,7 +25,7 @@ def button_callback(channel):
     main(camera_number_string, save_image_filepath)  # Call the main function when the button is pressed
 
 # Add an interrupt event for the button press
-GPIO.add_event_detect(button_pin, GPIO.FALLING, callback=button_callback, bouncetime=200)
+GPIO.add_event_detect(button_pin, GPIO.FALLING, callback=button_callback, bouncetime=500)
 
 try:
     while True:
