@@ -108,10 +108,18 @@ def verify_signature(combined_data, signature, public_key):
 # Usage
 
 
+image_path = f"52.png"
+json_path = f"52.json"
+valid = verify_image_and_metadata(image_path, json_path)
+print(f"Verification result: {valid}")
+
+
+'''
 for i in range(50):
     image_path = f"{i}.png"
     json_path = f"{i}.json"
 
     valid = verify_image_and_metadata(image_path, json_path)
     print(f"Verification result: {valid}")
+'''
 
