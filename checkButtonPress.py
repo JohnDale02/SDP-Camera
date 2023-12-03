@@ -15,7 +15,7 @@ def checkButtonPressed():
     if input_state == False:
         print("Button Pressed")
         time.sleep(0.2)  # debounce delay
-
+    print(input_state)
   finally:
       GPIO.cleanup()
   return (input_state)
