@@ -24,9 +24,9 @@ def main(camera_number_string, save_image_filepath):
         
         lat_value, long_value, time_value =  read_gps_data()
         location = f"{lat_value}, {long_value}"
-        time = f"{time_value}"
+        time_str = f"{time_value}"
         
-        combined_data = create_combined(camera_number_string, image, time, location)
+        combined_data = create_combined(camera_number_string, image, time_str, location)
         
         try:
             digest = create_digest(combined_data)
@@ -38,7 +38,7 @@ def main(camera_number_string, save_image_filepath):
         except Exception as e:
             print(str(e))
 
-        metadata = create_metadata(camera_number_string, time, location, signature_string)
+        metadata = create_metadata(camera_number_string, time_str, location, signature_string)
         
         if is_internet_available():
             print(f"Internet is available...Uploading")
