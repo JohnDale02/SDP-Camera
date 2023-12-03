@@ -57,3 +57,4 @@ def main(camera_number_string, save_image_filepath):
             break
 
 # Rest of your code remains the same
+main()
