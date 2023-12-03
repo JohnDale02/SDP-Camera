@@ -14,7 +14,6 @@ import os
 
 def main(camera_number_string, save_image_filepath):
 #---------------------- Wait for Camera input and take picture ----------------------------
-	print("-------------------------------------------------")
 	image = create_image()  # take the image
 	_, encoded_image = cv2.imencode('.png', image)  # we send the encoded image to the cloud 
 	print("Took Image")

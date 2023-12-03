@@ -31,7 +31,7 @@ def upload_saved_images():
 
                     try:
                         upload_image(encoded_image.tobytes(), metadata)   # cv2 png object, metadat
-                        print(f"Uploaded Image")
+                        print(f"Uploaded Saved Image")
                         os.remove(file_path)
                         os.remove(file_path_metadata)
                     except Exception as e:

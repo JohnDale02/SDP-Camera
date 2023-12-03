@@ -18,6 +18,7 @@ button_pin = 37
 GPIO.setup(button_pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
 def button_callback(channel):
+    print("-------------------------------------------------------------")
     print("Button Pressed")
     main(camera_number_string, save_image_filepath)
 
