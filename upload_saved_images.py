@@ -15,7 +15,7 @@ def upload_saved_images():
 
     while True:
         if is_internet_available :
-            print(f"Internet is available...Uploading")
+            #print(f"Internet is available...Uploading")
             count = 0
             for file_name in os.listdir(save_image_filepath):
                 count += 1
@@ -34,6 +34,7 @@ def upload_saved_images():
                         upload_image(encoded_image.tobytes(), metadata)   # cv2 png object, metadat
                         print(f"Uploaded Saved Image")
                         os.remove(file_path)
+                        print(file_path_metadata)
                         os.remove(file_path_metadata)
                     except Exception as e:
                         print(f"Error uploading saved image: {str(e)}")
