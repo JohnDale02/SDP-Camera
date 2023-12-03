@@ -19,3 +19,5 @@ def checkButtonPressed():
   finally:
       GPIO.cleanup()
   return (input_state)
+
+checkButtonPressed()
