@@ -1,18 +1,16 @@
 # Ignore .jpg files
-#*.jpg
-
-# Ignore folders inside lambda folder
-lambda/*/
-lambda/_*
+*.jpg
+*.png
 
 # Ignore .txt files
-*.txt
+#*.txt
 
 # Ignore .json files
 *.json
 
 # Ignore Pycache
-/__pycache__
+*__pycache__
 
 # ignore recreated public key 
 *.pem
+

@@ -1,3 +1,4 @@
+
 # Outline for Main function
 from create_image import create_image
 from check_wifi import is_internet_available
@@ -6,27 +7,27 @@ from create_combined import create_combined
 from upload_image import upload_image
 from create_digest import create_digest
 from create_signature import create_signature
-from GPS_uart import parse_nmea_sentence, read_gps_data
 import cv2
 import base64
-from save_image import save_image
-import os
+import numpy as np
+from matplotlib import pyplot as plt
 
-def main(camera_number_string, save_image_filepath):
+def main(camera_number_string):
 #---------------------- Wait for Camera input and take picture ----------------------------
+	
 	image = create_image()  # take the image
-	_, encoded_image = cv2.imencode('.png', image)  # we send the encoded image to the cloud 
-	print("Took Image")
-
+	
+	image_blurred = cv2.blur(image,(5,5))
+	_, encoded_image = cv2.imencode('.png', image_blurred)  # we send the encoded baltered image to the cloud 
+	
+	print("Took Image; Using Sending Blurred")
+	
 #---------- Capture GNSS Data (Time and Location) ------------------------
 
 	#time, location, = capture_time_location()  # time and location both returned as strings
-	#time = "2023-10-29 14:30:00"
-	#location = "Latitude: 40.7128, Longitude: -74.0060"
-	lat_value, long_value, time_value =  read_gps_data()
-	location = (f"{lat_value}, {long_value}")
-	time = (f"{time_value}")
-	print(f"Recieved Time and GNSS Data: {time}{location}")
+	time = "2023-10-29 14:30:00"
+	location = "Latitude: 40.7128, Longitude: -74.0060"
+	#print(f"Recieved Time and GNSS Data: {time}{location}")
 
 #-------------- combine number + image + Time + Location ----------------------------------------------
 
@@ -53,6 +54,7 @@ def main(camera_number_string, save_image_filepath):
 
 	metadata = create_metadata(camera_number_string, time, location, signature_string)   # creates a dictionary for the strings [string, string, string, byte64]
 	#print(f"Metadata: {metadata}")
+	print("Camera Number: ", metadata['CameraNumber'])
 
 #------------------ Check if we have Wi-FI -----------------------------
 
@@ -63,9 +65,24 @@ def main(camera_number_string, save_image_filepath):
 		print(f"Uploaded Image")
 	
 	else: 
-		save_image(encoded_image.tobytes(), metadata, save_image_filepath)
+
 		print("No wifi")
-        
+		
+            
+	plt.figure(figsize=(12,6))
+	# Display original image
+	plt.subplot(1, 2, 1)
+	plt.imshow(cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
+	plt.title("Original Image")
+	plt.axis("off")
+
+    # Display blurred image
+	plt.subplot(1, 2, 2)
+	plt.imshow(cv2.cvtColor(image_blurred, cv2.COLOR_BGR2RGB))
+	plt.title("Blurred Image")
+	plt.axis("off")
+		
+	plt.show()
 	# ---------------- Save the image and metadata to files -------------------
 
 #------------- Callback Functions for recieving Success or Failure messages for each image from cloud ------------
@@ -76,10 +93,5 @@ def main(camera_number_string, save_image_filepath):
 	# check SD card and upload all photos
 
 camera_number_string = "1"  # camera number used to search for public key
+main(camera_number_string)
 
-if not os.path.exists(os.path.join(os.getcwd(), "tmpImages")): # make a directory for tmpImages if it doesnt exist
-    os.makedirs(os.path.join(os.getcwd(), "tmpImages"))
-
-save_image_filepath = os.path.join(os.getcwd(), "tmpImages")
-
-#main(camera_number_string, save_image_filepath)
