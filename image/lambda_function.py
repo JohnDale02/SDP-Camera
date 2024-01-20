@@ -117,7 +117,7 @@ def recreate_data(metadata):
 def create_combined(camera_number: str, image: bytes, time: str, location: str) -> bytes:
     '''Takes in camera number, image, time, location and encodes then combines to form one byte object'''
 
-    # Encode the image as a JPEG byte array
+    # Encode the image as a PNG byte array
     _, encoded_image = cv2.imencode(".png", image)
     encoded_image = encoded_image.tobytes()
 
@@ -166,7 +166,6 @@ def get_public_key(camera_number):
     else:
         return 'Public key not found'
     
-
 
 
 def upload_verified(s3_client, camera_number, time_data, location_data, signature, temp_image_path):
@@ -279,3 +278,83 @@ def send_text(valid, image_save_name="default"):
     to='+17819159187'
     )
 
+
+def store_json_details(image, camera_number, time_data, location_data, signature):
+    # Hash the image data to use as an index
+    digest = hashes.Hash(hashes.SHA256(), backend=default_backend())
+    digest.update(image.read())
+    image_hash = digest.finalize().hex()
+
+    # Convert details to JSON format
+    details = json.dumps({
+        'Camera Number': camera_number,
+        'Time': time_data,
+        'Location': location_data,
+        'Signature_Base64': signature
+    })
+
+    # Database connection details
+    host = "publickeycamerastorage.c90gvpt3ri4q.us-east-2.rds.amazonaws.com"
+    user = "sdp"
+    password = "sdpsdpsdp"
+    database = "PublicKeySchema"
+
+    # Connect to the database
+    connection = mysql.connector.connect(
+        host=host, user=user, password=password, database=database
+    )
+    cursor = connection.cursor()
+
+    query = """
+    INSERT INTO image_data (image_hash, data)
+    VALUES (%s, %s)
+    ON DUPLICATE KEY UPDATE data = %s
+    """
+
+    cursor.execute(query, (image_hash, details, details))
+    
+    # Commit the transaction
+    connection.commit()
+
+    # Close the cursor and connection
+    cursor.close()
+    connection.close()
+
+    print(f"Stored the data with image hash {image_hash}, Time: {time_data}")
+
+def get_json_details(image_hash):
+    # Environment variables for database connection
+    #host = os.environ['DB_HOST']
+    #user = os.environ['DB_USER']
+    #password = os.environ['DB_PASSWORD']
+    #database = os.environ['DB_NAME']
+    host = "publickeycamerastorage.c90gvpt3ri4q.us-east-2.rds.amazonaws.com"
+    user = "sdp"
+    password = "sdpsdpsdp"
+    database = "PublicKeySchema"
+
+    # Connect to the database
+    connection = mysql.connector.connect(
+        host=host, user=user, password=password, database=database
+    )
+    cursor = connection.cursor()
+
+    # SQL query to retrieve the data for given image_hash
+    query = "SELECT data FROM image_data WHERE image_hash = %s"
+
+    cursor.execute(query, (str(image_hash),))
+
+    # Fetch the result
+    result = cursor.fetchone()
+    cursor.close()
+    connection.close()
+
+    if result:
+        data = json.loads(result['data'])
+        camera_number = data.get("Camera Number")
+        time_data = data.get("Time")
+        location_data = data.get("Location")
+        signature = data.get("Signature_Base64")
+        return camera_number, time_data, location_data, signature
+    else:
+        return None, None, None, None
