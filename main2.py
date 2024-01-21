@@ -12,11 +12,11 @@ import base64
 from save_image import save_image
 import os
 
-def main(camera_number_string, save_image_filepath,identifier):
+def main2(camera_number_string, save_image_filepath):
 #---------------------- Wait for Camera input and take picture ----------------------------
-	image = create_image()  # take the image
-	_, encoded_image = cv2.imencode('.png', image)  # we send the encoded image to the cloud 
-	print("Took Image")
+	
+	_, encoded_video = cv2.imencode('.avi', video)  # we send the encoded image to the cloud 
+	print("Took Video")
 
 #---------- Capture GNSS Data (Time and Location) ------------------------
 
@@ -30,7 +30,7 @@ def main(camera_number_string, save_image_filepath,identifier):
 
 #-------------- combine number + image + Time + Location ----------------------------------------------
 
-	combined_data = create_combined(camera_number_string, image, time, location)   # returns combined data as a 
+	combined_data = create_combined(camera_number_string, video, time, location)   # returns combined data as a 
 	#print(f"Made combined_data: {combined_data}")
 
 # ---------------- Create digest for signing --------------------------
@@ -63,7 +63,7 @@ def main(camera_number_string, save_image_filepath,identifier):
 		print(f"Uploaded Image")
 	
 	else: 
-		save_image(encoded_image.tobytes(), metadata, save_image_filepath)
+		save_video(encoded_image.tobytes(), metadata, save_image_filepath)
 		print("No wifi")
         
 	# ---------------- Save the image and metadata to files -------------------
@@ -77,9 +77,9 @@ def main(camera_number_string, save_image_filepath,identifier):
 
 camera_number_string = "1"  # camera number used to search for public key
 
-if not os.path.exists(os.path.join(os.getcwd(), "tmpImages")): # make a directory for tmpImages if it doesnt exist
-    os.makedirs(os.path.join(os.getcwd(), "tmpImages"))
+# if not os.path.exists(os.path.join(os.getcwd(), "tmpImages")): # make a directory for tmpImages if it doesnt exist
+#     os.makedirs(os.path.join(os.getcwd(), "tmpImages"))
 
-save_image_filepath = os.path.join(os.getcwd(), "tmpImages")
+# save_image_filepath = os.path.join(os.getcwd(), "tmpImages")
 
 #main(camera_number_string, save_image_filepath)
