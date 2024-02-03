@@ -24,12 +24,13 @@ def encode_video_to_bytes(video_path: str) -> bytes:
         video_bytes.extend(encoded_frame.tobytes())
 
     cap.release()
+    print("Completed Video Encoding")
     return bytes(video_bytes)
 
-def create_combined_vid(camera_number: str, video_path: str, time: str, location: str) -> bytes:
+def create_combined_vid(camera_number: str, video_path: str, time: str, location: str, encoded_video) -> bytes:
     '''Takes in camera number, video path, time, location and combines them into one byte object'''
     
-    encoded_video = encode_video_to_bytes(video_path)  # This will be quite large for videos
+    
 
     encoded_number = camera_number.encode('utf-8')
     encoded_time = time.encode('utf-8')

@@ -11,7 +11,7 @@ import cv2
 import base64
 from save_image import save_image
 import os
-from create_combined_vid import create_combined_vid
+from create_combined_vid import create_combined_vid , encode_video_to_bytes
 
 #Function called as soon Video to finish recording
 
@@ -33,8 +33,8 @@ def main2(camera_number_string, save_image_filepath, object_count):
 #-------------- combine number + image + Time + Location ----------------------------------------------
 	
 	vid_filepath = os.path.join(save_image_filepath, f'{object_count}.avi')
-	combined_data = create_combined_vid(camera_number_string, vid_filepath, time, location) 
-
+	encoded_video = encode_video_to_bytes(vid_filepath)  # This will be quite large for videos
+	combined_data = create_combined_vid(camera_number_string, vid_filepath, time, location,encoded_video) 
 
 # ---------------- Create digest for signing --------------------------
 
@@ -63,7 +63,7 @@ def main2(camera_number_string, save_image_filepath, object_count):
 	if is_internet_available():
 		print(f"Internet is available...Uploading")
 
-		upload_image(video_avi.tobytes(), metadata)   # cv2 png object, metadat
+		upload_image(encoded_video, metadata)   # cv2 png object, metadat
 		print(f"Uploaded Image")
 	
 	else: 
