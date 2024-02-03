@@ -7,22 +7,27 @@ is_recording = False
 record_condition = threading.Condition()
 
 def start_video_capture():
+    print("Envoked start_video_capture function")
     global is_recording
     with record_condition:
         is_recording = True
+        print("is_recording: True (start_video_capture function)")
         record_condition.notify()
 
 
 def stop_video_capture():
+    print("Envoked stop_video_capture function")
     global is_recording
     with record_condition:
         is_recording = False
+        print("is_recording: False (stop_video_capture function)")
         record_condition.notify()
 
 def record_video(object_count):
     
     # Initialize the camera
     camera = cv2.VideoCapture(0)
+    print("Camera initialized for video capture")
     if not camera.isOpened():
         print("\tError: Camera not found or could not be opened.")
         return
@@ -35,17 +40,25 @@ def record_video(object_count):
     save_image_filepath = os.path.join(os.getcwd(), "tmpImages")
     vid_filepath = os.path.join(save_image_filepath, f'{object_count}.avi')
     video_writer = cv2.VideoWriter(vid_filepath, fourcc, 60.0, (frame_width, frame_height))
-
+    print("Videowriter initalized")
     while True:
         with record_condition:
             if not is_recording:
                 break
-            ret, frame = camera.read()
-            print("\nReading camera frame")
+            try:
+            # Your code block here
+                ret, frame = camera.read()
+                print("\nReading camera frame")
+            except Exception as e:
+                print(f"Exception occurred: {e}")
 
         if ret:
-            video_writer.write(frame)
-            print("\nWriting frame")
+            try:
+                video_writer.write(frame)
+                print("\nWriting frame")
+            except Exception as e:
+                print(f"Exception occurred: {e}")
+            
         else:
             print("\tError: Failed to capture frame.")
             break
