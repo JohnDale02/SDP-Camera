@@ -2,6 +2,7 @@ import cv2
 
 def encode_video_to_bytes(video_path: str) -> bytes:
     # Read video file
+    print(video_path)
     cap = cv2.VideoCapture(video_path)
     if not cap.isOpened():
         print("Error: Could not open video file.")
