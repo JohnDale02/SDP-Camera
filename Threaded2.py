@@ -51,7 +51,7 @@ def video_capture_callback(channel):
                 stop_video_capture()
                 is_recording = False
                 # Post-recording processing can be added here
-        
+                object_count = count_vid_files(save_image_filepath) -1
                 main2(camera_number_string, save_image_filepath,object_count)
         finally:
             camera_lock.release()
