@@ -63,7 +63,10 @@ def main2(camera_number_string, save_image_filepath, object_count):
 	if is_internet_available():
 		print(f"Internet is available...Uploading")
 
-		upload_image(encoded_video, metadata)   # cv2 png object, metadat
+		try:
+			upload_image(encoded_video, metadata)   # cv2 png object, metadat
+		except Exception as e:
+			print(f"Exception occurred: {e}")
 		print(f"Uploaded Image")
 	
 	else: 

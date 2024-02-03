@@ -51,14 +51,14 @@ def video_capture_callback(channel):
                 stop_video_capture()
                 is_recording = False
                 # Post-recording processing can be added here
-                object_count = count_vid_files(save_image_filepath) -1
+                object_count = count_vid_files(save_image_filepath) - 1
                 main2(camera_number_string, save_image_filepath,object_count)
         finally:
             camera_lock.release()
 
 # Add event detection for buttons
 GPIO.add_event_detect(button_pin_image, GPIO.FALLING, callback=image_capture_callback, bouncetime=2250)
-GPIO.add_event_detect(button_pin_video, GPIO.FALLING, callback=video_capture_callback, bouncetime=2250)
+GPIO.add_event_detect(button_pin_video, GPIO.FALLING, callback=video_capture_callback, bouncetime=1550)
 
 # Create a thread for the upload_saved_images function
 upload_thread = threading.Thread(target=upload_saved_images)
