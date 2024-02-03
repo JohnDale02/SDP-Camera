@@ -6,7 +6,7 @@ from save_video import count_vid_files
 is_recording = False
 record_condition = threading.Condition()
 
-def start_video_capture(save_image_filepath):
+def start_video_capture():
     global is_recording
     with record_condition:
         is_recording = True
