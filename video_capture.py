@@ -11,7 +11,7 @@ def start_video_capture():
     global is_recording
     with record_condition:
         is_recording = True
-        print("is_recording: True (start_video_capture function)")
+        print(f'is_recording: {is_recording} (start_video_capture function)')
         record_condition.notify()
 
 
@@ -20,7 +20,7 @@ def stop_video_capture():
     global is_recording
     with record_condition:
         is_recording = False
-        print("is_recording: False (stop_video_capture function)")
+        print(f'is_recording: {is_recording} (stop_video_capture function)')
         record_condition.notify()
 
 def record_video(object_count):

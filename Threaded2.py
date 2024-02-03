@@ -46,7 +46,7 @@ def video_capture_callback(channel):
                 object_count = count_vid_files(save_image_filepath)
                 start_video_capture()
                 is_recording = True
-                threading.Thread(target=record_video, args=(object_count)).start
+                threading.Thread(target=record_video, args=(object_count,)).start()
             else:
                 stop_video_capture()
                 is_recording = False
