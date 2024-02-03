@@ -3,7 +3,10 @@ import cv2
 def encode_video_to_bytes(video_path: str) -> bytes:
     # Read video file
     print(video_path)
-    cap = cv2.VideoCapture(video_path)
+    try:
+        cap = cv2.VideoCapture(video_path)
+    except Exception as e:
+                print(f"Exception occurred: {e}")
     if not cap.isOpened():
         print("Error: Could not open video file.")
         return b''
@@ -17,7 +20,7 @@ def encode_video_to_bytes(video_path: str) -> bytes:
             break
 
         # Encode frame
-        _, encoded_frame = cv2.imencode('.jpg', frame)
+        _, encoded_frame = cv2.imencode('.png', frame)
         video_bytes.extend(encoded_frame.tobytes())
 
     cap.release()

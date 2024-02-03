@@ -14,8 +14,10 @@ import os
 from create_combined_vid import create_combined_vid
 
 #Function called as soon Video to finish recording
-def main2(camera_number_string, save_image_filepath,video_avi):
+
+def main2(camera_number_string, save_image_filepath, object_count):
 #----------------------   ----------------------------
+	
 	print("main2: Video capture complete")
 
 #---------- Capture GNSS Data (Time and Location) ------------------------
@@ -29,12 +31,13 @@ def main2(camera_number_string, save_image_filepath,video_avi):
 	print(f"Recieved Time and GNSS Data: {time}{location}")
 
 #-------------- combine number + image + Time + Location ----------------------------------------------
-  
-	vid_file_path = f"{save_image_filepath}/{video_avi}"
-	combined_data = create_combined_vid(camera_number_string, vid_file_path, time, location)   # returns combined data as a 
-	#print(f"Made combined_data: {combined_data}")
+	
+	vid_filepath = os.path.join(save_image_filepath, f'{object_count}.avi')
+	combined_data = create_combined_vid(camera_number_string, vid_filepath, time, location) 
+
 
 # ---------------- Create digest for signing --------------------------
+
 	try:
 		digest = create_digest(combined_data)
 		#print("Created Digest: ", digest)

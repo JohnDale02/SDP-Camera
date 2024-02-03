@@ -51,7 +51,6 @@ def record_video(object_count):
                 print("\nReading camera frame")
             except Exception as e:
                 print(f"Exception occurred: {e}")
-
         if ret:
             try:
                 video_writer.write(frame)
