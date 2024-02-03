@@ -1,7 +1,7 @@
 import cv2
 import threading
 from save_video import count_vid_files
-
+import os 
 # Flag and condition for video recording control
 is_recording = False
 record_condition = threading.Condition()
@@ -32,7 +32,8 @@ def record_video(object_count):
     frame_width = int(camera.get(3))
     frame_height = int(camera.get(4))
     #Write video to 'video.avi'
-    video_writer = cv2.VideoWriter(f'{object_count}.avi', fourcc, 60.0, (frame_width, frame_height))
+    save_image_filepath = os.path.join(os.getcwd(), "tmpImages")
+    video_writer = cv2.VideoWriter(f'{save_image_filepath}/{object_count}.avi', fourcc, 60.0, (frame_width, frame_height))
 
     while True:
         with record_condition:
