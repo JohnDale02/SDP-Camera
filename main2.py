@@ -12,11 +12,10 @@ import base64
 from save_image import save_image
 import os
 
-def main2(camera_number_string, save_image_filepath):
-#---------------------- Wait for Camera input and take picture ----------------------------
-	
-	_, encoded_video = cv2.imencode('.avi', video)  # we send the encoded image to the cloud 
-	print("Took Video")
+#Function called as soon Video to finish recording
+def main2(camera_number_string, save_image_filepath,video_avi):
+#----------------------   ----------------------------
+	print("main2: Video capture complete")
 
 #---------- Capture GNSS Data (Time and Location) ------------------------
 
@@ -30,7 +29,7 @@ def main2(camera_number_string, save_image_filepath):
 
 #-------------- combine number + image + Time + Location ----------------------------------------------
 
-	combined_data = create_combined(camera_number_string, video, time, location)   # returns combined data as a 
+	combined_data = create_combined(camera_number_string, video_avi, time, location)   # returns combined data as a 
 	#print(f"Made combined_data: {combined_data}")
 
 # ---------------- Create digest for signing --------------------------
@@ -59,11 +58,11 @@ def main2(camera_number_string, save_image_filepath):
 	if is_internet_available():
 		print(f"Internet is available...Uploading")
 
-		upload_image(encoded_image.tobytes(), metadata)   # cv2 png object, metadat
+		upload_image(video_avi.tobytes(), metadata)   # cv2 png object, metadat
 		print(f"Uploaded Image")
 	
 	else: 
-		save_video(encoded_image.tobytes(), metadata, save_image_filepath)
+		save_video(video_avi.tobytes(), metadata, save_image_filepath)
 		print("No wifi")
         
 	# ---------------- Save the image and metadata to files -------------------

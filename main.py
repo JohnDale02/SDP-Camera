@@ -12,11 +12,11 @@ import base64
 from save_image import save_image
 import os
 
-def main(camera_number_string, save_image_filepath,identifier):
+def main(camera_number_string, save_image_filepath):
 #---------------------- Wait for Camera input and take picture ----------------------------
 	image = create_image()  # take the image
 	_, encoded_image = cv2.imencode('.png', image)  # we send the encoded image to the cloud 
-	print("Took Image")
+	print("main: Image captured")
 
 #---------- Capture GNSS Data (Time and Location) ------------------------
 

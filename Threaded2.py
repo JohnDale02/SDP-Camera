@@ -6,6 +6,7 @@ from main import main  # For image capture
 from main2 import main2
 from video_capture import start_video_capture, stop_video_capture, record_video  # For video capture
 from upload_saved_images import upload_saved_images
+from save_video import count_vid_files
 
 # Define GPIO pins for the buttons
 button_pin_image = 37
@@ -42,14 +43,15 @@ def video_capture_callback(channel):
     if camera_lock.acquire(blocking=False):
         try:
             if not is_recording:
+                object_count = count_vid_files(save_image_filepath)
                 start_video_capture()
                 is_recording = True
-                threading.Thread(target=record_video).start()
+                threading.Thread(target=record_video, args=(object_count)).start
             else:
                 stop_video_capture()
                 is_recording = False
                 # Post-recording processing can be added here
-                main2(camera_number_string, save_video_filepath)
+                main2(camera_number_string, save_image_filepath,f'{object_count}.avi')
         finally:
             camera_lock.release()
 

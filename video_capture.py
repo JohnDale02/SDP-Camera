@@ -1,15 +1,17 @@
 import cv2
 import threading
+from save_video import count_vid_files
 
 # Flag and condition for video recording control
 is_recording = False
 record_condition = threading.Condition()
 
-def start_video_capture():
+def start_video_capture(save_image_filepath):
     global is_recording
     with record_condition:
         is_recording = True
         record_condition.notify()
+
 
 def stop_video_capture():
     global is_recording
@@ -17,7 +19,8 @@ def stop_video_capture():
         is_recording = False
         record_condition.notify()
 
-def record_video():
+def record_video(object_count):
+    
     # Initialize the camera
     camera = cv2.VideoCapture(0)
     if not camera.isOpened():
@@ -28,7 +31,8 @@ def record_video():
     fourcc = cv2.VideoWriter_fourcc(*'MJPG')
     frame_width = int(camera.get(3))
     frame_height = int(camera.get(4))
-    video_writer = cv2.VideoWriter('video.avi', fourcc, 60.0, (frame_width, frame_height))
+    #Write video to 'video.avi'
+    video_writer = cv2.VideoWriter(f'{object_count}.avi', fourcc, 60.0, (frame_width, frame_height))
 
     while True:
         with record_condition:
