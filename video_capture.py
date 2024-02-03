@@ -33,7 +33,7 @@ def record_video(object_count):
     frame_height = int(camera.get(4))
     #Write video to 'video.avi'
     save_image_filepath = os.path.join(os.getcwd(), "tmpImages")
-    video_writer = cv2.VideoWriter(f'{save_image_filepath}/{object_count}.avi', fourcc, 60.0, (frame_width, frame_height))
+    video_writer = cv2.VideoWriter(f'{save_image_filepath}/{0}.avi', fourcc, 60.0, (frame_width, frame_height))
 
     while True:
         with record_condition:
