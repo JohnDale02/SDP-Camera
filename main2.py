@@ -28,8 +28,9 @@ def main2(camera_number_string, save_image_filepath,video_avi):
 	print(f"Recieved Time and GNSS Data: {time}{location}")
 
 #-------------- combine number + image + Time + Location ----------------------------------------------
-
-	combined_data = create_combined(camera_number_string, video_avi, time, location)   # returns combined data as a 
+  
+	vid_file_path = f"{save_image_filepath}/{video_avi}"
+	combined_data = create_combined(camera_number_string, vid_file_path, time, location)   # returns combined data as a 
 	#print(f"Made combined_data: {combined_data}")
 
 # ---------------- Create digest for signing --------------------------
@@ -62,7 +63,7 @@ def main2(camera_number_string, save_image_filepath,video_avi):
 		print(f"Uploaded Image")
 	
 	else: 
-		save_video(video_avi.tobytes(), metadata, save_image_filepath)
+		#save_video(video_avi.tobytes(), metadata, save_image_filepath)
 		print("No wifi")
         
 	# ---------------- Save the image and metadata to files -------------------
