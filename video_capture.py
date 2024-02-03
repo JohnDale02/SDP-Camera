@@ -33,16 +33,19 @@ def record_video(object_count):
     frame_height = int(camera.get(4))
     #Write video to 'video.avi'
     save_image_filepath = os.path.join(os.getcwd(), "tmpImages")
-    video_writer = cv2.VideoWriter(f'{save_image_filepath}/{0}.avi', fourcc, 60.0, (frame_width, frame_height))
+    vid_filepath = os.path.join(save_image_filepath, f'{object_count}.avi')
+    video_writer = cv2.VideoWriter(vid_filepath, fourcc, 60.0, (frame_width, frame_height))
 
     while True:
         with record_condition:
             if not is_recording:
                 break
             ret, frame = camera.read()
+            print("\nReading camera frame")
 
         if ret:
             video_writer.write(frame)
+            print("\nWriting frame")
         else:
             print("\tError: Failed to capture frame.")
             break
