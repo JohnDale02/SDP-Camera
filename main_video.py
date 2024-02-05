@@ -16,6 +16,7 @@ def main_video(camera_number_string, save_video_filepath):
 #---------------------- Wait for Camera input and take picture ----------------------------
 	video_bytes, object_count = create_video(save_video_filepath)  # take the video (return base64 (string) and bytes version of video) 
 	print("main: Image captured")
+	print("Last 10 bytes of video: ", video_bytes[-10:])
 
 #---------- Capture GNSS Data (Time and Location) ------------------------
 
