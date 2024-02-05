@@ -14,14 +14,11 @@ import os
 
 def main_video(camera_number_string, save_video_filepath):
 #---------------------- Wait for Camera input and take picture ----------------------------
-	video, encoded_video, object_count = create_video(save_video_filepath)  # take the video (return base64 (string) and bytes version of video) 
+	video_bytes, object_count = create_video(save_video_filepath)  # take the video (return base64 (string) and bytes version of video) 
 	print("main: Image captured")
 
 #---------- Capture GNSS Data (Time and Location) ------------------------
 
-	#time, location, = capture_time_location()  # time and location both returned as strings
-	#time = "2023-10-29 14:30:00"
-	#location = "Latitude: 40.7128, Longitude: -74.0060"
 	lat_value, long_value, time_value =  read_gps_data()
 	location = (f"{lat_value}, {long_value}")
 	time = (f"{time_value}")
@@ -29,7 +26,7 @@ def main_video(camera_number_string, save_video_filepath):
 
 #-------------- combine number + image + Time + Location ----------------------------------------------
 
-	combined_data = create_combined(camera_number_string, video, time, location)   # returns combined data as a 
+	combined_data = create_combined(camera_number_string, video_bytes, time, location)   # returns combined data as a 
 	#print(f"Made combined_data: {combined_data}")
 
 # ---------------- Create digest for signing --------------------------
@@ -58,7 +55,7 @@ def main_video(camera_number_string, save_video_filepath):
 	if is_internet_available():
 		print(f"Internet is available...Uploading")
 
-		upload_video(encoded_video, metadata)   # cv2 png object, metadat
+		upload_video(video_bytes, metadata)   # cv2 png object, metadat
 		print(f"Uploaded Video")
 	
 	else: 

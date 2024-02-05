@@ -30,7 +30,7 @@ def main(camera_number_string, save_image_filepath):
 
 #-------------- combine number + image + Time + Location ----------------------------------------------
 
-	combined_data = create_combined(camera_number_string, image, time, location)   # returns combined data as a 
+	combined_data = create_combined(camera_number_string, encoded_image.tobytes(), time, location)   # returns combined data as a 
 	#print(f"Made combined_data: {combined_data}")
 
 # ---------------- Create digest for signing --------------------------
