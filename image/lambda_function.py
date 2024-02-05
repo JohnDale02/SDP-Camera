@@ -26,12 +26,14 @@ def handler(event, context):
 
     # Extract bucket name and object key from the event
     object_key = str(event['Records'][0]['s3']['object']['key'])
+    print("Object key: should be NewImage.png or NewVideo.avi", object_key)
     bucket_name = 'unverifiedimages'
 
     image = False   # video default
     if object_key.endswith(".png"):
         image = True  # we have an image now 
-
+    
+    print(f"Is this an image: {image}")
 
     errors = ""
 
@@ -50,16 +52,18 @@ def handler(event, context):
             temp_media_path = '/tmp/TempNewImage.png'   # recreate the png using the cv2 png object bytes recieved
             s3_client.download_file(bucket_name, object_key, temp_media_path)
             media = cv2.imread(temp_media_path)
+            _, encoded_image = cv2.imencode('.png', media)  # we send the encoded image to the cloud
+            encoded_media = encoded_image.tobytes()
 
         else:
             temp_media_path = '/tmp/TempNewVideo.avi'
             s3_client.download_file(bucket_name, object_key, temp_media_path)
+            print("Downloading video Done")
 
-            media = None
             with open(temp_media_path, 'rb') as video:
-                video_bytes = video.read()
-                media = base64.b64encode(video_bytes).decode('utf-8')
-            
+                encoded_media = video.read()
+                print(encoded_media[-10:])
+                
         # Access the object's metadata
         metadata = response['Metadata']
 
@@ -84,7 +88,7 @@ def handler(event, context):
             errors = errors + "Error:" + f"Public key error: {str(e)}"
 
         try:
-            combined_data = create_combined(camera_number, media, time_data, location_data)
+            combined_data = create_combined(camera_number, encoded_media, time_data, location_data)
 
         except Exception as e:
             errors = errors + "Error:" + f"Couldnt combine Data: {str(e)}"
@@ -96,8 +100,8 @@ def handler(event, context):
 
         if valid == True:
             try:
-                image_save_name = upload_verified(s3_client, camera_number, time_data, location_data, signature, temp_media_path)
-                send_text(valid, image_save_name)
+                media_save_name = upload_verified(s3_client, camera_number, time_data, location_data, signature, temp_media_path, image)
+                send_text(valid, media_save_name)
 
             except Exception as e:
                 errors = errors + "Issue Sending text or uploading to verified bucket" + str(e)
@@ -135,18 +139,14 @@ def recreate_data(metadata):
     return camera_number, time_data, location_data, signature, signature_string
 
 
-def create_combined(camera_number: str, image: bytes, time: str, location: str) -> bytes:
+def create_combined(camera_number: str, media: bytes, time: str, location: str) -> bytes:
     '''Takes in camera number, image, time, location and encodes then combines to form one byte object'''
-
-    # Encode the image as a PNG byte array
-    _, encoded_image = cv2.imencode(".png", image)
-    encoded_image = encoded_image.tobytes()
 
     encoded_number = camera_number.encode('utf-8')
     encoded_time = time.encode('utf-8')
     encoded_location = location.encode('utf-8')
 
-    combined_data = encoded_number + encoded_image + encoded_time + encoded_location
+    combined_data = encoded_number + media + encoded_time + encoded_location
 
     return combined_data
 
@@ -189,7 +189,7 @@ def get_public_key(camera_number):
     
 
 
-def upload_verified(s3_client, camera_number, time_data, location_data, signature, temp_image_path):
+def upload_verified(s3_client, camera_number, time_data, location_data, signature, temp_media_path, image):
 # Get S3 bucket for verified images(camera_number)
 
     destination_bucket_name = f'camera{int(camera_number)}verifiedimages'
@@ -199,8 +199,11 @@ def upload_verified(s3_client, camera_number, time_data, location_data, signatur
 
     except Exception as e:
         pass
-
-    image_file_name = str(image_number) + '.png'  # Changes file extension to .json
+    
+    if image:
+        media_file_name = str(image_number) + '.png'  # Changes file extension
+    else:
+        media_file_name = str(image_number) + '.avi'
 
     # Create JSON data
     json_data = {
@@ -220,7 +223,7 @@ def upload_verified(s3_client, camera_number, time_data, location_data, signatur
         json.dump(json_data, json_file)
 
     try:
-        s3_client.upload_file(temp_image_path, destination_bucket_name, image_file_name)
+        s3_client.upload_file(temp_media_path, destination_bucket_name, media_file_name)
 
     except Exception as e:
         pass
@@ -233,10 +236,10 @@ def upload_verified(s3_client, camera_number, time_data, location_data, signatur
         #print(f"Uploading JSON error : {e}")
 
     # Clean up: Delete temporary files
-    os.remove(temp_image_path)
+    os.remove(temp_media_path)
     os.remove(temp_json_path)
 
-    return image_file_name
+    return media_file_name
 
 
 def count_objects_in_bucket(bucket_name):
