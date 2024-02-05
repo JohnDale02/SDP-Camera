@@ -24,6 +24,6 @@ def convert_video(input_file, output_file):
         print(process.stderr.decode())
 
 # Example usage
-input_mkv = 'output.mkv'
-output_mp4 = 'ZoutpuT.mp4'
+input_mkv = 'output2.mkv'
+output_mp4 = 'XXXoutpuT.mp4'
 convert_video(input_mkv, output_mp4)

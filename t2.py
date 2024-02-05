@@ -13,7 +13,7 @@ def start_recording(directory, filename="output2.mkv", duration=120):
         "-video_size", "640x480",
         "-i", "/dev/video0",  # Default camera device on Raspberry Pi
         "-t", str(duration),
-        "-vcodec", "copy",  # Use 'copy' for testing or specify another codec
+        "-vcodec", "ffv1",  # Use 'copy' for testing or specify another codec
         full_path
     ]
     return subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)  # Starts the recording process

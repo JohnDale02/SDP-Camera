@@ -37,7 +37,7 @@ def main2(camera_number_string, save_image_filepath, object_count):
 	
 	#vid_filepath = os.path.join(save_image_filepath, f'{object_count}.avi')
 	
-	video_hash = create_vid_digest 
+	#video_hash = create_vid_digest 
 	#encoded_video = encode_video_to_bytes(vid_filepath)  # This will be quite large for videos
 	combined_data = create_combined_vid(camera_number_string, video_hash, time, location) 
 

@@ -3,7 +3,7 @@ import signal
 import os
 
 # Function to start recording
-def start_recording(filename="output2.mkv", duration=60, video_device_index="0", audio_device_index=":0"):
+def start_recording(filename="output3.mkv", duration=10, video_device_index="0", audio_device_index=":0"):
     command = [
     "ffmpeg",
     "-f", "avfoundation",
