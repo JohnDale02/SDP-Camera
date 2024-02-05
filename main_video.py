@@ -14,7 +14,7 @@ import os
 
 def main_video(camera_number_string, save_video_filepath):
 #---------------------- Wait for Camera input and take picture ----------------------------
-	video, encoded_video, object_count = create_video()  # take the video (return base64 (string) and bytes version of video) 
+	video, encoded_video, object_count = create_video(save_video_filepath)  # take the video (return base64 (string) and bytes version of video) 
 	print("main: Image captured")
 
 #---------- Capture GNSS Data (Time and Location) ------------------------
