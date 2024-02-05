@@ -6,7 +6,7 @@ def upload_video(video_path, metadata):
 
     # Bucket and file details
     bucket_name = 'unverifiedimages'
-    file_key = 'NewImage.png'  # The desired key in the S3 bucket
+    file_key = 'video.mp4'  # The desired key in the S3 bucket
 
     try:
         # Open the video file in binary mode and upload it
