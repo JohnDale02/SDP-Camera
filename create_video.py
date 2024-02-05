@@ -12,7 +12,6 @@ def create_video(save_video_filepath):
 
     if video_bytes is not None:
         print("\Video not None, Loading...")
-        video_base64_string = base64.b64encode(video_bytes).decode('utf-8')
 
         return video_bytes, object_count
     
