@@ -101,10 +101,15 @@ def handler(event, context):
         if valid == True:
             try:
                 media_save_name = upload_verified(s3_client, camera_number, time_data, location_data, signature, temp_media_path, image)
+
+            except Exception as e:
+                errors = errors + "Issue uploading to verified bucket" + str(e)
+
+            try:
                 send_text(valid, media_save_name)
 
             except Exception as e:
-                errors = errors + "Issue Sending text or uploading to verified bucket" + str(e)
+                errors = errors + "Issue Sending text: " + str(e)
             
         else:
             try:
@@ -286,8 +291,8 @@ def verify_signature(combined_data, signature, public_key):
 
 def send_text(valid, image_save_name="default"):
 
-    account_sid = 'AC8010fcf8a7c9217f2e222a62cc0e49cf'
-    auth_token = '7878598daf6be483622dec964a241a03'
+    account_sid = 'SID HERE'
+    auth_token = 'AUTH TOKEN HERE'
     client = Client(account_sid, auth_token)
 
     if valid == True:
