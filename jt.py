@@ -7,11 +7,12 @@ output_video = f"output_{number}video.avi"
 command = [
     'ffmpeg',
     '-f', 'v4l2',
-    '-s', '1920x1080',
+    '-video_size', '1920x1080',
     '-i', '/dev/video0',
-    '-c:v', 'libx264',
+    '-c:v', 'h264_v4l2m2m',
     '-pix_fmt', 'yuv420p',
-    '-r', '30',
+    '-b:v', '2M',
+    '-bufsize', '2M',
     '-t', '10',
     output_video
 ]
