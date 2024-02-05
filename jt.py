@@ -12,6 +12,7 @@ command = [
     '-c:v', 'libx264',
     '-pix_fmt', 'yuv420p',
     '-r', '30',
+    '-t', '10',
     output_video
 ]
 
