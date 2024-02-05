@@ -28,7 +28,7 @@ def count_files(directory_path):
     count = 0
     # Iterate over all files in the directory
     for file_name in os.listdir(directory_path):
-        if file_name.lower().endswith('.avi') or file_name.lower().endswith('.png'):
+        if file_name.lower().endswith('.png'):
             count += 1
 
     return count

@@ -6,7 +6,7 @@ from main import main  # For image capture
 from main2 import main2
 from video_capture import start_video_capture, stop_video_capture, record_video  # For video capture
 from upload_saved_images import upload_saved_images
-from save_video import count_vid_files
+from save_metadata import count_vid_files
 
 # Define GPIO pins for the buttons
 button_pin_image = 37

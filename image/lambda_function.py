@@ -13,7 +13,7 @@ from cryptography.hazmat.primitives.asymmetric import padding
 from cryptography.hazmat.primitives import serialization
 from cryptography.exceptions import InvalidSignature
 from cryptography.hazmat.backends import default_backend
-
+import hashlib
 
 # Possible updates
 # - Done hardcode bucket name and object key
@@ -25,10 +25,13 @@ def handler(event, context):
     s3_client = boto3.client('s3')
 
     # Extract bucket name and object key from the event
-    #bucket_name = event['Records'][0]['s3']['bucket']['name']
-    #object_key = event['Records'][0]['s3']['object']['key']
+    object_key = str(event['Records'][0]['s3']['object']['key'])
     bucket_name = 'unverifiedimages'
-    object_key = 'NewImage.png'
+
+    image = False   # video default
+    if object_key.endswith(".png"):
+        image = True  # we have an image now 
+
 
     errors = ""
 
@@ -42,20 +45,36 @@ def handler(event, context):
         except Exception as e:
             errors = errors + "Error:" + f"Get object error : {str(e)}"
 
-       # Access the image content
-        temp_image_path = '/tmp/TempNewImage.png'   # recreate the png using the cv2 png object bytes recieved
-        s3_client.download_file(bucket_name, object_key, temp_image_path)
 
-        image = cv2.imread(temp_image_path)
+        if image: 
+            temp_media_path = '/tmp/TempNewImage.png'   # recreate the png using the cv2 png object bytes recieved
+            s3_client.download_file(bucket_name, object_key, temp_media_path)
+            media = cv2.imread(temp_media_path)
 
+        else:
+            temp_media_path = '/tmp/TempNewVideo.avi'
+            s3_client.download_file(bucket_name, object_key, temp_media_path)
+
+            media = None
+            with open(temp_media_path, 'rb') as video:
+                video_bytes = video.read()
+                media = base64.b64encode(video_bytes).decode('utf-8')
+            
         # Access the object's metadata
         metadata = response['Metadata']
 
         try:
-            camera_number, time_data, location_data, signature = recreate_data(metadata)
+            camera_number, time_data, location_data, signature, signature_string = recreate_data(metadata)
 
         except Exception as e:
             errors = errors + "Error:" + f"Cannot recreate time and metadata {str(e)}"
+
+        try: 
+            print("Storing json details")
+            store_json_details(temp_media_path, camera_number, time_data, location_data, signature_string)
+            print("Stored json details")
+        except Exception as e: 
+            errors = errors + "Error:" + f"Cannot store json details {str(e)}"
         
         try:
             public_key_base64 = get_public_key(int(camera_number))
@@ -65,7 +84,7 @@ def handler(event, context):
             errors = errors + "Error:" + f"Public key error: {str(e)}"
 
         try:
-            combined_data = create_combined(camera_number, image, time_data, location_data)
+            combined_data = create_combined(camera_number, media, time_data, location_data)
 
         except Exception as e:
             errors = errors + "Error:" + f"Couldnt combine Data: {str(e)}"
@@ -77,7 +96,7 @@ def handler(event, context):
 
         if valid == True:
             try:
-                image_save_name = upload_verified(s3_client, camera_number, time_data, location_data, signature, temp_image_path)
+                image_save_name = upload_verified(s3_client, camera_number, time_data, location_data, signature, temp_media_path)
                 send_text(valid, image_save_name)
 
             except Exception as e:
@@ -93,6 +112,8 @@ def handler(event, context):
 
     except Exception as e:
         errors = errors + f'There was an exeption: {str(e)}'
+
+    print("Errors: ", errors)
 
     return {
         'statusCode': 200,
@@ -111,13 +132,13 @@ def recreate_data(metadata):
     signature_string = metadata.get('signature')
     signature = base64.b64decode(signature_string)
 
-    return camera_number, time_data, location_data, signature
+    return camera_number, time_data, location_data, signature, signature_string
 
 
 def create_combined(camera_number: str, image: bytes, time: str, location: str) -> bytes:
     '''Takes in camera number, image, time, location and encodes then combines to form one byte object'''
 
-    # Encode the image as a JPEG byte array
+    # Encode the image as a PNG byte array
     _, encoded_image = cv2.imencode(".png", image)
     encoded_image = encoded_image.tobytes()
 
@@ -166,7 +187,6 @@ def get_public_key(camera_number):
     else:
         return 'Public key not found'
     
-
 
 
 def upload_verified(s3_client, camera_number, time_data, location_data, signature, temp_image_path):
@@ -264,7 +284,7 @@ def verify_signature(combined_data, signature, public_key):
 def send_text(valid, image_save_name="default"):
 
     account_sid = 'AC8010fcf8a7c9217f2e222a62cc0e49cf'
-    auth_token = 'AUTH TOKEN'
+    auth_token = '7878598daf6be483622dec964a241a03'
     client = Client(account_sid, auth_token)
 
     if valid == True:
@@ -279,3 +299,51 @@ def send_text(valid, image_save_name="default"):
     to='+17819159187'
     )
 
+
+def store_json_details(temp_image_path, camera_number, time_data, location_data, signature):
+    # Hash the image data to use as an index
+    with open(temp_image_path, 'rb') as file:
+        data = file.read()
+        hash_object = hashlib.sha256()
+        hash_object.update(data)
+        image_hash = hash_object.hexdigest()
+
+    # Convert details to JSON format
+    details = json.dumps({
+        'Camera Number': camera_number,
+        'Time': time_data,
+        'Location': location_data,
+        'Signature_Base64': signature
+    })
+    
+    print(f"Image Hash: {image_hash}")
+    print(f"Details: {details}")
+
+    # Database connection details
+    host = "publickeycamerastorage.c90gvpt3ri4q.us-east-2.rds.amazonaws.com"
+    user = "sdp"
+    password = "sdpsdpsdp"
+    database = "PublicKeySchema"
+
+    # Connect to the database
+    connection = mysql.connector.connect(
+        host=host, user=user, password=password, database=database
+    )
+    cursor = connection.cursor()
+
+    query = """
+    INSERT INTO image_data (image_hash, data)
+    VALUES (%s, %s)
+    ON DUPLICATE KEY UPDATE data = %s
+    """
+
+    cursor.execute(query, (image_hash, details, details))
+    
+    # Commit the transaction
+    connection.commit()
+
+    # Close the cursor and connection
+    cursor.close()
+    connection.close()
+
+    print(f"Stored the data with image hash {image_hash}, Time: {time_data}")
