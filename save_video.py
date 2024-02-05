@@ -3,17 +3,10 @@ import cv2
 import numpy as np
 import json
 
-def save_video(encoded_image_bytes, metadata, save_image_filepath):
-
-    object_count = count_vid_files(save_image_filepath)
+def save_video(encoded_video, metadata, save_image_filepath, object_count):
+    
     video_filepath = os.path.join(save_image_filepath, f'{object_count}.avi')
     metadata_filepath = os.path.join(save_image_filepath, f"{object_count}.json")
-
-    encoded_image_np = np.frombuffer(encoded_image_bytes, dtype=np.uint8)  # Convert the bytes back into a numpy array
-    decoded_image = cv2.imdecode(encoded_image_np, cv2.IMREAD_UNCHANGED)   # Decode the image from the numpy array
-
-    # Save the image as a PNG file
-    cv2.imwrite(image_filepath, decoded_image)
 
     with open(metadata_filepath, 'w') as file:
         json.dump(metadata, file)

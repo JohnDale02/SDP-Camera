@@ -1,0 +1,28 @@
+import subprocess
+import hashlib
+
+def hash_video_ffmpeg(video_path):
+    """Use FFmpeg to process and hash a video file."""
+    BUF_SIZE = 65536  # Buffer size for reading
+    sha256 = hashlib.sha256()
+
+    # Use FFmpeg to read the video file, this example just copies the video stream
+    # Adjust FFmpeg command according to your processing needs
+    command = ['ffmpeg', '-i', video_path, '-f', 'rawvideo', '-vcodec', 'copy', '-']
+    ffmpeg_process = subprocess.Popen(command, stdout=subprocess.PIPE)
+
+    while True:
+        data = ffmpeg_process.stdout.read(BUF_SIZE)
+        if not data:
+            break
+        sha256.update(data)
+
+    return sha256.hexdigest()
+
+video_path = './output.mp4'
+video_path2 = '/Users/danikasti/Downloads/output-1.mp4'
+video_hash2 = hash_video_ffmpeg(video_path)
+video_hash = hash_video_ffmpeg(video_path2)
+print(f"The hash of the video is: {video_hash}")
+print(f"The hash of the video3 is: {video_hash2}")
+print(str(video_hash == video_hash2))

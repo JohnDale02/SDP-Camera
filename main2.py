@@ -12,6 +12,9 @@ import base64
 from save_image import save_image
 import os
 from create_combined_vid import create_combined_vid , encode_video_to_bytes
+from save_video import save_video
+from create_combined_vid import create_combined_vid 
+from create_vid_digest import create_vid_digest
 
 #Function called as soon Video to finish recording
 
@@ -32,9 +35,11 @@ def main2(camera_number_string, save_image_filepath, object_count):
 
 #-------------- combine number + image + Time + Location ----------------------------------------------
 	
-	vid_filepath = os.path.join(save_image_filepath, f'{object_count}.avi')
-	encoded_video = encode_video_to_bytes(vid_filepath)  # This will be quite large for videos
-	combined_data = create_combined_vid(camera_number_string, vid_filepath, time, location,encoded_video) 
+	#vid_filepath = os.path.join(save_image_filepath, f'{object_count}.avi')
+	
+	video_hash = create_vid_digest 
+	#encoded_video = encode_video_to_bytes(vid_filepath)  # This will be quite large for videos
+	combined_data = create_combined_vid(camera_number_string, video_hash, time, location) 
 
 # ---------------- Create digest for signing --------------------------
 
@@ -70,7 +75,7 @@ def main2(camera_number_string, save_image_filepath, object_count):
 		print(f"Uploaded Image")
 	
 	else: 
-		#save_video(video_avi.tobytes(), metadata, save_image_filepath)
+		save_video(encoded_video, metadata, save_image_filepath, object_count)
 		print("No wifi")
         
 	# ---------------- Save the image and metadata to files -------------------

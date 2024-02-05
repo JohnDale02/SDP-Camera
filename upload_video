@@ -1,0 +1,20 @@
+import boto3
+
+def upload_video(video_path, metadata):
+    # Create an S3 client
+    s3_client = boto3.client('s3')
+
+    # Bucket and file details
+    bucket_name = 'unverifiedimages'
+    file_key = 'NewImage.png'  # The desired key in the S3 bucket
+
+    try:
+        # Open the video file in binary mode and upload it
+        with open(video_path, 'rb') as video:
+            response = s3_client.put_object(Bucket=bucket_name, Key=file_key, Body=video, Metadata=metadata)
+            print(f"Upload successful. Response: {response}")
+    except Exception as e:
+        print(f'We had an exception: {e}')
+
+metadata = {"Camera Number": "1", "Time": "18:19:38", "Location": "42.39379516666666, -72.52867866666666", "Signature_Base64": "ovJ/PiGolE0zWDIIjU9qXR4AkQJ7TUjif8+eY4cMGsqqezFoR/1kZi6I1kJmPz1Ki4wKWtjdhj7OOiJ28c9i1mFKILQQBXXoA4noI8BIj68ZAR0+sFFwRts7ObI54qHCQ1yZICl/+wJzdBb6wdxUlN03dxv2qNqQ9BxQsyAO/Jpl9ybtNZkHe2DyKWcHFCYcem2fKTatuP0OpRA7UjTgVAcLJoe8E9Z3SnQKjou87gLK0wbELs/4VW7L58NWCI7AV0yYI9EOaRcSul3TAOynAvU0MydEZO9DTHVQiy/Sr/Pae5/ic8M7mOvG6uS3YsixDVmiBKyk+UVKenFJoPF73Q=="}
+upload_video("./output.mp4",metadata)
