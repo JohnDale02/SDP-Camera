@@ -54,14 +54,15 @@ def capture_video(video_filename, video_filename_webm):
     process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     stdout, stderr = process.communicate()
 
-    print(f"Recording video Stdout and stderr: {stderr}")
-    print("Starting conversion...")
-    process_conversion = subprocess.Popen(command_convert_to_webm, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    if process.returncode == 0:
+        print(f"Recording video Stdout and stderr: {stderr}")
+        print("Starting conversion...")
+        process_conversion = subprocess.Popen(command_convert_to_webm, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
 
-    # Wait for the process to complete
-    stdout, stderr = process_conversion.communicate()
-    print(f"Converting video to WEBM Stdout and stderr: {stderr}")
+        # Wait for the process to complete
+        stdout, stderr = process_conversion.communicate()
+        print(f"Converting video to WEBM Stdout and stderr: {stderr}")
 
     print("Removing AVI FILE")
     os.remove(video_filename)    # delete the AVI file from the folder
