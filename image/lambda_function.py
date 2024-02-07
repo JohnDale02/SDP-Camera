@@ -109,7 +109,7 @@ def handler(event, context):
 
             try: 
                 convert_to_webm(temp_media_path, temp_webm_path)
-                upload_verified_webm(s3_client, camera_number, temp_media_path)  # create and save a webm file
+                upload_verified_webm(s3_client, camera_number, temp_webm_path)  # create and save a webm file
 
             except Exception as e:
                 errors = errors + "Issue uploading to verified bucket" + str(e)
@@ -258,7 +258,7 @@ def upload_verified(s3_client, camera_number, time_data, location_data, signatur
     return media_file_name
 
 
-def upload_verified_webm(s3_client, camera_number, temp_media_path):
+def upload_verified_webm(s3_client, camera_number, temp_webm_path):
 # Get S3 bucket for verified images(camera_number)
 
     destination_bucket_name = f'camera{int(camera_number)}verifiedimages'
@@ -272,11 +272,10 @@ def upload_verified_webm(s3_client, camera_number, temp_media_path):
     media_file_name = str(image_number) + '.webm'
 
     try:
-        s3_client.upload_file(temp_media_path, destination_bucket_name, media_file_name)
+        s3_client.upload_file(temp_webm_path, destination_bucket_name, media_file_name, ExtraArgs={'ContentType': 'video/webm'})
 
     except Exception as e:
         pass
-
 
 
 def count_objects_in_bucket(bucket_name):
