@@ -55,6 +55,7 @@ def capture_video(video_filename, video_filename_webm):
         '-threads', '4',  # Adjust based on your CPU
         '-speed', '4',  # Faster encoding speed, lower quality
         '-tile-columns', '2',  # Adjust for better multithreading, depending on CPU
+         video_filename_webm
     ]
     
     print("Starting to record!!!")
