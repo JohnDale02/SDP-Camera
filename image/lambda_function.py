@@ -26,7 +26,7 @@ def handler(event, context):
 
     # Extract bucket name and object key from the event
     object_key = str(event['Records'][0]['s3']['object']['key'])
-    print("Object key: should be NewImage.png or NewVideo.avi", object_key)
+    print("Object key: should be NewImage.png or NewVideo.webm", object_key)
     bucket_name = 'unverifiedimages'
 
     image = False   # video default
@@ -56,7 +56,7 @@ def handler(event, context):
             encoded_media = encoded_image.tobytes()
 
         else:
-            temp_media_path = '/tmp/TempNewVideo.avi'
+            temp_media_path = '/tmp/TempNewVideo.webm'
             s3_client.download_file(bucket_name, object_key, temp_media_path)
             print("Downloading video Done")
 
@@ -208,7 +208,7 @@ def upload_verified(s3_client, camera_number, time_data, location_data, signatur
     if image:
         media_file_name = str(image_number) + '.png'  # Changes file extension
     else:
-        media_file_name = str(image_number) + '.avi'
+        media_file_name = str(image_number) + '.webm'
 
     # Create JSON data
     json_data = {

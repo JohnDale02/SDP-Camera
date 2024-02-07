@@ -7,7 +7,7 @@ def create_video(save_video_filepath):
     '''Captures Video file; returns data as a byetes'''
 
     object_count = count_files(save_video_filepath)
-    video_filepath = os.path.join(save_video_filepath, f'{object_count}.avi')
+    video_filepath = os.path.join(save_video_filepath, f'{object_count}.webm')
     video_bytes = capture_video(video_filepath)
 
     if video_bytes is not None:
@@ -27,13 +27,15 @@ def capture_video(video_filename):
     command = [
         'ffmpeg',
         '-f', 'v4l2',
-        '-video_size', '1280x720',
+        '-video_size', '1920x1080',
         '-i', '/dev/video0',
-        '-c:v', 'h264_v4l2m2m',
-        '-pix_fmt', 'yuv420p',
+        '-c:v', 'libvpx-vp9',  # Use the VP9 codec
+        '-lossless', '1',      # Enable lossless encoding
+        '-pix_fmt', 'yuv420p', # Use a pixel format compatible with lossless encoding
         '-b:v', '2M',
         '-bufsize', '2M',
         '-t', '10',
+        '-f', 'webm', 
         video_filename
     ]
 
@@ -66,7 +68,7 @@ def count_files(directory_path):
     count = 0
     # Iterate over all files in the directory
     for file_name in os.listdir(directory_path):
-        if file_name.lower().endswith('.avi'):
+        if file_name.lower().endswith('.webm'):
             count += 1
 
     return count

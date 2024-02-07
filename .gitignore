@@ -4,6 +4,7 @@
 *.avi
 *.mp4
 *.mkv
+*.webm
 
 # Ignore .txt files
 #*.txt

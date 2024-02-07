@@ -6,7 +6,7 @@ def upload_video(video_bytes, metadata):
 
     # Bucket and file details
     bucket_name = 'unverifiedimages'
-    file_key = 'NewVideo.avi'  # The desired key in the S3 bucket
+    file_key = 'NewVideo.webm'  # The desired key in the S3 bucket
 
     try:
         # Open the video file in binary mode and upload it
