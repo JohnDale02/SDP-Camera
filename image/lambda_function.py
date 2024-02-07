@@ -119,6 +119,9 @@ def handler(event, context):
 
             except Exception as e:
                 errors = errors + "Issue Sending text: " + str(e)
+
+            os.remove(temp_media_path)
+            os.remove(temp_webm_path)
             
         else:
             try:
@@ -250,7 +253,6 @@ def upload_verified(s3_client, camera_number, time_data, location_data, signatur
         #print(f"Uploading JSON error : {e}")
 
     # Clean up: Delete temporary files
-    os.remove(temp_media_path)
     os.remove(temp_json_path)
 
     return media_file_name
@@ -274,9 +276,6 @@ def upload_verified_webm(s3_client, camera_number, temp_media_path):
 
     except Exception as e:
         pass
-
-    # Clean up: Delete temporary files
-    os.remove(temp_media_path)
 
 
 
@@ -392,12 +391,10 @@ def store_json_details(temp_image_path, camera_number, time_data, location_data,
 
 def convert_to_webm(temp_media_path, temp_webm_path):
 
-    ffmpeg_path = '/opt/bin/ffmpeg' 
-
     print("Trying to convert to webm from avi...........")
 
     command_convert_to_webm = [
-        ffmpeg_path,
+        'ffmpeg',
         '-i', temp_media_path,
         '-c:v', 'libvpx-vp9',
         '-lossless', '1',
