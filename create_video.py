@@ -48,14 +48,12 @@ def capture_video(video_filename, video_filename_webm):
         '-i', video_filename,
         '-c:v', 'libvpx-vp9',
         '-lossless', '1',
-        '-b:v', '1M',  # Adjust bitrate as needed
-        '-crf', '30',  # Adjust CRF value for quality vs size trade-off
         '-c:a', 'libopus',
         '-b:a', '128k',
         '-threads', '4',  # Adjust based on your CPU
-        '-speed', '4',  # Faster encoding speed, lower quality
         '-tile-columns', '2',  # Adjust for better multithreading, depending on CPU
-         video_filename_webm
+        '-frame-parallel', '1',  # Enable frame parallel decoding feature
+        video_filename_webm
     ]
     
     print("Starting to record!!!")
