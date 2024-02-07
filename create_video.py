@@ -28,8 +28,8 @@ def capture_video(video_filename, video_filename_webm):
     # Define the command and arguments
     command = [
         'ffmpeg',
-        '-framerate', '30',
-        '-video_size', '1920x1080',
+        '-framerate', '24',
+        '-video_size', '1280x720',
         '-i', '/dev/video0',
         '-f', 'alsa', '-i', 'default',
         '-c:v', 'h264_v4l2m2m',
@@ -39,7 +39,7 @@ def capture_video(video_filename, video_filename_webm):
         '-c:a', 'aac',
         '-b:a', '128k',
         '-threads', '4',
-        '-t', '3',
+        '-t', '10',
         video_filename
     ]
 
