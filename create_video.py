@@ -49,26 +49,24 @@ def capture_video(video_filename, video_filename_webm):
         
     ]
     
-
+    print("Starting to record!!!")
     # Execute the command
     process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-
-    # Wait for the process to complete
     stdout, stderr = process.communicate()
+
     print(f"Recording video Stdout and stderr: {stderr}")
+    print("Starting conversion...")
+    process_conversion = subprocess.Popen(command_convert_to_webm, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
-    process = subprocess.Popen(command_convert_to_webm, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
-    print("Starting to record!!!")
     # Wait for the process to complete
-    stdout, stderr = process.communicate()
+    stdout, stderr = process_conversion.communicate()
     print(f"Converting video to WEBM Stdout and stderr: {stderr}")
 
-    print("Sleeping for 10")
-    time.sleep(10)
-
+    print("Removing AVI FILE")
     os.remove(video_filename)    # delete the AVI file from the folder
 
+    print("reading and returning webm bytes")
     video_bytes = None
     with open(video_filename_webm, 'rb') as video:
         video_bytes = video.read()
