@@ -7,8 +7,9 @@ def create_video(save_video_filepath):
     '''Captures Video file; returns data as a byetes'''
 
     object_count = count_files(save_video_filepath)
-    video_filepath = os.path.join(save_video_filepath, f'{object_count}.webm')
-    video_bytes = capture_video(video_filepath)
+    video_filepath = os.path.join(save_video_filepath, f'{object_count}.avi')
+    video_filepath_webm = os.path.join(save_video_filepath, f'{object_count}.webm')
+    video_bytes = capture_video(video_filepath, video_filepath_webm)
 
     if video_bytes is not None:
         print("\Video not None, Loading...")
@@ -20,14 +21,14 @@ def create_video(save_video_filepath):
         return None
 
 
-def capture_video(video_filename):
+def capture_video(video_filename, video_filename_webm):
     ''' Initialized camera and takes picture'''
 
     # Define the command and arguments
     command = [
         'ffmpeg',
         '-f', 'v4l2',
-        '-video_size', '1280x720',
+        '-video_size', '1920x1080',
         '-i', '/dev/video0',
         '-c:v', 'h264_v4l2m2m',
         '-pix_fmt', 'yuv420p',
@@ -37,6 +38,17 @@ def capture_video(video_filename):
         video_filename
     ]
 
+    command_convert_to_webm = [
+        'ffmpeg',
+        '-i', 'video_filename', 
+        '-c:v', 'libvpx-vp9', 
+        '-lossless', '1',
+        '-c:a', 'libopus', 
+        video_filename_webm
+        
+    ]
+    
+
     # Execute the command
     process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
@@ -44,8 +56,16 @@ def capture_video(video_filename):
     stdout, stderr = process.communicate()
     print(f"Recording video Stdout and stderr: {stdout}, {stderr}")
 
+    process = subprocess.Popen(command_convert_to_webm, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+
+    # Wait for the process to complete
+    stdout, stderr = process.communicate()
+    print(f"Converting video to WEBM Stdout and stderr: {stdout}, {stderr}")
+
+    os.remove(video_filename)    # delete the AVI file from the folder
+
     video_bytes = None
-    with open(video_filename, 'rb') as video:
+    with open(video_filename_webm, 'rb') as video:
         video_bytes = video.read()
 
     if video_bytes == None: 
