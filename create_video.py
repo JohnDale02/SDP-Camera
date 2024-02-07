@@ -30,12 +30,11 @@ def capture_video(video_filename):
         '-video_size', '1920x1080',
         '-i', '/dev/video0',
         '-c:v', 'libvpx-vp9',  # Use the VP9 codec
-        '-lossless', '1',      # Enable lossless encoding
+        '-lossless', 1,      # Enable lossless encoding
         '-pix_fmt', 'yuv420p', # Use a pixel format compatible with lossless encoding
         '-b:v', '2M',
         '-bufsize', '2M',
         '-t', '10',
-        '-f', 'webm', 
         video_filename
     ]
 
