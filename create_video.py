@@ -8,9 +8,8 @@ def create_video(save_video_filepath):
     '''Captures Video file; returns data as a byetes'''
 
     object_count = count_files(save_video_filepath)
-    video_filepath = os.path.join(save_video_filepath, f'{object_count}.mp4')
-    video_filepath_webm = os.path.join(save_video_filepath, f'{object_count}.webm')
-    video_bytes = capture_video(video_filepath, video_filepath_webm)
+    video_filepath = os.path.join(save_video_filepath, f'{object_count}.avi')
+    video_bytes = capture_video(video_filepath)
 
     if video_bytes is not None:
         print("\Video not None, Loading...")
@@ -22,7 +21,7 @@ def create_video(save_video_filepath):
         return None
 
 
-def capture_video(video_filename, video_filename_webm):
+def capture_video(video_filename):
     ''' Initialized camera and takes picture'''
 
     # Define the command and arguments
@@ -42,41 +41,17 @@ def capture_video(video_filename, video_filename_webm):
         '-t', '10',
         video_filename
     ]
-
-    command_convert_to_webm = [
-        'ffmpeg',
-        '-i', video_filename,
-        '-c:v', 'libvpx-vp9',
-        '-lossless', '1',
-        '-c:a', 'libopus',
-        '-b:a', '128k',
-        '-threads', '4',  # Adjust based on your CPU
-        '-tile-columns', '2',  # Adjust for better multithreading, depending on CPU
-        '-frame-parallel', '1',  # Enable frame parallel decoding feature
-        video_filename_webm
-    ]
     
     print("Starting to record!!!")
     # Execute the command
     process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     stdout, stderr = process.communicate()
 
-    if process.returncode == 0:
-        print(f"Recording video Stdout and stderr: {stderr}")
-        print("Starting conversion...")
-        process_conversion = subprocess.Popen(command_convert_to_webm, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    print(f"Video output: stdout {stdout}, stderr: {stderr}")
 
-
-        # Wait for the process to complete
-        stdout, stderr = process_conversion.communicate()
-        print(f"Converting video to WEBM Stdout and stderr: {stderr}")
-
-    print("Removing AVI FILE")
-    os.remove(video_filename)    # delete the AVI file from the folder
-
-    print("reading and returning webm bytes")
+    print("reading and returning avi bytes")
     video_bytes = None
-    with open(video_filename_webm, 'rb') as video:
+    with open(video_filename, 'rb') as video:
         video_bytes = video.read()
 
     if video_bytes == None: 
@@ -84,7 +59,6 @@ def capture_video(video_filename, video_filename_webm):
     
     else:
         return video_bytes
-
 
 
 def count_files(directory_path):
@@ -97,7 +71,7 @@ def count_files(directory_path):
     count = 0
     # Iterate over all files in the directory
     for file_name in os.listdir(directory_path):
-        if file_name.lower().endswith('.webm'):
+        if file_name.lower().endswith('.avi'):
             count += 1
 
     return count

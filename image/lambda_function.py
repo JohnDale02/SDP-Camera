@@ -14,6 +14,7 @@ from cryptography.hazmat.primitives import serialization
 from cryptography.exceptions import InvalidSignature
 from cryptography.hazmat.backends import default_backend
 import hashlib
+import subprocess
 
 # Possible updates
 # - Done hardcode bucket name and object key
@@ -26,7 +27,7 @@ def handler(event, context):
 
     # Extract bucket name and object key from the event
     object_key = str(event['Records'][0]['s3']['object']['key'])
-    print("Object key: should be NewImage.png or NewVideo.webm", object_key)
+    print("Object key: should be NewImage.png or NewVideo.avi", object_key)
     bucket_name = 'unverifiedimages'
 
     image = False   # video default
@@ -56,9 +57,10 @@ def handler(event, context):
             encoded_media = encoded_image.tobytes()
 
         else:
-            temp_media_path = '/tmp/TempNewVideo.webm'
+            temp_media_path = '/tmp/TempNewVideo.avi'
             s3_client.download_file(bucket_name, object_key, temp_media_path)
             print("Downloading video Done")
+            temp_webm_path = '/tmp/TempNewWebm.webm'
 
             with open(temp_media_path, 'rb') as video:
                 encoded_media = video.read()
@@ -100,7 +102,14 @@ def handler(event, context):
 
         if valid == True:
             try:
-                media_save_name = upload_verified(s3_client, camera_number, time_data, location_data, signature, temp_media_path, image)
+                media_save_name = upload_verified(s3_client, camera_number, time_data, location_data, signature, temp_media_path, image)  # save the AVI file
+
+            except Exception as e:
+                errors = errors + "Issue uploading to verified bucket" + str(e)
+
+            try: 
+                convert_to_webm(temp_media_path, temp_webm_path)
+                upload_verified_webm(s3_client, camera_number, temp_media_path)  # create and save a webm file
 
             except Exception as e:
                 errors = errors + "Issue uploading to verified bucket" + str(e)
@@ -208,7 +217,7 @@ def upload_verified(s3_client, camera_number, time_data, location_data, signatur
     if image:
         media_file_name = str(image_number) + '.png'  # Changes file extension
     else:
-        media_file_name = str(image_number) + '.webm'
+        media_file_name = str(image_number) + '.avi'
 
     # Create JSON data
     json_data = {
@@ -245,6 +254,30 @@ def upload_verified(s3_client, camera_number, time_data, location_data, signatur
     os.remove(temp_json_path)
 
     return media_file_name
+
+
+def upload_verified_webm(s3_client, camera_number, temp_media_path):
+# Get S3 bucket for verified images(camera_number)
+
+    destination_bucket_name = f'camera{int(camera_number)}verifiedimages'
+
+    try:
+        image_number = count_objects_in_bucket(destination_bucket_name) // 2
+
+    except Exception as e:
+        pass
+    
+    media_file_name = str(image_number) + '.webm'
+
+    try:
+        s3_client.upload_file(temp_media_path, destination_bucket_name, media_file_name)
+
+    except Exception as e:
+        pass
+
+    # Clean up: Delete temporary files
+    os.remove(temp_media_path)
+
 
 
 def count_objects_in_bucket(bucket_name):
@@ -355,3 +388,25 @@ def store_json_details(temp_image_path, camera_number, time_data, location_data,
     connection.close()
 
     print(f"Stored the data with image hash {image_hash}, Time: {time_data}")
+
+
+def convert_to_webm(temp_media_path, temp_webm_path):
+
+    ffmpeg_path = '/opt/bin/ffmpeg' 
+
+    print("Trying to convert to webm from avi...........")
+
+    command_convert_to_webm = [
+        ffmpeg_path,
+        '-i', temp_media_path,
+        '-c:v', 'libvpx-vp9',
+        '-lossless', '1',
+        '-c:a', 'libopus',
+        '-b:a', '128k',
+        temp_webm_path
+    ]
+
+    process = subprocess.Popen(command_convert_to_webm, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    stdout, stderr = process.communicate()
+
+    print(f"Video output: stdout {stdout}, stderr: {stderr}")
