@@ -40,7 +40,7 @@ def capture_video(video_filename, video_filename_webm):
 
     command_convert_to_webm = [
         'ffmpeg',
-        '-i', 'video_filename', 
+        '-i', video_filename, 
         '-c:v', 'libvpx-vp9', 
         '-lossless', '1',
         '-c:a', 'libopus', 
@@ -62,8 +62,8 @@ def capture_video(video_filename, video_filename_webm):
     stdout, stderr = process.communicate()
     print(f"Converting video to WEBM Stdout and stderr: {stderr}")
 
-    #os.remove(video_filename)    # delete the AVI file from the folder
-    
+    os.remove(video_filename)    # delete the AVI file from the folder
+
     video_bytes = None
     with open(video_filename_webm, 'rb') as video:
         video_bytes = video.read()
