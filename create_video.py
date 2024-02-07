@@ -8,7 +8,7 @@ def create_video(save_video_filepath):
     '''Captures Video file; returns data as a byetes'''
 
     object_count = count_files(save_video_filepath)
-    video_filepath = os.path.join(save_video_filepath, f'{object_count}.avi')
+    video_filepath = os.path.join(save_video_filepath, f'{object_count}.mp4')
     video_filepath_webm = os.path.join(save_video_filepath, f'{object_count}.webm')
     video_bytes = capture_video(video_filepath, video_filepath_webm)
 
@@ -28,25 +28,33 @@ def capture_video(video_filename, video_filename_webm):
     # Define the command and arguments
     command = [
         'ffmpeg',
-        '-f', 'v4l2',
+        '-framerate', '30',
         '-video_size', '1920x1080',
         '-i', '/dev/video0',
+        '-f', 'alsa', '-i', 'default',
         '-c:v', 'h264_v4l2m2m',
         '-pix_fmt', 'yuv420p',
-        '-b:v', '2M',
-        '-bufsize', '2M',
-        '-t', '10',
+        '-b:v', '4M',
+        '-bufsize', '4M',
+        '-c:a', 'aac',
+        '-b:a', '128k',
+        '-threads', '4',
+        '-t', '3',
         video_filename
     ]
 
     command_convert_to_webm = [
         'ffmpeg',
-        '-i', video_filename, 
-        '-c:v', 'libvpx-vp9', 
+        '-i', video_filename,
+        '-c:v', 'libvpx-vp9',
         '-lossless', '1',
-        '-c:a', 'libopus', 
-        video_filename_webm
-        
+        '-b:v', '1M',  # Adjust bitrate as needed
+        '-crf', '30',  # Adjust CRF value for quality vs size trade-off
+        '-c:a', 'libopus',
+        '-b:a', '128k',
+        '-threads', '4',  # Adjust based on your CPU
+        '-speed', '4',  # Faster encoding speed, lower quality
+        '-tile-columns', '2',  # Adjust for better multithreading, depending on CPU
     ]
     
     print("Starting to record!!!")
