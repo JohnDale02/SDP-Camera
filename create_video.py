@@ -2,6 +2,7 @@ import cv2
 import subprocess
 import base64
 import os 
+import time
 
 def create_video(save_video_filepath):
     '''Captures Video file; returns data as a byetes'''
@@ -58,9 +59,13 @@ def capture_video(video_filename, video_filename_webm):
 
     process = subprocess.Popen(command_convert_to_webm, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
+    print("Starting to record!!!")
     # Wait for the process to complete
     stdout, stderr = process.communicate()
     print(f"Converting video to WEBM Stdout and stderr: {stderr}")
+
+    print("Sleeping for 10")
+    time.sleep(10)
 
     os.remove(video_filename)    # delete the AVI file from the folder
 
