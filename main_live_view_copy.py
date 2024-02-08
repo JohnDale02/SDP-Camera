@@ -3,6 +3,7 @@ import tkinter as tk
 from PIL import Image, ImageTk
 import subprocess
 import RPi.GPIO as GPIO
+import threading
 import time
 
 class CameraGUI:
@@ -35,12 +36,13 @@ class CameraGUI:
         if self.capture.isOpened():
             self.capture.release()
 
+recording_process = None
 
 def start_recording():
     global recording_process
     command = [
         'ffmpeg',
-        '-f', 'v4l2', '-i', '/dev/video0',  # Directly use the real camera for recording
+        '-f', 'v4l2', '-i', '/dev/video0',
         '-c:v', 'libx264', '-preset', 'fast', '-crf', '21',
         'output.mp4'
     ]
@@ -49,47 +51,44 @@ def start_recording():
 def stop_recording():
     global recording_process
     if recording_process:
-        recording_process.terminate()  # sends SIGTERM
-        recording_process.wait()  # Wait for the process to finish
+        recording_process.terminate()
+        recording_process.wait()
         recording_process = None
 
+def monitor_button(record_button):
+    global recording_process
+    while True:
+        button_state = GPIO.input(record_button)
+        if button_state == False and not recording_process:
+            start_recording()
+        elif button_state == True and recording_process:
+            stop_recording()
+        time.sleep(0.1)
 
 def setup_gpio():
     GPIO.setmode(GPIO.BOARD)
-
-    record_button = 37
+    record_button = 37  # Use the physical pin numbering
     GPIO.setup(record_button, GPIO.IN, pull_up_down=GPIO.PUD_UP)
     return record_button
 
-
 def main_live_view():
+    record_button = setup_gpio()
+
     # Create a Tkinter window
     root = tk.Tk()
+    
     # Create the GUI application
     gui = CameraGUI(root, video_source='/dev/video0')
-    
-    record_button = setup_gpio()
-    recording_process = None
 
-    try:
-        while True:
-            # Check for button press
-            button_state = GPIO.input(record_button)
-            if button_state == False and not recording_process:  # Assuming False means the button is pressed
-                start_recording()
-            elif button_state == True and recording_process:
-                stop_recording()
-            # Add a small delay to debounce button press
-            time.sleep(0.1)
-    except KeyboardInterrupt:
-        # Handle cleanup on Ctrl+C (optional)
-        stop_recording()
-        gui.release()
-        GPIO.cleanup()
+    # Setup thread for monitoring button press in the background
+    threading.Thread(target=monitor_button, args=(record_button,), daemon=True).start()
 
     # Run the application
     gui.run()
 
+    # Release resources after the window is closed
+    gui.release()
+    GPIO.cleanup()
 
 if __name__ == '__main__':
     main_live_view()
