@@ -40,30 +40,39 @@ recording_process = None
 
 def start_recording():
     global recording_process
+    print("Starting recording...")
     command = [
         'ffmpeg',
         '-f', 'v4l2', '-i', '/dev/video0',
         '-c:v', 'libx264', '-preset', 'fast', '-crf', '21',
         'output.mp4'
     ]
-    recording_process = subprocess.Popen(command)
+    recording_process = subprocess.Popen(command, stderr=subprocess.STDOUT, stdout=subprocess.PIPE)
+    print("Recording process started.")
 
 def stop_recording():
     global recording_process
     if recording_process:
+        print("Stopping recording...")
         recording_process.terminate()
-        recording_process.wait()
+        stdout, _ = recording_process.communicate()
+        print("FFmpeg output:", stdout.decode())
         recording_process = None
+        print("Recording stopped.")
 
 def monitor_button(record_button):
     global recording_process
+    print("Monitoring button...")
     while True:
         button_state = GPIO.input(record_button)
         if button_state == False and not recording_process:
+            print("Button pressed.")
             start_recording()
         elif button_state == True and recording_process:
+            print("Button released.")
             stop_recording()
         time.sleep(0.1)
+
 
 def setup_gpio():
     GPIO.setmode(GPIO.BOARD)
