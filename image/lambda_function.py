@@ -60,7 +60,7 @@ def handler(event, context):
             temp_media_path = '/tmp/TempNewVideo.avi'
             s3_client.download_file(bucket_name, object_key, temp_media_path)
             print("Downloading video Done")
-            temp_webm_path = '/tmp/TempNewWebm.webm'
+            temp_mp4_path = '/tmp/TempNewMp4.mp4'
 
             with open(temp_media_path, 'rb') as video:
                 encoded_media = video.read()
@@ -102,14 +102,14 @@ def handler(event, context):
 
         if valid == True:
             try:
-                media_save_name = upload_verified(s3_client, camera_number, time_data, location_data, signature, temp_media_path, image)  # save the AVI file
+                media_save_name, media_number = upload_verified(s3_client, camera_number, time_data, location_data, signature, temp_media_path, image)  # save the AVI file
 
             except Exception as e:
                 errors = errors + "Issue uploading to verified bucket" + str(e)
 
             try: 
-                convert_to_webm(temp_media_path, temp_webm_path)
-                upload_verified_webm(s3_client, camera_number, temp_webm_path)  # create and save a webm file
+                convert_to_mp4(temp_media_path, temp_mp4_path)
+                upload_verified_mp4(s3_client, camera_number, temp_mp4_path, media_number)  # create and save a mp4 file
 
             except Exception as e:
                 errors = errors + "Issue uploading to verified bucket" + str(e)
@@ -121,7 +121,7 @@ def handler(event, context):
                 errors = errors + "Issue Sending text: " + str(e)
 
             os.remove(temp_media_path)
-            os.remove(temp_webm_path)
+            os.remove(temp_mp4_path)
             
         else:
             try:
@@ -212,15 +212,15 @@ def upload_verified(s3_client, camera_number, time_data, location_data, signatur
     destination_bucket_name = f'camera{int(camera_number)}verifiedimages'
 
     try:
-        image_number = count_objects_in_bucket(destination_bucket_name) // 2
+        media_number = count_objects_in_bucket(destination_bucket_name) // 2
 
     except Exception as e:
         pass
     
     if image:
-        media_file_name = str(image_number) + '.png'  # Changes file extension
+        media_file_name = str(media_number) + '.png'  # Changes file extension
     else:
-        media_file_name = str(image_number) + '.avi'
+        media_file_name = str(media_number) + '.avi'
 
     # Create JSON data
     json_data = {
@@ -231,7 +231,7 @@ def upload_verified(s3_client, camera_number, time_data, location_data, signatur
     }
 
     # Save JSON data to a file with the same name as the image
-    json_file_name = str(image_number) + '.json'  # Changes file extension to .json
+    json_file_name = str(media_number) + '.json'  # Changes file extension to .json
 
     temp_json_path = f'/tmp/{json_file_name}'
 
@@ -255,24 +255,18 @@ def upload_verified(s3_client, camera_number, time_data, location_data, signatur
     # Clean up: Delete temporary files
     os.remove(temp_json_path)
 
-    return media_file_name
+    return media_file_name, media_number
 
 
-def upload_verified_webm(s3_client, camera_number, temp_webm_path):
+def upload_verified_mp4(s3_client, camera_number, temp_mp4_path, media_number):
 # Get S3 bucket for verified images(camera_number)
 
     destination_bucket_name = f'camera{int(camera_number)}verifiedimages'
 
-    try:
-        image_number = count_objects_in_bucket(destination_bucket_name) // 2
-
-    except Exception as e:
-        pass
-    
-    media_file_name = str(image_number) + '.webm'
+    media_file_name = str(media_number) + '.mp4'
 
     try:
-        s3_client.upload_file(temp_webm_path, destination_bucket_name, media_file_name, ExtraArgs={'ContentType': 'video/webm'})
+        s3_client.upload_file(temp_mp4_path, destination_bucket_name, media_file_name, ExtraArgs={'ContentType': 'video/mp4'})
 
     except Exception as e:
         pass
@@ -323,7 +317,7 @@ def verify_signature(combined_data, signature, public_key):
 def send_text(valid, image_save_name="default"):
 
     account_sid = 'SID HERE'
-    auth_token = 'AUTH TOKEN HERE'
+    auth_token = 'TOKEN HERE'
     client = Client(account_sid, auth_token)
 
     if valid == True:
@@ -388,21 +382,23 @@ def store_json_details(temp_image_path, camera_number, time_data, location_data,
     print(f"Stored the data with image hash {image_hash}, Time: {time_data}")
 
 
-def convert_to_webm(temp_media_path, temp_webm_path):
+def convert_to_mp4(temp_media_path, temp_mp4_path):
 
-    print("Trying to convert to webm from avi...........")
+    print("Trying to convert to mp4 from avi...........")
 
-    command_convert_to_webm = [
+    command_convert_to_mp4 = [
         'ffmpeg',
-        '-i', temp_media_path,
-        '-c:v', 'libvpx-vp9',
-        '-lossless', '1',
-        '-c:a', 'libopus',
-        '-b:a', '128k',
-        temp_webm_path
+        '-i', temp_media_path,          # Input file path
+        '-c:v', 'libx264',              # Video codec to use (H.264)
+        '-crf', '23',                   # Constant Rate Factor (CRF) value, 18-28 is a good range, lower is higher quality
+        '-preset', 'medium',          # Preset for compression efficiency (you can use 'medium' for a balance between speed and quality)
+        '-c:a', 'aac',                  # Audio codec to use (AAC)
+        '-b:a', '128k',                 # Audio bitrate
+        '-strict', 'experimental',      # Allow experimental codecs (if needed for AAC)
+        temp_mp4_path                   # Output file path
     ]
 
-    process = subprocess.Popen(command_convert_to_webm, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    process = subprocess.Popen(command_convert_to_mp4, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     stdout, stderr = process.communicate()
 
     print(f"Video output: stdout {stdout}, stderr: {stderr}")
