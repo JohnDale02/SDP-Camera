@@ -69,7 +69,7 @@ def monitor_mode(mode_button):
         if button_state == False:
             image_mode = not image_mode
             print("Monitor button has image_mode == ", image_mode)
-            time.sleep(.2)
+            time.sleep(2)
 
 
 def monitor_recording(record_button):
@@ -79,7 +79,7 @@ def monitor_recording(record_button):
         if button_state == False:
             is_recording = not is_recording
             print("Monitor button has is_recording == ", is_recording)
-            time.sleep(.2)
+            time.sleep(2)
 
 def update_gui():
     global image_mode, is_recording
