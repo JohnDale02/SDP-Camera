@@ -104,14 +104,12 @@ def update_gui():
         recording_indicator.place_forget()
 
     # Schedule the update_gui function to run again after 100ms
-    root.after(200, update_gui)
+    root.after(1000, update_gui)
 
 def update_frame():
     global capture
     ret, frame = capture.read()
     if ret:
-        # Resize the frame to half the size to reduce processing
-        frame = cv2.resize(frame, (0, 0), fx=0.5, fy=0.5)
         frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         im = Image.fromarray(frame)
         img = ImageTk.PhotoImage(image=im)
