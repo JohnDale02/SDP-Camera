@@ -51,9 +51,9 @@ def monitor_button(record_button):
         if button_state == False:
             print("Button pressed.")
             image_mode = not image_mode
-            time.sleep(0.1)
+            print(f"Changing image mode to: {image_mode}")
+            time.sleep(.2)
 
-        print(f"Changing image mode to: {image_mode}")
 
 
 def setup_gpio():
