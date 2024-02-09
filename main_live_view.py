@@ -89,8 +89,8 @@ def update_gui():
         text_box.config(text="Image", anchor="ne")
         text_box.place(relx=1.0, rely=0.0, anchor="ne")
     else:
-        text_box.config(text="Video", anchor="se")
-        text_box.place(relx=1.0, rely=1.0, anchor="se")
+        text_box.config(text="Video", anchor="ne")
+        text_box.place(relx=1.0, rely=0.0, anchor="ne")
 
     # Display or hide the recording indicator based on is_recording
     if is_recording:
