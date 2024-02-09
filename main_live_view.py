@@ -20,16 +20,17 @@ def record_thread():
     changeStateThread.start()
 
     while True:
-        print(f"Recording: {is_recording}")
-        time.sleep(5)
+        #print(f"Recording: {is_recording}")
+        #time.sleep(5)
+        continue
      
 
 
 def gui_thread():
     global image_mode
-    print("Gui has image_mode == ", image_mode)
-    time.sleep(5)
-    pass
+    while True:
+        print("Gui has image_mode == ", image_mode)
+        time.sleep(3)
 
 
 def photoLock():
