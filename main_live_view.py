@@ -16,7 +16,7 @@ def record_thread():
     is_recording = False
 
     record_button = setup_gpio()
-    changeStateThread = threading.Thread(target=monitor_button, args=(record_button,), daemon=True).start()
+    changeStateThread = threading.Thread(target=monitor_button, args=(record_button,), daemon=True)
     changeStateThread.start()
 
     while True:
