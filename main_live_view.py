@@ -106,7 +106,7 @@ def update_gui():
         recording_indicator.place_forget()
 
     # Schedule the update_gui function to run again after 100ms
-    root.after(1000, update_gui)
+    root.after(100, update_gui)
 
 def update_frame():
     global capture
