@@ -32,14 +32,9 @@ def record_thread():
     ''' Thread resonsible for updating states of camera recording mode and recording state'''
     global image_mode
     global is_recording
-
-    mode_button, record_button = setup_gpio()
-    changeModeThread = threading.Thread(target=monitor_mode, args=(mode_button,), daemon=True)
-    changeRecordingThread = threading.Thread(target=monitor_recording, args=(record_button,), daemon=True)
+    
+    setup_gpio()
     handleCaptureThread = threading.Thread(target=handle_capture, daemon=True)
-
-    changeModeThread.start()
-    changeRecordingThread.start()
     handleCaptureThread.start()
 
     while True:
@@ -113,12 +108,20 @@ def update_frame():
         # Resize the frame to half the size to reduce processing
         frame = cv2.resize(frame, (0, 0), fx=0.5, fy=0.5)
         frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        
+        # Convert to PIL image
         im = Image.fromarray(frame)
+        
+        # Resize the PIL image to fill the entire screen dimensions (800x480 in your case)
+        im = im.resize((800, 480), Image.ANTIALIAS)  # Use ANTIALIAS filter for better quality
+        
         img = ImageTk.PhotoImage(image=im)
         video_label.img = img  # Keep a reference to avoid garbage collection
         video_label.config(image=img)
+    
     # Update the frame in the GUI less frequently
     root.after(100, update_frame)  # Adjust the delay as needed
+
 
 # --------------------------------------------------------------------
 
