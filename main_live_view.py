@@ -10,6 +10,8 @@ from PIL import Image, ImageTk
 image_mode = True
 is_recording = False
 capture = cv2.VideoCapture(0)  # capture object for liveView
+capture.set(cv2.CAP_PROP_FRAME_WIDTH, 320)  # Adjust width
+capture.set(cv2.CAP_PROP_FRAME_HEIGHT, 240)  # Adjust height
 
 
 
@@ -116,7 +118,7 @@ def update_frame():
         video_label.img = img  # Keep a reference to avoid garbage collection
         video_label.config(image=img)
     # Update the frame in the GUI less frequently
-    root.after(100, update_frame)  # Adjust the delay as needed
+    root.after(3, update_frame)  # Adjust the delay as needed
 
 # --------------------------------------------------------------------
 
