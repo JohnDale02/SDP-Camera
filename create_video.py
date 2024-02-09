@@ -38,7 +38,6 @@ def capture_video(video_filename):
         '-c:a', 'aac',
         '-b:a', '128k',
         '-threads', '4',
-        '-t', '10',
         video_filename
     ]
     
