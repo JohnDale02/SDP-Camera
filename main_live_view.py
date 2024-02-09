@@ -89,14 +89,17 @@ def handle_capture():
     '''Function for monitoring modes and recording states and starting and stopping recording accordingly.'''
     global image_mode
     global is_recording
-    
-    ffmpeg_process = None
-    while True: 
-        if image_mode == False and is_recording == True:
-            ffmpeg_process = start_recording()
 
-        elif image_mode == False and is_recording == False and ffmpeg_process != None:
+    ffmpeg_process = None
+    have_started = False
+    while True: 
+        if image_mode == False and is_recording == True and have_started == False:
+            ffmpeg_process = start_recording()
+            have_started = True
+
+        elif image_mode == False and is_recording == False and have_started == True:
             ffmpeg_process = stop_recording(ffmpeg_process)
+            have_started = False
 
         else:
             continue
