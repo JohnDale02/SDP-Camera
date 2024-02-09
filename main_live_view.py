@@ -61,3 +61,8 @@ def setup_gpio():
     record_button = 37  # Use the physical pin numbering
     GPIO.setup(record_button, GPIO.IN, pull_up_down=GPIO.PUD_UP)
     return record_button
+
+
+if __name__ == '__main__':
+    photoLock()
+    GPIO.cleanup()
