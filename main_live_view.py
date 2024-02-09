@@ -55,6 +55,8 @@ def gui_thread():
     root = tk.Tk()
     root.geometry("800x480")
 
+    video_canvas = tk.Canvas(root, width=320, height=240)
+    video_canvas.pack()  # Adjust the placement as needed
     # Create a text box widget
     text_box = ttk.Label(root, text="", background="white", font=("Helvetica", 16))
     
@@ -64,8 +66,7 @@ def gui_thread():
     
 
     # Create a label for displaying the video
-    video_label = tk.Label(root)
-    video_label.pack()  # Adjust the placement as needed
+    video_label = video_canvas
 
     # Initialize the GUI update loop
     update_gui()
@@ -110,14 +111,18 @@ def update_gui():
     root.after(100, update_gui)
 
 def update_frame():
-    global capture
+    global capture, video_label
     ret, frame = capture.read()
     if ret:
         frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         im = Image.fromarray(frame)
         img = ImageTk.PhotoImage(image=im)
         video_label.img = img  # Keep a reference to avoid garbage collection
-        video_label.config(image=img)
+        video_label.create_image(0, 0, anchor="nw", image=img)
+        if is_recording:
+            recording_indicator = video_label.create_oval(5, 5, 45, 45, fill="red")
+        else:
+            video_label.delete("recording_indicator")
     # Update the frame in the GUI less frequently
     root.after(3, update_frame)  # Adjust the delay as needed
 
