@@ -34,12 +34,12 @@ def record_thread():
     global is_recording
 
     mode_button, record_button = setup_gpio()
-    changeModeThread = threading.Thread(target=toggle_image_mode, args=(mode_button,), daemon=True)
-    changeRecordingThread = threading.Thread(target=toggle_recording, args=(record_button,), daemon=True)
+    #changeModeThread = threading.Thread(target=toggle_image_mode, args=(mode_button,), daemon=True)
+    #changeRecordingThread = threading.Thread(target=toggle_recording, args=(record_button,), daemon=True)
     handleCaptureThread = threading.Thread(target=handle_capture, daemon=True)
 
-    changeModeThread.start()
-    changeRecordingThread.start()
+    #changeModeThread.start()
+    #changeRecordingThread.start()
     handleCaptureThread.start()
 
     while True:
