@@ -32,9 +32,14 @@ def record_thread():
     ''' Thread resonsible for updating states of camera recording mode and recording state'''
     global image_mode
     global is_recording
-    
-    setup_gpio()
+
+    mode_button, record_button = setup_gpio()
+    changeModeThread = threading.Thread(target=toggle_image_mode, args=(mode_button,), daemon=True)
+    changeRecordingThread = threading.Thread(target=toggle_recording, args=(record_button,), daemon=True)
     handleCaptureThread = threading.Thread(target=handle_capture, daemon=True)
+
+    changeModeThread.start()
+    changeRecordingThread.start()
     handleCaptureThread.start()
 
     while True:
