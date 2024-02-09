@@ -2,7 +2,8 @@ import threading
 import RPi.GPIO as GPIO
 import time
 import subprocess
-
+import tkinter as tk
+from tkinter import ttk
 
 image_mode = True
 is_recording = False
@@ -38,19 +39,27 @@ def record_thread():
     handleCaptureThread.start()
 
     while True:
-        #print(f"Recording: {is_recording}")
-        #time.sleep(5)
         continue
      
 
 def gui_thread():
     ''' Thread responsible for reflecting state changes to the GUI'''
-    global image_mode
-    global is_recording
-    while True:
-        print("Gui has image_mode == ", image_mode)
-        time.sleep(3)
+    global root, text_box, recording_indicator
 
+    root = tk.Tk()
+    root.geometry("640x480")
+
+    # Create a text box widget
+    text_box = ttk.Label(root, text="", background="white", font=("Helvetica", 16))
+    
+    # Create a recording indicator
+    recording_indicator = tk.Canvas(root, width=50, height=50, highlightthickness=0)
+    recording_indicator.create_oval(5, 5, 45, 45, fill="red")
+
+    # Initialize the GUI update loop
+    update_gui()
+
+    root.mainloop()
 # --------------------------------------------------------------------
         
 def monitor_mode(mode_button):
@@ -71,6 +80,26 @@ def monitor_recording(record_button):
             is_recording = not is_recording
             print("Monitor button has is_recording == ", is_recording)
             time.sleep(.2)
+
+def update_gui():
+    global image_mode, is_recording
+
+    # Update the text box based on image_mode
+    if image_mode:
+        text_box.config(text="Image", anchor="ne")
+        text_box.place(relx=1.0, rely=0.0, anchor="ne")
+    else:
+        text_box.config(text="Video", anchor="se")
+        text_box.place(relx=1.0, rely=1.0, anchor="se")
+
+    # Display or hide the recording indicator based on is_recording
+    if is_recording:
+        recording_indicator.place(relx=0.5, rely=0.5, anchor="center")
+    else:
+        recording_indicator.place_forget()
+
+    # Schedule the update_gui function to run again after 100ms
+    root.after(100, update_gui)
 
 # --------------------------------------------------------------------
 
