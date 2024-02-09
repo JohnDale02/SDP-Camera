@@ -59,6 +59,7 @@ def gui_thread():
     video_canvas.pack()  # Adjust the placement as needed
     # Create a text box widget
     text_box = ttk.Label(root, text="", background="white", font=("Helvetica", 16))
+    
 
     # Create a label for displaying the video
     video_label = video_canvas
@@ -94,13 +95,6 @@ def update_gui():
         text_box.config(text=desired_text)
         # Since both conditions place the text box in the same location, we don't need to check this every time
         text_box.place(relx=1.0, rely=0.0, anchor="ne")
-
-    # For the recording indicator, check if its display state needs to change
-    # This uses the `winfo_ismapped()` method to check if the widget is currently being displayed
-    if is_recording and not recording_indicator.winfo_ismapped():
-        recording_indicator.place(relx=0.5, rely=0.5, anchor="center")
-    elif not is_recording and recording_indicator.winfo_ismapped():
-        recording_indicator.place_forget()
 
     # Schedule the update_gui function to run again after 100ms
     root.after(100, update_gui)
