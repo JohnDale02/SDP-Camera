@@ -35,13 +35,11 @@ def record_thread():
     global image_mode
     global is_recording
 
-    mode_button, record_button = setup_gpio()
-    #changeModeThread = threading.Thread(target=toggle_image_mode, args=(mode_button,), daemon=True)
-    #changeRecordingThread = threading.Thread(target=toggle_recording, args=(record_button,), daemon=True)
+    setup_gpio()
+
     handleCaptureThread = threading.Thread(target=handle_capture, daemon=True)
 
-    #changeModeThread.start()
-    #changeRecordingThread.start()
+
     handleCaptureThread.start()
 
     while True:
@@ -61,7 +59,7 @@ def gui_thread():
     # Create a recording indicator
     recording_indicator = tk.Canvas(root, width=50, height=50, highlightthickness=0)
     recording_indicator.create_oval(5, 5, 45, 45, fill="red")
-    recording_indicator.place(relx=0.5, rely=0.5, anchor="center") 
+    
 
     # Create a label for displaying the video
     video_label = tk.Label(root)
