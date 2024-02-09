@@ -51,7 +51,7 @@ def gui_thread():
     global root, text_box, recording_indicator, video_label
 
     root = tk.Tk()
-    window = root.geometry("800x480")
+    root.geometry("800x480")
 
     # Create a text box widget
     text_box = ttk.Label(root, text="", background="white", font=("Helvetica", 16))
@@ -71,24 +71,15 @@ def gui_thread():
     root.mainloop()
 # --------------------------------------------------------------------
         
-def monitor_mode(mode_button):
+def toggle_image_mode(channel):
     global image_mode
-    while True:
-        button_state = GPIO.input(mode_button)
-        if button_state == False:
-            image_mode = not image_mode
-            print("Monitor button has image_mode == ", image_mode)
-            time.sleep(.4)
+    image_mode = not image_mode
+    print("Image mode toggled:", image_mode)
 
-
-def monitor_recording(record_button):
+def toggle_recording(channel):
     global is_recording
-    while True:
-        button_state = GPIO.input(record_button)
-        if button_state == False:
-            is_recording = not is_recording
-            print("Monitor button has is_recording == ", is_recording)
-            time.sleep(.4)
+    is_recording = not is_recording
+    print("Recording toggled:", is_recording)
 
 # --------------------------------------------------------------------
 
@@ -119,23 +110,28 @@ def update_frame():
     global capture
     ret, frame = capture.read()
     if ret:
+        # Resize the frame to half the size to reduce processing
+        frame = cv2.resize(frame, (0, 0), fx=0.5, fy=0.5)
         frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         im = Image.fromarray(frame)
         img = ImageTk.PhotoImage(image=im)
-        video_label.img = img  # Keep a reference, so it's not garbage collected
+        video_label.img = img  # Keep a reference to avoid garbage collection
         video_label.config(image=img)
-    root.after(34, update_frame) 
+    # Update the frame in the GUI less frequently
+    root.after(100, update_frame)  # Adjust the delay as needed
 
 # --------------------------------------------------------------------
 
 def setup_gpio():
     GPIO.setmode(GPIO.BOARD)
-    record_button = 37 
-    mode_button = 38   
+    record_button = 37
+    mode_button = 38
     GPIO.setup(record_button, GPIO.IN, pull_up_down=GPIO.PUD_UP)
     GPIO.setup(mode_button, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
-    return mode_button, record_button
+    # Setup event detection
+    GPIO.add_event_detect(mode_button, GPIO.FALLING, callback=toggle_image_mode, bouncetime=200)
+    GPIO.add_event_detect(record_button, GPIO.FALLING, callback=toggle_recording, bouncetime=200)
 
 # --------------------------------------------------------------------
 
