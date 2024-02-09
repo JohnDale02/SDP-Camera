@@ -27,6 +27,8 @@ def record_thread():
 
 def gui_thread():
     global image_mode
+    print("Gui has image_mode == ", image_mode)
+    time.sleep(5)
     pass
 
 
@@ -49,9 +51,8 @@ def monitor_button(record_button):
     while True:
         button_state = GPIO.input(record_button)
         if button_state == False:
-            print("Button pressed.")
             image_mode = not image_mode
-            print(f"Changing image mode to: {image_mode}")
+            print("Monitor button has image_mode == ", image_mode)
             time.sleep(.2)
 
 
