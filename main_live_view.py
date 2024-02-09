@@ -59,11 +59,6 @@ def gui_thread():
     video_canvas.pack()  # Adjust the placement as needed
     # Create a text box widget
     text_box = ttk.Label(root, text="", background="white", font=("Helvetica", 16))
-    
-    # Create a recording indicator
-    recording_indicator = tk.Canvas(root, width=50, height=50, highlightthickness=0)
-    recording_indicator.create_oval(5, 5, 45, 45, fill="red")
-    
 
     # Create a label for displaying the video
     video_label = video_canvas
