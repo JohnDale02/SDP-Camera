@@ -40,14 +40,16 @@ recording_process = None
 
 def start_recording():
     global recording_process
-    print("Starting recording...")
-    command = [
-        'ffmpeg',
-        '-f', 'v4l2', '-i', '/dev/video0',
-        '-c:v', 'libx264', '-preset', 'fast', '-crf', '21',
-        'output.mp4'
-    ]
-    recording_process = subprocess.Popen(command, stderr=subprocess.STDOUT, stdout=subprocess.PIPE)
+    if not recording_process:
+        print("Starting recording from virtual camera...")
+        command = [
+            'ffmpeg',
+            '-f', 'v4l2', '-i', '/dev/video1',  # Use the virtual camera device for recording
+            '-c:v', 'libx264', '-preset', 'fast', '-crf', '21',
+            'output.mp4'
+        ]
+        recording_process = subprocess.Popen(command, stderr=subprocess.STDOUT, stdout=subprocess.PIPE)
+
     print("Recording process started.")
 
 def stop_recording():
@@ -99,5 +101,19 @@ def main_live_view():
     gui.release()
     GPIO.cleanup()
 
+def main_gui_update():
+    # Shared variable
+    is_recording = False
+    # Lock to synchronize access to the shared variable
+    lock = threading.Lock()
+
+    record_button = setup_gpio()
+     # Setup thread for monitoring button press in the background
+    threading.Thread(target=monitor_button, args=(record_button,), daemon=True).start()
+    root = tk.Tk()
+    gui = CameraGUI(root, video_source='/dev/video0')
+
+
 if __name__ == '__main__':
-    main_live_view()
+    #main_live_view()
+    main_gui_update()
