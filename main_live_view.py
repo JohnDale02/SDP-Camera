@@ -44,36 +44,31 @@ def record_thread():
 
     while True:
         continue
-
      
+
 def gui_thread():
     ''' Thread responsible for reflecting state changes to the GUI'''
     global root, text_box, recording_indicator, video_label
 
     root = tk.Tk()
-    root.geometry("800x480")
+    window = root.geometry("800x480")
 
-    # Initialize video display
-    video_label = tk.Label(root)
-    video_label.pack(side="top", fill="both", expand=True)
-
-    # Create a text box widget for mode display
-    text_box = ttk.Label(video_label, text="", background="white", font=("Helvetica", 16))
-    text_box.pack(side="top", anchor="ne")
-
+    # Create a text box widget
+    text_box = ttk.Label(root, text="", background="white", font=("Helvetica", 16))
+    
     # Create a recording indicator
-    recording_indicator = tk.Canvas(video_label, width=50, height=50, highlightthickness=0, bg='red')
+    recording_indicator = tk.Canvas(root, width=50, height=50, highlightthickness=0)
     recording_indicator.create_oval(5, 5, 45, 45, fill="red")
 
-    # Don't pack the recording_indicator by default, show it only when recording
-    # recording_indicator.pack(side="top", anchor="center")
+    # Create a label for displaying the video
+    video_label = tk.Label(root)
+    video_label.pack()  # Adjust the placement as needed
 
-    # Start updating the GUI and the video frame
+    # Initialize the GUI update loop
     update_gui()
     update_frame()
 
     root.mainloop()
-
 # --------------------------------------------------------------------
         
 def monitor_mode(mode_button):
