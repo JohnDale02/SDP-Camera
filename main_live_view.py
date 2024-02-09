@@ -113,7 +113,8 @@ def update_frame():
         im = Image.fromarray(frame)
         
         # Resize the PIL image to fill the entire screen dimensions (800x480 in your case)
-        im = im.resize((800, 480), Image.ANTIALIAS)  # Use ANTIALIAS filter for better quality
+        im = im.resize((800, 480), Image.LANCZOS)
+
         
         img = ImageTk.PhotoImage(image=im)
         video_label.img = img  # Keep a reference to avoid garbage collection
