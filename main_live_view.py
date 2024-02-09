@@ -4,9 +4,13 @@ import time
 import subprocess
 import tkinter as tk
 from tkinter import ttk
+import cv2
+from PIL import Image, ImageTk
 
 image_mode = True
 is_recording = False
+capture = cv2.VideoCapture(0)  # capture object for liveView
+
 
 
 # --------------------------------------------------------------------
@@ -44,10 +48,10 @@ def record_thread():
 
 def gui_thread():
     ''' Thread responsible for reflecting state changes to the GUI'''
-    global root, text_box, recording_indicator
+    global root, text_box, recording_indicator, video_label
 
     root = tk.Tk()
-    root.geometry("640x480")
+    window = root.geometry("800x480")
 
     # Create a text box widget
     text_box = ttk.Label(root, text="", background="white", font=("Helvetica", 16))
@@ -55,6 +59,10 @@ def gui_thread():
     # Create a recording indicator
     recording_indicator = tk.Canvas(root, width=50, height=50, highlightthickness=0)
     recording_indicator.create_oval(5, 5, 45, 45, fill="red")
+
+    # Create a label for displaying the video
+    video_label = tk.Label(root)
+    video_label.pack()  # Adjust the placement as needed
 
     # Initialize the GUI update loop
     update_gui()
@@ -69,7 +77,7 @@ def monitor_mode(mode_button):
         if button_state == False:
             image_mode = not image_mode
             print("Monitor button has image_mode == ", image_mode)
-            time.sleep(2)
+            time.sleep(.4)
 
 
 def monitor_recording(record_button):
@@ -79,27 +87,43 @@ def monitor_recording(record_button):
         if button_state == False:
             is_recording = not is_recording
             print("Monitor button has is_recording == ", is_recording)
-            time.sleep(2)
+            time.sleep(.4)
+
+# --------------------------------------------------------------------
 
 def update_gui():
     global image_mode, is_recording
 
-    # Update the text box based on image_mode
-    if image_mode:
-        text_box.config(text="Image", anchor="ne")
-        text_box.place(relx=1.0, rely=0.0, anchor="ne")
-    else:
-        text_box.config(text="Video", anchor="ne")
+    # Current state of the text box (to minimize unnecessary updates)
+    current_text = text_box.cget("text")  # Get the current text of the text box
+    desired_text = "Image" if image_mode else "Video"
+
+    # Only update the text box if the text has changed
+    if current_text != desired_text:
+        text_box.config(text=desired_text)
+        # Since both conditions place the text box in the same location, we don't need to check this every time
         text_box.place(relx=1.0, rely=0.0, anchor="ne")
 
-    # Display or hide the recording indicator based on is_recording
-    if is_recording:
+    # For the recording indicator, check if its display state needs to change
+    # This uses the `winfo_ismapped()` method to check if the widget is currently being displayed
+    if is_recording and not recording_indicator.winfo_ismapped():
         recording_indicator.place(relx=0.5, rely=0.5, anchor="center")
-    else:
+    elif not is_recording and recording_indicator.winfo_ismapped():
         recording_indicator.place_forget()
 
     # Schedule the update_gui function to run again after 100ms
-    root.after(100, update_gui)
+    root.after(200, update_gui)
+
+def update_frame():
+    global capture
+    ret, frame = capture.read()
+    if ret:
+        frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        im = Image.fromarray(frame)
+        img = ImageTk.PhotoImage(image=im)
+        video_label.img = img  # Keep a reference, so it's not garbage collected
+        video_label.config(image=img)
+    root.after(34, update_frame) 
 
 # --------------------------------------------------------------------
 
