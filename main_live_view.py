@@ -108,21 +108,12 @@ def update_frame():
         # Resize the frame to half the size to reduce processing
         frame = cv2.resize(frame, (0, 0), fx=0.5, fy=0.5)
         frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-        
-        # Convert to PIL image
         im = Image.fromarray(frame)
-        
-        # Resize the PIL image to fill the entire screen dimensions (800x480 in your case)
-        im = im.resize((800, 480), Image.LANCZOS)
-
-        
         img = ImageTk.PhotoImage(image=im)
         video_label.img = img  # Keep a reference to avoid garbage collection
         video_label.config(image=img)
-    
     # Update the frame in the GUI less frequently
     root.after(100, update_frame)  # Adjust the delay as needed
-
 
 # --------------------------------------------------------------------
 
