@@ -61,6 +61,7 @@ def gui_thread():
     # Create a recording indicator
     recording_indicator = tk.Canvas(root, width=50, height=50, highlightthickness=0)
     recording_indicator.create_oval(5, 5, 45, 45, fill="red")
+    recording_indicator.place(relx=0.5, rely=0.5, anchor="center") 
 
     # Create a label for displaying the video
     video_label = tk.Label(root)
