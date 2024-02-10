@@ -22,12 +22,9 @@ def photoLock():
     recordThread = threading.Thread(target=record_thread)
     guiThread = threading.Thread(target=gui_thread)
 
-    guiThread.start()
     recordThread.start()
+    guiThread.start()
 
-
-    recordThread.join()
-    guiThread.join()
 
 
 
@@ -36,7 +33,7 @@ def record_thread():
     global image_mode
     global is_recording
 
-    setup_gpio()
+    mode_button, record_button = setup_gpio()
 
     handleCaptureThread = threading.Thread(target=handle_capture, daemon=True)
 
@@ -48,7 +45,7 @@ def record_thread():
 
 def gui_thread():
     ''' Thread responsible for reflecting state changes to the GUI'''
-    global root, text_box, recording_indicator, video_label
+    global root, text_box, video_label
 
     root = tk.Tk()
     root.geometry("800x480")
