@@ -6,7 +6,7 @@ import cv2
 from kivy.config import Config
 Config.set('graphics', 'width', '800')
 Config.set('graphics', 'height', '480')
-Config.set('kivy', 'default_font_size', '50sp')
+Config.set('kivy', 'default_font_size', '100sp')
 Config.set('graphics', 'fullscreen', 'auto')
 
 # Now, import the rest of your Kivy components
@@ -38,7 +38,7 @@ class PhotoLockGUI(FloatLayout):
             Color(0, 0, 0, 0.7)  # Semi-transparent black background
             self.rect = Rectangle(size=self.status_layout.size, pos=self.status_layout.pos)
             self.recording_color = Color(1, 0, 0, 0)  # Start with transparent (invisible)
-            self.recording_indicator = Ellipse(size=(50, 50), pos=(720, 410))
+            self.recording_indicator = Ellipse(size=(50, 50), pos=(740, 410))
         
         # Update the rectangle size and position when the layout changes
         self.status_layout.bind(pos=self.update_rect, size=self.update_rect)
