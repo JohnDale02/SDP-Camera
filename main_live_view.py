@@ -38,7 +38,7 @@ class PhotoLockGUI(FloatLayout):
             Color(0, 0, 0, 0.7)  # Semi-transparent black background
             self.rect = Rectangle(size=self.status_layout.size, pos=self.status_layout.pos)
             self.recording_color = Color(1, 0, 0, 0)  # Start with transparent (invisible)
-            self.recording_indicator = Ellipse(size=(50, 50), pos=(self.width - 60, self.height - 60))
+            self.recording_indicator = Ellipse(size=(50, 50), pos=(700, 460))
         
         # Update the rectangle size and position when the layout changes
         self.status_layout.bind(pos=self.update_rect, size=self.update_rect)
@@ -84,8 +84,7 @@ class PhotoLockGUI(FloatLayout):
             self.img1.texture = texture
             
             mode_text = "Image" if image_mode else "Video"
-            recording_text = " - Recording" if is_recording else ""
-            self.status_label.text = f"{mode_text}{recording_text}"
+            self.status_label.text = f"{mode_text}"
 
             self.recording_color.a = 1 if is_recording else 0
 
