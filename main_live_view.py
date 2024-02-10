@@ -16,6 +16,7 @@ from kivy.clock import Clock
 from kivy.graphics.texture import Texture
 from kivy.core.window import Window
 from kivy.graphics import Color, Rectangle
+from kivy.uix.boxlayout import BoxLayout
 
 image_mode = True
 is_recording = False
