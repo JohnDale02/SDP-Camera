@@ -64,7 +64,7 @@ class PhotoLockGUI(FloatLayout):
 
         # Center the video in the window
         self.img1.size = (video_width, video_height)
-        self.img1.pos = ((window_width - video_width) / 2, (window_height - video_height) / 2)
+        self.img1.pos = ((window_width - video_width) / 2, 0)
 
         
     def update_rect(self, instance, value):
