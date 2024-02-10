@@ -21,14 +21,12 @@ capture.set(cv2.CAP_PROP_FRAME_HEIGHT, 240)  # Adjust height
 # --------------------------------------------------------------------
 
 def photoLock():
-
     '''Main Function that performs all PhotoLock software: "The Main" '''
     setup_gpio()
     handleCaptureThread = threading.Thread(target=handle_capture, daemon=True)
     handleCaptureThread.start()
     print("Handle Capture thread started")
 
-    gui_thread()
 
 
 
@@ -53,7 +51,6 @@ def gui_thread():
     # Initialize the GUI update loop
     update_gui()
     update_frame()
-
 
     root.mainloop()
 # --------------------------------------------------------------------
@@ -201,5 +198,6 @@ def capture_image():
 # --------------------------------------------------------------------
 
 if __name__ == '__main__':
+    gui_thread()
     photoLock()
     GPIO.cleanup()
