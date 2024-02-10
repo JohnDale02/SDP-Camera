@@ -18,31 +18,17 @@ capture.set(cv2.CAP_PROP_FRAME_HEIGHT, 240)  # Adjust height
 # --------------------------------------------------------------------
 
 def photoLock():
+
     '''Main Function that performs all PhotoLock software: "The Main" '''
-    recordThread = threading.Thread(target=record_thread)
+    setup_gpio()
+    handleCaptureThread = threading.Thread(target=handle_capture, daemon=True)
     guiThread = threading.Thread(target=gui_thread)
 
-    recordThread.start()
-    guiThread.start()
-
-
-
-
-def record_thread():
-    ''' Thread resonsible for updating states of camera recording mode and recording state'''
-    global image_mode
-    global is_recording
-
-    setup_gpio()
-    time.sleep(1)
-
-    handleCaptureThread = threading.Thread(target=handle_capture, daemon=True)
-
     handleCaptureThread.start()
+    print("Handle Capture thread started")
+    guiThread.start()
+    print("GUI Thread Started")
 
-    while True:
-        continue
-     
 
 def gui_thread():
     ''' Thread responsible for reflecting state changes to the GUI'''
@@ -61,6 +47,7 @@ def gui_thread():
     # Create a label for displaying the video
     video_label = video_canvas
 
+    print("Initialized everythign in the GUI; updating frame and text dynamically")
     # Initialize the GUI update loop
     update_gui()
     update_frame()
