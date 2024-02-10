@@ -22,12 +22,11 @@ def photoLock():
     '''Main Function that performs all PhotoLock software: "The Main" '''
     setup_gpio()
     handleCaptureThread = threading.Thread(target=handle_capture, daemon=True)
-    guiThread = threading.Thread(target=gui_thread)
+    gui_thread()
 
     handleCaptureThread.start()
     print("Handle Capture thread started")
-    guiThread.start()
-    print("GUI Thread Started")
+
 
 
 def gui_thread():
