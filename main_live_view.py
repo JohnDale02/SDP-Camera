@@ -38,7 +38,7 @@ class PhotoLockGUI(FloatLayout):
             Color(0, 0, 0, 0.7)  # Semi-transparent black background
             self.rect = Rectangle(size=self.status_layout.size, pos=self.status_layout.pos)
             self.recording_color = Color(1, 0, 0, 0)  # Start with transparent (invisible)
-            self.recording_indicator = Ellipse(size=(50, 50), pos=(660, 430))
+            self.recording_indicator = Ellipse(size=(50, 50), pos=(720, 410))
         
         # Update the rectangle size and position when the layout changes
         self.status_layout.bind(pos=self.update_rect, size=self.update_rect)
