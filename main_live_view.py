@@ -7,6 +7,7 @@ from kivy.config import Config
 Config.set('graphics', 'width', '800')
 Config.set('graphics', 'height', '480')
 Config.set('kivy', 'default_font_size', '50sp')
+Config.set('graphics', 'fullscreen', 'auto')
 
 # Now, import the rest of your Kivy components
 from kivy.app import App
