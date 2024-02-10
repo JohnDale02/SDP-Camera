@@ -109,24 +109,11 @@ def gui_thread():
 def toggle_image_mode(channel):
     global image_mode
     image_mode = not image_mode
-    print("Image mode toggled:", image_mode)\
 
 def toggle_recording(channel):
-    global image_mode
     global is_recording
-    global ffmpeg_process
-    global have_started
 
     is_recording = not is_recording
-    print("Recording toggled:", is_recording)
-
-    if image_mode == False and is_recording == True and have_started == False:
-        ffmpeg_process = start_recording()
-        have_started = True
-
-    elif image_mode == False and is_recording == False and have_started == True:
-        ffmpeg_process = stop_recording(ffmpeg_process)
-        have_started = False
 
 # --------------------------------------------------------------------
 
@@ -150,6 +137,7 @@ def handle_capture():
 
     ffmpeg_process = None
     have_started = False
+
     while True: 
         if image_mode == False and is_recording == True and have_started == False:
             ffmpeg_process = start_recording()
@@ -161,6 +149,7 @@ def handle_capture():
 
         elif image_mode == True and is_recording == True:
             ffmpeg_process = capture_image()
+            time.sleep(.5)  
             is_recording = False
 
 
