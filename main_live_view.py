@@ -18,7 +18,6 @@ from kivy.graphics.texture import Texture
 from kivy.core.window import Window
 from kivy.graphics import Color, Rectangle, Ellipse
 from kivy.uix.boxlayout import BoxLayout
-Window.show_cursor = False
 
 image_mode = True
 is_recording = False
@@ -113,7 +112,6 @@ def toggle_image_mode(channel):
 
 def toggle_recording(channel):
     global is_recording
-
     is_recording = not is_recording
 
 # --------------------------------------------------------------------
