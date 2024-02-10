@@ -26,7 +26,7 @@ def photoLock():
         handleCaptureThread = threading.Thread(target=handle_capture, daemon=True)
         handleCaptureThread.start()
         print("Handle Capture thread started")
-        
+
     setup_gpio()
 
     global root, text_box, video_label
@@ -40,16 +40,16 @@ def photoLock():
     # Create a text box widget
     text_box = ttk.Label(root, text="", background="white", font=("Helvetica", 16))
     
-
-
     # Create a label for displaying the video
     video_label = video_canvas
 
-    # Schedule the background task to start shortly after the GUI.
-    root.after(100, start_background_tasks)  # Start after 100 milliseconds
     # Initialize the GUI update loop
     update_gui()
     update_frame()
+
+    # Schedule the background task to start shortly after the GUI.
+    root.after(100, start_background_tasks)  # Start after 100 milliseconds
+
 
     root.mainloop()
 # ------------------
