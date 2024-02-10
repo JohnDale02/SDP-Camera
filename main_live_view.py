@@ -15,9 +15,11 @@ from kivy.uix.label import Label
 from kivy.uix.image import Image
 from kivy.clock import Clock
 from kivy.graphics.texture import Texture
-from kivy.core.window import Window
 from kivy.graphics import Color, Rectangle, Ellipse
 from kivy.uix.boxlayout import BoxLayout
+
+from kivy.core.window import Window
+Window.show_cursor = False
 
 image_mode = True
 is_recording = False
@@ -86,9 +88,6 @@ class PhotoLockGUI(FloatLayout):
             self.status_label.text = f"{mode_text}"
 
             self.recording_color.a = 1 if is_recording else 0
-
-
-
             
 class PhotoLockApp(App):
     def build(self):
