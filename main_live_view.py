@@ -3,15 +3,19 @@ import RPi.GPIO as GPIO
 import time
 import subprocess
 import cv2
+from kivy.config import Config
+Config.set('graphics', 'width', '800')
+Config.set('graphics', 'height', '480')
+
+# Now, import the rest of your Kivy components
 from kivy.app import App
+from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.label import Label
 from kivy.uix.image import Image
 from kivy.clock import Clock
 from kivy.graphics.texture import Texture
-from kivy.uix.floatlayout import FloatLayout
-from kivy.uix.boxlayout import BoxLayout
-from kivy.core.window import Window
-from kivy.graphics import Color, Rectangle
+import cv2
+import threading
 
 image_mode = True
 is_recording = False
@@ -26,7 +30,7 @@ class PhotoLockGUI(FloatLayout):
         
         # Determine the window size for positioning
         window_size = Window.size  # Returns a tuple (width, height)
-        print("window_Size: ", window_size)
+        print("window_Size: ", window)
         quit()
         
         # Calculate position for the top right, adjusting for the widget's size
