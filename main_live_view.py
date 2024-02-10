@@ -21,15 +21,38 @@ capture.set(cv2.CAP_PROP_FRAME_HEIGHT, 240)  # Adjust height
 # --------------------------------------------------------------------
 
 def photoLock():
-
     '''Main Function that performs all PhotoLock software: "The Main" '''
     setup_gpio()
+
+    global root, text_box, video_label
+
+    root = tk.Tk()
+    root.geometry("800x480")
+
+    video_canvas = tk.Canvas(root, width=1280, height=720)
+    video_canvas.pack()  # Adjust the placement as needed
+    
+    # Create a text box widget
+    text_box = ttk.Label(root, text="", background="white", font=("Helvetica", 16))
+    
+
+    # Create a label for displaying the video
+    video_label = video_canvas
+
+    # Schedule the background task to start shortly after the GUI.
+    root.after(100, start_background_tasks)  # Start after 100 milliseconds
+    # Initialize the GUI update loop
+    update_gui()
+    update_frame()
+
+
+    root.mainloop()
+# ------------------
+
+def start_background_tasks():
     handleCaptureThread = threading.Thread(target=handle_capture, daemon=True)
     handleCaptureThread.start()
     print("Handle Capture thread started")
-
-    gui_thread()
-
 
 
 def gui_thread():
@@ -201,10 +224,5 @@ def capture_image():
 # --------------------------------------------------------------------
 
 if __name__ == '__main__':
-    setup_gpio()
-    handleCaptureThread = threading.Thread(target=handle_capture, daemon=True)
-    handleCaptureThread.start()
-    print("Handle Capture thread started")
-
-    gui_thread()
+    photoLock()
     GPIO.cleanup()
