@@ -32,7 +32,8 @@ class PhotoLockGUI(FloatLayout):
         self.capture = capture
 
         # Create a layout for the status label with a background
-        self.status_layout = BoxLayout(size_hint=(1, None), height=50, pos_hint={'top': 1})
+        self.status_layout = BoxLayout(size_hint=(None, None), size=(300, 50),
+                                       pos_hint={'right': 1, 'y': 0})
         with self.status_layout.canvas.before:
             Color(0, 0, 0, 0.7)  # Semi-transparent black background
             self.rect = Rectangle(size=self.status_layout.size, pos=self.status_layout.pos)
