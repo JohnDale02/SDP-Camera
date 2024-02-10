@@ -23,20 +23,21 @@ class PhotoLockGUI(FloatLayout):
     def __init__(self, capture, **kwargs):
         super(PhotoLockGUI, self).__init__(**kwargs)
         self.capture = capture
-
-        # Create a layout for the status label with a background
-        self.status_layout = BoxLayout(size_hint=(1, None), height=50, pos_hint={'top': 1})
+        
+        # Adjusting the status layout to be in the top right
+        # Assuming the Label text does not require more than 300px in width and 50px in height
+        self.status_layout = BoxLayout(size_hint=(None, None), size=(300, 50),
+                                       pos_hint={'right': 1, 'top': 1})
         with self.status_layout.canvas.before:
             Color(0, 0, 0, 0.5)  # Semi-transparent black background
             self.rect = Rectangle(size=self.status_layout.size, pos=self.status_layout.pos)
         
-        # Update the rectangle size and position when the layout changes
         self.status_layout.bind(pos=self.update_rect, size=self.update_rect)
         
         self.img1 = Image(size_hint=(1, 1))
         self.add_widget(self.img1)
         
-        self.status_label = Label(text='Image', color=(1, 0, 0, 1))  # Red text for visibility
+        self.status_label = Label(text='Image', color=(1, 0, 0, 1))  # Using red text for visibility
         self.status_layout.add_widget(self.status_label)
         self.add_widget(self.status_layout)
         
