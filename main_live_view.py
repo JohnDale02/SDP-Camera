@@ -6,6 +6,7 @@ import cv2
 from kivy.config import Config
 Config.set('graphics', 'width', '800')
 Config.set('graphics', 'height', '480')
+Config.set('kivy', 'default_font_size', '20sp')
 
 # Now, import the rest of your Kivy components
 from kivy.app import App
@@ -32,7 +33,7 @@ class PhotoLockGUI(FloatLayout):
         # Create a layout for the status label with a background
         self.status_layout = BoxLayout(size_hint=(1, None), height=50, pos_hint={'top': 1})
         with self.status_layout.canvas.before:
-            Color(0, 0, 0, 0.5)  # Semi-transparent black background
+            Color(0, 0, 0, 0.7)  # Semi-transparent black background
             self.rect = Rectangle(size=self.status_layout.size, pos=self.status_layout.pos)
         
         # Update the rectangle size and position when the layout changes
@@ -41,7 +42,7 @@ class PhotoLockGUI(FloatLayout):
         self.img1 = Image(size_hint=(1, 1))
         self.add_widget(self.img1)
         
-        self.status_label = Label(text='Image', color=(1, 0, 0, 1))  # Red text for visibility
+        self.status_label = Label(text='Image', color=(1, 1, 1, 1))  # White text for visibility
         self.status_layout.add_widget(self.status_label)
         self.add_widget(self.status_layout)
         
