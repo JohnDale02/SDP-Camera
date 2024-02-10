@@ -33,7 +33,7 @@ def record_thread():
     global image_mode
     global is_recording
 
-    mode_button, record_button = setup_gpio()
+    setup_gpio()
 
     handleCaptureThread = threading.Thread(target=handle_capture, daemon=True)
 
