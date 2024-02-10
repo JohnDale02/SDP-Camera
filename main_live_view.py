@@ -9,6 +9,9 @@ from PIL import Image, ImageTk
 
 image_mode = True
 is_recording = False
+ffmpeg_process = None
+have_started = False
+
 capture = cv2.VideoCapture(0)  # capture object for liveView
 capture.set(cv2.CAP_PROP_FRAME_WIDTH, 320)  # Adjust width
 capture.set(cv2.CAP_PROP_FRAME_HEIGHT, 240)  # Adjust height
@@ -22,10 +25,10 @@ def photoLock():
     '''Main Function that performs all PhotoLock software: "The Main" '''
     setup_gpio()
     handleCaptureThread = threading.Thread(target=handle_capture, daemon=True)
-    gui_thread()
-
     handleCaptureThread.start()
     print("Handle Capture thread started")
+
+    gui_thread()
 
 
 
@@ -58,12 +61,24 @@ def gui_thread():
 def toggle_image_mode(channel):
     global image_mode
     image_mode = not image_mode
-    print("Image mode toggled:", image_mode)
+    print("Image mode toggled:", image_mode)\
 
 def toggle_recording(channel):
+    global image_mode
     global is_recording
+    global ffmpeg_process
+    global have_started
+
     is_recording = not is_recording
     print("Recording toggled:", is_recording)
+
+    if image_mode == False and is_recording == True and have_started == False:
+        ffmpeg_process = start_recording()
+        have_started = True
+
+    elif image_mode == False and is_recording == False and have_started == True:
+        ffmpeg_process = stop_recording(ffmpeg_process)
+        have_started = False
 
 # --------------------------------------------------------------------
 
@@ -93,7 +108,7 @@ def update_frame():
         video_label.img = img  # Keep a reference to avoid garbage collection
         video_label.create_image(0, 0, anchor="nw", image=img)
         if is_recording:
-            recording_indicator = video_label.create_oval(5, 5, 45, 45, fill="red")
+            video_label.create_oval(5, 5, 45, 45, fill="red")
         else:
             video_label.delete("recording_indicator")
             
@@ -113,7 +128,6 @@ def setup_gpio():
     GPIO.add_event_detect(mode_button, GPIO.FALLING, callback=toggle_image_mode, bouncetime=200)
     GPIO.add_event_detect(record_button, GPIO.FALLING, callback=toggle_recording, bouncetime=200)
     
-
 # --------------------------------------------------------------------
 
 def handle_capture():
@@ -132,8 +146,10 @@ def handle_capture():
             ffmpeg_process = stop_recording(ffmpeg_process)
             have_started = False
 
-        else:
-            continue
+        elif image_mode == True and is_recording == True:
+            ffmpeg_process = capture_image()
+            is_recording = False
+
 
 def start_recording():
     ffmpeg_command = [
@@ -155,6 +171,32 @@ def stop_recording(ffmpeg_process):
     ffmpeg_process.wait()
 
     return None
+
+
+def capture_image():
+    ''' Initialized camera and takes picture'''
+    
+    # Initialize the camera (use the appropriate video device)
+    camera = cv2.VideoCapture(0)
+
+    if not camera.isOpened():
+        print("\tError: Camera not found or could not be opened.")
+        return None
+
+    # Capture a single frame from the camera
+    ret, frame = camera.read()
+    camera.release()
+
+    if ret:
+        image = frame
+        image_filename = "NewImage.png"
+        cv2.imwrite(image_filename, image)
+
+        return image
+
+    else:
+        print("\tError: Failed to capture an image.")
+        return None
 
 # --------------------------------------------------------------------
 
