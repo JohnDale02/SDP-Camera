@@ -19,6 +19,7 @@ capture.set(cv2.CAP_PROP_FRAME_HEIGHT, 240)  # Adjust height
 
 def photoLock():
     '''Main Function that performs all PhotoLock software: "The Main" '''
+    setup_gpio()
     recordThread = threading.Thread(target=record_thread)
     guiThread = threading.Thread(target=gui_thread)
 
@@ -35,7 +36,7 @@ def record_thread():
     global image_mode
     global is_recording
 
-    mode_button, record_button = setup_gpio()
+    #mode_button, record_button = setup_gpio()
     #changeModeThread = threading.Thread(target=toggle_image_mode, args=(mode_button,), daemon=True)
     #changeRecordingThread = threading.Thread(target=toggle_recording, args=(record_button,), daemon=True)
     handleCaptureThread = threading.Thread(target=handle_capture, daemon=True)
