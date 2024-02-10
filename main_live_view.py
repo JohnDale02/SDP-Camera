@@ -14,8 +14,8 @@ from kivy.uix.label import Label
 from kivy.uix.image import Image
 from kivy.clock import Clock
 from kivy.graphics.texture import Texture
-import cv2
-import threading
+from kivy.core.window import Window
+from kivy.graphics import Color, Rectangle
 
 image_mode = True
 is_recording = False
@@ -30,7 +30,7 @@ class PhotoLockGUI(FloatLayout):
         
         # Determine the window size for positioning
         window_size = Window.size  # Returns a tuple (width, height)
-        print("window_Size: ", window)
+        print("window_Size: ", window_size)
         quit()
         
         # Calculate position for the top right, adjusting for the widget's size
