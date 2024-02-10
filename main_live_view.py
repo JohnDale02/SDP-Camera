@@ -4,11 +4,11 @@ import time
 import subprocess
 import cv2
 from kivy.app import App
-from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.label import Label
 from kivy.uix.image import Image
 from kivy.clock import Clock
 from kivy.graphics.texture import Texture
+from kivy.uix.floatlayout import FloatLayout
 
 image_mode = True
 is_recording = False
@@ -16,34 +16,40 @@ ffmpeg_process = None
 have_started = False
 # --------------------------------------------------------------------
 
-class PhotoLockGUI(BoxLayout):
+class PhotoLockGUI(FloatLayout):
     def __init__(self, capture, **kwargs):
-        super(PhotoLockGUI, self).__init__(orientation='vertical', **kwargs)
+        super(PhotoLockGUI, self).__init__(**kwargs)
         self.capture = capture
-        self.img1 = Image(size_hint=(1, .9))
+        
+        # Image widget for displaying video frames
+        self.img1 = Image(size_hint=(1, None), pos_hint={'top': 1})
+        self.img1.height = 720  # Adjust based on your requirements
+        self.img1.width = 1280  # Adjust based on your requirements
         self.add_widget(self.img1)
-        self.status_label = Label(text='Image', size_hint=(1, .1))
+        
+        # Status label for displaying mode and recording status
+        self.status_label = Label(text='Image', size_hint=(None, None), size=(200, 50),
+                                  pos_hint={'x': 0.01, 'top': 0.1}, color=(1, 0, 0, 1))
         self.add_widget(self.status_label)
+        
+        # Update the GUI periodically to reflect the current video frame and status
         Clock.schedule_interval(self.update, 1.0 / 33.0)
 
     def update(self, dt):
         ret, frame = self.capture.read()
         if ret:
-            # Convert it to texture
+            # Convert the frame to texture
             buf1 = cv2.flip(frame, 0)
-            buf = buf1.tostring()
-            image_texture = Texture.create(size=(frame.shape[1], frame.shape[0]), colorfmt='bgr')
-            image_texture.blit_buffer(buf, colorfmt='bgr', bufferfmt='ubyte')
-            self.img1.texture = image_texture
+            buf = buf1.tobytes()
+            texture = Texture.create(size=(frame.shape[1], frame.shape[0]), colorfmt='bgr')
+            texture.blit_buffer(buf, colorfmt='bgr', bufferfmt='ubyte')
+            self.img1.texture = texture
+            
+            # Update status text based on current mode and recording state
+            mode_text = "Image" if image_mode else "Video"
+            recording_text = " - Recording" if is_recording else ""
+            self.status_label.text = f"{mode_text}{recording_text}"
 
-            # Update status
-            if image_mode:
-                self.status_label.text = 'Image'
-            else:
-                self.status_label.text = 'Video'
-
-            if is_recording:
-                self.status_label.text += ' - Recording'
             
 class PhotoLockApp(App):
     def build(self):
