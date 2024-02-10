@@ -57,7 +57,7 @@ class PhotoLockGUI(FloatLayout):
 
         # Calculate the maximum possible size of the video feed within the window
         window_width, window_height = self.size
-        window_aspect_ratio = window_width / window_height
+        window_aspect_ratio = window_width / (window_height - 50)
 
         if window_aspect_ratio > video_aspect_ratio:
             # Window is wider than the video aspect ratio, so fit to height
@@ -72,7 +72,7 @@ class PhotoLockGUI(FloatLayout):
         self.img1.size = (video_width, video_height)
         self.img1.pos = ((window_width - video_width) / 2, (window_height - video_height) / 2)
 
-        
+
     def update_rect(self, instance, value):
         self.rect.pos = instance.pos
         self.rect.size = instance.size
