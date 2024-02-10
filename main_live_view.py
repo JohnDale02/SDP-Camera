@@ -17,7 +17,7 @@ from kivy.uix.image import Image
 from kivy.clock import Clock
 from kivy.graphics.texture import Texture
 from kivy.core.window import Window
-from kivy.graphics import Color, Rectangle
+from kivy.graphics import Color, Rectangle, Ellipse
 from kivy.uix.boxlayout import BoxLayout
 
 image_mode = True
@@ -32,11 +32,13 @@ class PhotoLockGUI(FloatLayout):
         self.capture = capture
 
         # Create a layout for the status label with a background
-        self.status_layout = BoxLayout(size_hint=(None, None), size=(300, 50),
+        self.status_layout = BoxLayout(size_hint=(None, None), size=(100, 40),
                                        pos_hint={'right': 1, 'y': 0})
         with self.status_layout.canvas.before:
             Color(0, 0, 0, 0.7)  # Semi-transparent black background
             self.rect = Rectangle(size=self.status_layout.size, pos=self.status_layout.pos)
+            self.recording_color = Color(1, 0, 0, 0)  # Start with transparent (invisible)
+            self.recording_indicator = Ellipse(size=(50, 50), pos=(self.width - 60, self.height - 60))
         
         # Update the rectangle size and position when the layout changes
         self.status_layout.bind(pos=self.update_rect, size=self.update_rect)
@@ -84,6 +86,9 @@ class PhotoLockGUI(FloatLayout):
             mode_text = "Image" if image_mode else "Video"
             recording_text = " - Recording" if is_recording else ""
             self.status_label.text = f"{mode_text}{recording_text}"
+
+            self.recording_color.a = 1 if is_recording else 0
+
 
 
             
