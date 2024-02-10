@@ -22,8 +22,9 @@ def photoLock():
     recordThread = threading.Thread(target=record_thread)
     guiThread = threading.Thread(target=gui_thread)
 
-    recordThread.start()
     guiThread.start()
+    recordThread.start()
+
 
     recordThread.join()
     guiThread.join()
@@ -127,8 +128,7 @@ def setup_gpio():
     # Setup event detection
     GPIO.add_event_detect(mode_button, GPIO.FALLING, callback=toggle_image_mode, bouncetime=200)
     GPIO.add_event_detect(record_button, GPIO.FALLING, callback=toggle_recording, bouncetime=200)
-
-    return
+    
 
 # --------------------------------------------------------------------
 
