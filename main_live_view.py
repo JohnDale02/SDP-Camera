@@ -27,8 +27,9 @@ def photoLock():
     guiThread.start()
 
     recordThread.join()
+    print("RecordThread has joined")
     guiThread.join()
-
+    print("GUITHread has joined")
 
 
 def record_thread():
