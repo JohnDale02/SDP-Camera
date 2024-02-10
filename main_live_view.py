@@ -149,7 +149,7 @@ def handle_capture():
 
         elif image_mode == True and is_recording == True:
             ffmpeg_process = capture_image()
-            time.sleep(.5)  
+            time.sleep(.2)  
             is_recording = False
 
 
