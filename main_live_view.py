@@ -57,6 +57,11 @@ def gui_thread():
 
     video_canvas = tk.Canvas(root, width=320, height=240)
     video_canvas.pack()  # Adjust the placement as needed
+    frame = tk.Frame(root, width=800, height=480)
+    frame.pack(fill=tk.BOTH, expand=True)  # Allow the frame to expand
+    video_canvas = tk.Canvas(frame)
+    video_canvas.pack(fill=tk.BOTH, expand=True)  # Canvas fills the frame
+
     # Create a text box widget
     text_box = ttk.Label(root, text="", background="white", font=("Helvetica", 16))
     
