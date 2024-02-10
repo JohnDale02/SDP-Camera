@@ -48,7 +48,7 @@ class PhotoLockGUI(FloatLayout):
         # Bind to size changes of the layout to adjust the video size
         self.bind(size=self.adjust_video_size)
         
-        self.status_label = Label(text='Image', color=(1, 1, 1, 1), font_size='50sp')  # White text for visibility
+        self.status_label = Label(text='Image', color=(1, 1, 1, 1), font_size='20sp')  # White text for visibility
         self.status_layout.add_widget(self.status_label)
         self.add_widget(self.status_layout)
         
