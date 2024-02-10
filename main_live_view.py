@@ -44,9 +44,6 @@ def record_thread():
     #changeModeThread.start()
     #changeRecordingThread.start()
     handleCaptureThread.start()
-
-    while True:
-        continue
      
 
 def gui_thread():
