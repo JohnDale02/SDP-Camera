@@ -112,6 +112,7 @@ def toggle_image_mode(channel):
 def toggle_recording(channel):
     global is_recording
     is_recording = not is_recording
+    handle_capture()
 
 # --------------------------------------------------------------------
 
@@ -136,19 +137,21 @@ def handle_capture():
     ffmpeg_process = None
     have_started = False
 
-    while True: 
-        if image_mode == False and is_recording == True and have_started == False:
-            ffmpeg_process = start_recording()
-            have_started = True
+    if image_mode == False and is_recording == True and have_started == False:
+        ffmpeg_process = start_recording()
+        have_started = True
 
-        elif image_mode == False and is_recording == False and have_started == True:
-            ffmpeg_process = stop_recording(ffmpeg_process)
-            have_started = False
+    elif image_mode == False and is_recording == False and have_started == True:
+        ffmpeg_process = stop_recording(ffmpeg_process)
+        have_started = False
 
-        elif image_mode == True and is_recording == True:
-            ffmpeg_process = capture_image()
-            time.sleep(.2)  
-            is_recording = False
+    elif image_mode == True and is_recording == True:
+        ffmpeg_process = capture_image()
+        time.sleep(.2)  
+        is_recording = False
+
+    else:
+        pass
 
 
 def start_recording():
