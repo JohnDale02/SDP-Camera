@@ -2,87 +2,65 @@ import threading
 import RPi.GPIO as GPIO
 import time
 import subprocess
-import tkinter as tk
-from tkinter import ttk
 import cv2
-from PIL import Image, ImageTk
+from kivy.app import App
+from kivy.uix.boxlayout import BoxLayout
+from kivy.uix.label import Label
+from kivy.uix.image import Image
+from kivy.clock import Clock
+from kivy.graphics.texture import Texture
 
 image_mode = True
 is_recording = False
 ffmpeg_process = None
 have_started = False
-
-capture = cv2.VideoCapture(0)  # capture object for liveView
-capture.set(cv2.CAP_PROP_FRAME_WIDTH, 320)  # Adjust width
-capture.set(cv2.CAP_PROP_FRAME_HEIGHT, 240)  # Adjust height
-
-
-
 # --------------------------------------------------------------------
 
-def photoLock():
-    '''Main Function that performs all PhotoLock software: "The Main" '''
-    def start_background_tasks():
-        handleCaptureThread = threading.Thread(target=handle_capture, daemon=True)
-        handleCaptureThread.start()
-        print("Handle Capture thread started")
+class PhotoLockGUI(BoxLayout):
+    def __init__(self, capture, **kwargs):
+        super(PhotoLockGUI, self).__init__(orientation='vertical', **kwargs)
+        self.capture = capture
+        self.img1 = Image(size_hint=(1, .9))
+        self.add_widget(self.img1)
+        self.status_label = Label(text='Image', size_hint=(1, .1))
+        self.add_widget(self.status_label)
+        Clock.schedule_interval(self.update, 1.0 / 33.0)
 
-    setup_gpio()
+    def update(self, dt):
+        ret, frame = self.capture.read()
+        if ret:
+            # Convert it to texture
+            buf1 = cv2.flip(frame, 0)
+            buf = buf1.tostring()
+            image_texture = Texture.create(size=(frame.shape[1], frame.shape[0]), colorfmt='bgr')
+            image_texture.blit_buffer(buf, colorfmt='bgr', bufferfmt='ubyte')
+            self.img1.texture = image_texture
 
-    global root, text_box, video_label
+            # Update status
+            if image_mode:
+                self.status_label.text = 'Image'
+            else:
+                self.status_label.text = 'Video'
 
-    root = tk.Tk()
-    root.geometry("800x480")
+            if is_recording:
+                self.status_label.text += ' - Recording'
+            
+class PhotoLockApp(App):
+    def build(self):
+        self.capture = cv2.VideoCapture(0)
+        self.capture.set(cv2.CAP_PROP_FRAME_WIDTH, 320)
+        self.capture.set(cv2.CAP_PROP_FRAME_HEIGHT, 240)
+        return PhotoLockGUI(self.capture)
 
-    video_canvas = tk.Canvas(root, width=1280, height=720)
-    video_canvas.pack()  # Adjust the placement as needed
-    
-    # Create a text box widget
-    text_box = ttk.Label(root, text="", background="white", font=("Helvetica", 16))
-    
-    # Create a label for displaying the video
-    video_label = video_canvas
-
-    # Initialize the GUI update loop
-    update_gui()
-    update_frame()
-
-    # Schedule the background task to start shortly after the GUI.
-    root.after(100, start_background_tasks)  # Start after 100 milliseconds
-
-
-    root.mainloop()
-# ------------------
-
-
-
+    def on_stop(self):
+        self.capture.release()
 
 def gui_thread():
-    ''' Thread responsible for reflecting state changes to the GUI'''
-    global root, text_box, video_label
-
-    root = tk.Tk()
-    root.geometry("800x480")
-
-    video_canvas = tk.Canvas(root, width=1280, height=720)
-    video_canvas.pack()  # Adjust the placement as needed
-    
-    # Create a text box widget
-    text_box = ttk.Label(root, text="", background="white", font=("Helvetica", 16))
-    
-
-    # Create a label for displaying the video
-    video_label = video_canvas
-
-    print("Initialized everythign in the GUI; updating frame and text dynamically")
-    # Initialize the GUI update loop
-    update_gui()
-    update_frame()
+    PhotoLockApp().run()
 
 
-    root.mainloop()
 # --------------------------------------------------------------------
-        
+
 def toggle_image_mode(channel):
     global image_mode
     image_mode = not image_mode
@@ -104,41 +82,6 @@ def toggle_recording(channel):
     elif image_mode == False and is_recording == False and have_started == True:
         ffmpeg_process = stop_recording(ffmpeg_process)
         have_started = False
-
-# --------------------------------------------------------------------
-
-def update_gui():
-    global image_mode, is_recording
-
-    # Current state of the text box (to minimize unnecessary updates)
-    current_text = text_box.cget("text")  # Get the current text of the text box
-    desired_text = "Image" if image_mode else "Video"
-
-    # Only update the text box if the text has changed
-    if current_text != desired_text:
-        text_box.config(text=desired_text)
-        # Since both conditions place the text box in the same location, we don't need to check this every time
-        text_box.place(relx=1.0, rely=0.0, anchor="ne")
-
-    # Schedule the update_gui function to run again after 100ms
-    root.after(100, update_gui)
-
-def update_frame():
-    global capture, video_label
-    ret, frame = capture.read()
-    if ret:
-        frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-        im = Image.fromarray(frame)
-        img = ImageTk.PhotoImage(image=im)
-        video_label.img = img  # Keep a reference to avoid garbage collection
-        video_label.create_image(0, 0, anchor="nw", image=img)
-        if is_recording:
-            video_label.create_oval(5, 5, 45, 45, fill="red")
-        else:
-            video_label.delete("recording_indicator")
-            
-    # Update the frame in the GUI less frequently
-    root.after(3, update_frame)  # Adjust the delay as needed
 
 # --------------------------------------------------------------------
 
@@ -226,5 +169,7 @@ def capture_image():
 # --------------------------------------------------------------------
 
 if __name__ == '__main__':
-    photoLock()
+    setup_gpio()
+    threading.Thread(target=handle_capture, daemon=True).start()
+    gui_thread()  # This will start the Kivy application
     GPIO.cleanup()
