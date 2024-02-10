@@ -9,6 +9,9 @@ from kivy.uix.image import Image
 from kivy.clock import Clock
 from kivy.graphics.texture import Texture
 from kivy.uix.floatlayout import FloatLayout
+from kivy.uix.boxlayout import BoxLayout
+from kivy.core.window import Window
+from kivy.graphics import Color, Rectangle
 
 image_mode = True
 is_recording = False
@@ -20,30 +23,38 @@ class PhotoLockGUI(FloatLayout):
     def __init__(self, capture, **kwargs):
         super(PhotoLockGUI, self).__init__(**kwargs)
         self.capture = capture
+
+        # Create a layout for the status label with a background
+        self.status_layout = BoxLayout(size_hint=(1, None), height=50, pos_hint={'top': 1})
+        with self.status_layout.canvas.before:
+            Color(0, 0, 0, 0.5)  # Semi-transparent black background
+            self.rect = Rectangle(size=self.status_layout.size, pos=self.status_layout.pos)
         
-        # Image widget for displaying video frames, adjusted to fit the screen better
-        self.img1 = Image(size_hint=(1, 0.9), pos_hint={'center_x': 0.5, 'center_y': 0.5})
+        # Update the rectangle size and position when the layout changes
+        self.status_layout.bind(pos=self.update_rect, size=self.update_rect)
+        
+        self.img1 = Image(size_hint=(1, 1))
         self.add_widget(self.img1)
         
-        # Status label for displaying mode and recording status, with adjusted color and position
-        self.status_label = Label(text='Image', size_hint=(None, None), size=(300, 50),
-                                  pos_hint={'center_x': 0.5, 'y': 0.05}, color=(1, 1, 1, 1))
-        self.add_widget(self.status_label)
+        self.status_label = Label(text='Image', color=(1, 0, 0, 1))  # Red text for visibility
+        self.status_layout.add_widget(self.status_label)
+        self.add_widget(self.status_layout)
         
-        # Update the GUI periodically to reflect the current video frame and status
         Clock.schedule_interval(self.update, 1.0 / 33.0)
+        
+    def update_rect(self, instance, value):
+        self.rect.pos = instance.pos
+        self.rect.size = instance.size
 
     def update(self, dt):
         ret, frame = self.capture.read()
         if ret:
-            # Convert the frame to texture
             buf1 = cv2.flip(frame, 0)
             buf = buf1.tobytes()
             texture = Texture.create(size=(frame.shape[1], frame.shape[0]), colorfmt='bgr')
             texture.blit_buffer(buf, colorfmt='bgr', bufferfmt='ubyte')
             self.img1.texture = texture
             
-            # Update status text based on current mode and recording state
             mode_text = "Image" if image_mode else "Video"
             recording_text = " - Recording" if is_recording else ""
             self.status_label.text = f"{mode_text}{recording_text}"
