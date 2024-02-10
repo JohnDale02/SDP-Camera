@@ -18,6 +18,7 @@ from kivy.graphics.texture import Texture
 from kivy.core.window import Window
 from kivy.graphics import Color, Rectangle, Ellipse
 from kivy.uix.boxlayout import BoxLayout
+Window.show_cursor = False
 
 image_mode = True
 is_recording = False
