@@ -24,28 +24,41 @@ class PhotoLockGUI(FloatLayout):
         super(PhotoLockGUI, self).__init__(**kwargs)
         self.capture = capture
         
-        # Adjusting the status layout to be in the top right
-        # Assuming the Label text does not require more than 300px in width and 50px in height
-        self.status_layout = BoxLayout(size_hint=(None, None), size=(300, 50),
-                                       pos_hint={'right': 1, 'top': 1})
+        # Determine the window size for positioning
+        window_size = Window.size  # Returns a tuple (width, height)
+        print("window_Size: ", window_size)
+        quit()
+        
+        # Calculate position for the top right, adjusting for the widget's size
+        # Assuming the Label text widget size is 300px wide by 50px high
+        text_widget_width = 300
+        text_widget_height = 50
+        text_pos_x = window_size[0] - text_widget_width  # Position from the right edge
+        text_pos_y = window_size[1] - text_widget_height  # Position from the top edge
+        
+        self.status_layout = BoxLayout(size_hint=(None, None), size=(text_widget_width, text_widget_height),
+                                       pos=(text_pos_x, text_pos_y))
         with self.status_layout.canvas.before:
             Color(0, 0, 0, 0.5)  # Semi-transparent black background
             self.rect = Rectangle(size=self.status_layout.size, pos=self.status_layout.pos)
         
-        self.status_layout.bind(pos=self.update_rect, size=self.update_rect)
+        self.status_layout.bind(size=self.update_rect, pos=self.update_rect)
         
         self.img1 = Image(size_hint=(1, 1))
         self.add_widget(self.img1)
         
-        self.status_label = Label(text='Image', color=(1, 0, 0, 1))  # Using red text for visibility
+        self.status_label = Label(text='Image', color=(1, 0, 0, 1))  # Red text for visibility
         self.status_layout.add_widget(self.status_label)
         self.add_widget(self.status_layout)
         
         Clock.schedule_interval(self.update, 1.0 / 33.0)
-        
+
     def update_rect(self, instance, value):
         self.rect.pos = instance.pos
         self.rect.size = instance.size
+
+    # The update method remains unchanged
+
 
     def update(self, dt):
         ret, frame = self.capture.read()
