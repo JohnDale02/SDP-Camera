@@ -6,7 +6,7 @@ import cv2
 from kivy.config import Config
 Config.set('graphics', 'width', '800')
 Config.set('graphics', 'height', '480')
-Config.set('kivy', 'default_font_size', '20sp')
+Config.set('kivy', 'default_font_size', '50sp')
 
 # Now, import the rest of your Kivy components
 from kivy.app import App
@@ -39,14 +39,39 @@ class PhotoLockGUI(FloatLayout):
         # Update the rectangle size and position when the layout changes
         self.status_layout.bind(pos=self.update_rect, size=self.update_rect)
         
-        self.img1 = Image(size_hint=(1, 1))
+        self.img1 = Image(keep_ratio=True, allow_stretch=True)
         self.add_widget(self.img1)
+
+        # Bind to size changes of the layout to adjust the video size
+        self.bind(size=self.adjust_video_size)
         
         self.status_label = Label(text='Image', color=(1, 1, 1, 1))  # White text for visibility
         self.status_layout.add_widget(self.status_label)
         self.add_widget(self.status_layout)
         
         Clock.schedule_interval(self.update, 1.0 / 33.0)
+    
+    def adjust_video_size(self, *args):
+        # Aspect ratio of the video feed
+        video_aspect_ratio = 16.0 / 9.0
+
+        # Calculate the maximum possible size of the video feed within the window
+        window_width, window_height = self.size
+        window_aspect_ratio = window_width / window_height
+
+        if window_aspect_ratio > video_aspect_ratio:
+            # Window is wider than the video aspect ratio, so fit to height
+            video_height = window_height
+            video_width = video_height * video_aspect_ratio
+        else:
+            # Window is narrower, so fit to width
+            video_width = window_width
+            video_height = video_width / video_aspect_ratio
+
+        # Center the video in the window
+        self.img1.size = (video_width, video_height)
+        self.img1.pos = ((window_width - video_width) / 2, (window_height - video_height) / 2)
+
         
     def update_rect(self, instance, value):
         self.rect.pos = instance.pos
