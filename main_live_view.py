@@ -35,7 +35,7 @@ def record_thread():
     global image_mode
     global is_recording
 
-    mode_button, record_button = setup_gpio()
+    setup_gpio()
 
     handleCaptureThread = threading.Thread(target=handle_capture, daemon=True)
 
@@ -127,6 +127,8 @@ def setup_gpio():
     # Setup event detection
     GPIO.add_event_detect(mode_button, GPIO.FALLING, callback=toggle_image_mode, bouncetime=200)
     GPIO.add_event_detect(record_button, GPIO.FALLING, callback=toggle_recording, bouncetime=200)
+
+    return
 
 # --------------------------------------------------------------------
 
