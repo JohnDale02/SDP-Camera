@@ -59,7 +59,7 @@ class PhotoLockGUI(FloatLayout):
         # Calculate the maximum possible size of the video feed within the window
         window_width, window_height = self.size
 
-        video_width = window_width - 50
+        video_width = window_width - 20
         video_height = video_width / video_aspect_ratio
 
         # Center the video in the window
