@@ -21,15 +21,13 @@ class PhotoLockGUI(FloatLayout):
         super(PhotoLockGUI, self).__init__(**kwargs)
         self.capture = capture
         
-        # Image widget for displaying video frames
-        self.img1 = Image(size_hint=(1, None), pos_hint={'top': 1})
-        self.img1.height = 720  # Adjust based on your requirements
-        self.img1.width = 1280  # Adjust based on your requirements
+        # Image widget for displaying video frames, adjusted to fit the screen better
+        self.img1 = Image(size_hint=(1, 0.9), pos_hint={'center_x': 0.5, 'center_y': 0.5})
         self.add_widget(self.img1)
         
-        # Status label for displaying mode and recording status
-        self.status_label = Label(text='Image', size_hint=(None, None), size=(200, 50),
-                                  pos_hint={'x': 0.01, 'top': 0.1}, color=(1, 0, 0, 1))
+        # Status label for displaying mode and recording status, with adjusted color and position
+        self.status_label = Label(text='Image', size_hint=(None, None), size=(300, 50),
+                                  pos_hint={'center_x': 0.5, 'y': 0.05}, color=(1, 1, 1, 1))
         self.add_widget(self.status_label)
         
         # Update the GUI periodically to reflect the current video frame and status
