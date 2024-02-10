@@ -34,6 +34,7 @@ def record_thread():
     global is_recording
 
     setup_gpio()
+    time.sleep(1)
 
     handleCaptureThread = threading.Thread(target=handle_capture, daemon=True)
 
