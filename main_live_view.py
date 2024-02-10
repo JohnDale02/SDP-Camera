@@ -6,7 +6,6 @@ import cv2
 from kivy.config import Config
 Config.set('graphics', 'width', '800')
 Config.set('graphics', 'height', '480')
-Config.set('kivy', 'default_font_size', '100sp')
 Config.set('graphics', 'fullscreen', 'auto')
 
 # Now, import the rest of your Kivy components
@@ -49,7 +48,7 @@ class PhotoLockGUI(FloatLayout):
         # Bind to size changes of the layout to adjust the video size
         self.bind(size=self.adjust_video_size)
         
-        self.status_label = Label(text='Image', color=(1, 1, 1, 1))  # White text for visibility
+        self.status_label = Label(text='Image', color=(1, 1, 1, 1), font_size='50sp')  # White text for visibility
         self.status_layout.add_widget(self.status_label)
         self.add_widget(self.status_layout)
         
