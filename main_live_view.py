@@ -150,11 +150,11 @@ def handle_capture():
     global ffmpeg_process
 
     if image_mode == False and is_recording == True and have_started == False:
-        ffmpeg_process = start_recording()
+        ffmpeg_process, video_filepath = start_recording()
         have_started = True
 
     elif image_mode == False and is_recording == False and have_started == True:
-        ffmpeg_process = stop_recording(ffmpeg_process)
+        ffmpeg_process = stop_recording(ffmpeg_process, video_filepath)
         have_started = False
 
     elif image_mode == True and is_recording == True:
@@ -192,7 +192,7 @@ def start_recording():
 
     return ffmpeg_process, video_filepath
 
-def stop_recording(ffmpeg_process):
+def stop_recording(ffmpeg_process, video_filepath):
     '''Function for stopping the video and saving it. Key note is that we are not directly uploading after recording videos'''
 
     ffmpeg_process.stdin.write(b'q\n')
@@ -200,7 +200,7 @@ def stop_recording(ffmpeg_process):
     # Wait for the process to terminate
     ffmpeg_process.wait()
 
-    hashSignUploadThread = threading.Thread(target=main, args=("VideoInput", camera_number_string, save_video_filepath,))
+    hashSignUploadThread = threading.Thread(target=main, args=(video_filepath, camera_number_string, save_video_filepath,))
     hashSignUploadThread.start()
 
     return None
