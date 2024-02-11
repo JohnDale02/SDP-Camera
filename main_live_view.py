@@ -176,7 +176,7 @@ def start_recording():
         ' -thread_queue_size', '1024',
         '-framerate', '30',
         '-video_size', '1280x720',
-        '-i', '/dev/video0',
+        '-i', '/dev/video2',
         '-f', 'alsa', '-i', 'default',
         '-c:v', 'h264_v4l2m2m',
         '-pix_fmt', 'yuv420p',
@@ -211,7 +211,7 @@ def capture_image():
     ''' Initialized camera and takes picture'''
     
     # Initialize the camera (use the appropriate video device)
-    camera = cv2.VideoCapture(0)   # /dev/video2 is for low quality capture (direct from /dev/video0)
+    camera = cv2.VideoCapture(2)   # /dev/video2 is for low quality capture (direct from /dev/video0)
 
     if not camera.isOpened():
         print("\tError: Camera not found or could not be opened.")
