@@ -167,11 +167,12 @@ def start_recording():
     object_count = count_files(save_video_filepath)
     video_filepath = os.path.join(save_video_filepath, f'{object_count}.avi')
 
-    command = [
+    command = [            # /dev/video3 is for high quality capture (direct from /dev/video0)
         'ffmpeg',
-        '-framerate', '24',
+        ' -thread_queue_size', '1024',
+        '-framerate', '30',
         '-video_size', '1280x720',
-        '-i', '/dev/video2',
+        '-i', '/dev/video0',
         '-f', 'alsa', '-i', 'default',
         '-c:v', 'h264_v4l2m2m',
         '-pix_fmt', 'yuv420p',
@@ -206,7 +207,7 @@ def capture_image():
     ''' Initialized camera and takes picture'''
     
     # Initialize the camera (use the appropriate video device)
-    camera = cv2.VideoCapture(2)
+    camera = cv2.VideoCapture(0)   # /dev/video2 is for low quality capture (direct from /dev/video0)
 
     if not camera.isOpened():
         print("\tError: Camera not found or could not be opened.")
