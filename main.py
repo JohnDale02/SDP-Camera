@@ -12,6 +12,7 @@ import base64
 from save_image import save_image
 from save_metadata import save_metadata
 import os
+from upload_video import upload_video
 
 def main(media_input, camera_number_string, save_media_filepath, gps_lock):
 	'''main function for processing media for signing and uploading
@@ -120,3 +121,6 @@ def main(media_input, camera_number_string, save_media_filepath, gps_lock):
 		
 		object_count = save_video_filepath.replace(".avi", "")
 		save_metadata(object_count, metadata, save_video_filepath)
+
+		upload_video(video_bytes, metadata)  
+		print("Uplaoded Video successfully")
