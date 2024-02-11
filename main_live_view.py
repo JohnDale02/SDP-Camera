@@ -223,7 +223,7 @@ def capture_image():
     camera.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter.fourcc('M','J','P','G'))
     camera.set(cv2.CAP_PROP_FRAME_WIDTH, 3840)
     camera.set(cv2.CAP_PROP_FRAME_HEIGHT, 2160)
-    time.sleep(2)
+    time.sleep(1)
 
     if not camera.isOpened():
         print("\tError: Camera not found or could not be opened.")
