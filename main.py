@@ -80,7 +80,7 @@ def main(media_input, camera_number_string, save_media_filepath):
 	#---------------------- Receive Video input  ----------------------------
 
 		#  IN OUR CASE, VIDEOS WILL BE READ FROM STORAGE AND UPLOADED IN THE BACKGROUND 
-		with open(media_input, 'rb') as video:
+		with open(save_video_filepath, 'rb') as video:
 			video_bytes = video.read()
 		
 		print("main: Image captured")
