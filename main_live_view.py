@@ -30,7 +30,7 @@ is_recording = False
 ffmpeg_process = None
 have_started = False
 
-camera_number_string = 1
+camera_number_string = "1"
 save_video_filepath = os.path.join(os.getcwd(), "tmpVideos")
 save_image_filepath = os.path.join(os.getcwd(), "tmpImages")
 # --------------------------------------------------------------------
@@ -173,7 +173,6 @@ def start_recording():
 
     command = [            # /dev/video3 is for high quality capture (direct from /dev/video0)
         'ffmpeg',
-        ' -thread_queue_size', '1024',
         '-framerate', '30',
         '-video_size', '1280x720',
         '-i', '/dev/video2',
