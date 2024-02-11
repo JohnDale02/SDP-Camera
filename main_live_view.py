@@ -34,7 +34,6 @@ image_mode = True
 is_recording = False
 ffmpeg_process = None
 have_started = False
-camera_object =cv2.VideoCapture(0) 
 gps_lock = Lock()
 
 camera_number_string = "1"
@@ -128,15 +127,7 @@ def toggle_image_mode(channel):
 
     if have_started:  # if someone tried to change video mode while recording
         return
-
     image_mode = not image_mode
-
-    if image_mode == False:
-        camera_object.release()
-
-    if image_mode == True:
-        camera_object = cv2.VideoCapture(0) 
-
 
 def toggle_recording(channel):
     global is_recording
@@ -226,7 +217,9 @@ def capture_image():
     ''' Initialized camera and takes picture'''
     
     # Initialize the camera (use the appropriate video device)
-
+    camera_object = cv2.VideoCapture(0) 
+    time.sleep(2)
+    
     if not camera_object.isOpened():
         print("\tError: Camera not found or could not be opened.")
         return None
