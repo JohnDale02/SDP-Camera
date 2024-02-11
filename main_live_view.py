@@ -218,8 +218,10 @@ def capture_image():
     
     # Initialize the camera (use the appropriate video device)
     camera_object = cv2.VideoCapture(0) 
+    camera_object.set(cv2.CAP_PROP_FRAME_WIDTH, 1920)
+    camera_object.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080)
     time.sleep(2)
-    
+
     if not camera_object.isOpened():
         print("\tError: Camera not found or could not be opened.")
         return None
