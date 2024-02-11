@@ -32,6 +32,7 @@ image_mode = True
 is_recording = False
 ffmpeg_process = None
 have_started = False
+camera_object = cv2.VideoCapture(0)  
 
 camera_number_string = "1"
 save_video_filepath = os.path.join(os.getcwd(), "tmpVideos")
@@ -120,10 +121,17 @@ def gui_thread():
 def toggle_image_mode(channel):
     global image_mode
     global have_started
+    global camera_object
 
     if have_started:  # if someone tried to change video mode while recording
         return
     
+    if image_mode == True:
+        camera_object.release()
+    
+    if image_mode == False:
+        camera_object = cv2.VideoCapture(0)  
+
     image_mode = not image_mode
 
 def toggle_recording(channel):
@@ -164,7 +172,6 @@ def handle_capture():
 
     elif image_mode == True and is_recording == True:
         capture_image()
-        time.sleep(.2)  
         is_recording = False
 
     else:
@@ -179,7 +186,7 @@ def start_recording():
     command = [            # /dev/video3 is for high quality capture (direct from /dev/video0)
         'ffmpeg',
         '-framerate', '30',
-        '-video_size', '1280x720',
+        '-video_size', '1920x1080',
         '-i', '/dev/video0',
         '-f', 'alsa', '-i', 'default',
         '-c:v', 'h264_v4l2m2m',
@@ -215,15 +222,13 @@ def capture_image():
     ''' Initialized camera and takes picture'''
     
     # Initialize the camera (use the appropriate video device)
-    camera = cv2.VideoCapture(0)   # /dev/video2 is for low quality capture (direct from /dev/video0)
 
-    if not camera.isOpened():
+    if not camera_object.isOpened():
         print("\tError: Camera not found or could not be opened.")
         return None
 
     # Capture a single frame from the camera
-    ret, frame = camera.read()
-    camera.release()
+    ret, frame = camera_object.read()
 
     if ret:
         image = frame
