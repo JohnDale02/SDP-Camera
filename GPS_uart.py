@@ -79,7 +79,3 @@ def read_gps_data(gps_lock):
     return "None", "None", "None"
 
     
-
-#read_gps_data()
-
-

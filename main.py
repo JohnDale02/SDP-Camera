@@ -34,7 +34,7 @@ def main(media_input, camera_number_string, save_media_filepath, gps_lock):
 
 	#---------- Capture GNSS Data (Time and Location) ------------------------
 
-		lat_value, long_value, time_value =  read_gps_data()
+		lat_value, long_value, time_value =  read_gps_data(gps_lock)
 		location = (f"{lat_value}, {long_value}")
 		time = (f"{time_value}")
 		print(f"Recieved Time and GNSS Data: {time}{location}")
