@@ -3,6 +3,9 @@ import RPi.GPIO as GPIO
 import time
 import subprocess
 import cv2
+import os
+from main import main
+
 from kivy.config import Config
 Config.set('graphics', 'width', '800')
 Config.set('graphics', 'height', '480')
@@ -21,10 +24,15 @@ from kivy.uix.boxlayout import BoxLayout
 from kivy.core.window import Window
 Window.show_cursor = False
 
+# -------------Global Variables ------------------------------
 image_mode = True
 is_recording = False
 ffmpeg_process = None
 have_started = False
+
+camera_number_string = 1
+save_video_filepath = os.path.join(os.getcwd(), "tmpVideos")
+save_image_filepath = os.path.join(os.getcwd(), "tmpImages")
 # --------------------------------------------------------------------
 
 class PhotoLockGUI(FloatLayout):
@@ -91,7 +99,7 @@ class PhotoLockGUI(FloatLayout):
             
 class PhotoLockApp(App):
     def build(self):
-        self.capture = cv2.VideoCapture(0)
+        self.capture = cv2.VideoCapture(2)
         self.capture.set(cv2.CAP_PROP_FRAME_WIDTH, 320)
         self.capture.set(cv2.CAP_PROP_FRAME_HEIGHT, 240)
         return PhotoLockGUI(self.capture)
@@ -146,7 +154,7 @@ def handle_capture():
         have_started = False
 
     elif image_mode == True and is_recording == True:
-        ffmpeg_process = capture_image()
+        capture_image()
         time.sleep(.2)  
         is_recording = False
 
@@ -155,23 +163,41 @@ def handle_capture():
 
 
 def start_recording():
-    ffmpeg_command = [
+
+    object_count = count_files(save_video_filepath)
+    video_filepath = os.path.join(save_video_filepath, f'{object_count}.avi')
+
+    command = [
         'ffmpeg',
-        '-f', 'video4linux2',  # Example input format
-        '-i', '/dev/video0',  # Example input source
-        'PleaseWork.mp4'  # Output file
+        '-framerate', '24',
+        '-video_size', '1280x720',
+        '-i', '/dev/video2',
+        '-f', 'alsa', '-i', 'default',
+        '-c:v', 'h264_v4l2m2m',
+        '-pix_fmt', 'yuv420p',
+        '-b:v', '4M',
+        '-bufsize', '4M',
+        '-c:a', 'aac',
+        '-b:a', '128k',
+        '-threads', '4',
+        video_filepath
     ]
+    
     # Start FFmpeg process
-    ffmpeg_process = subprocess.Popen(ffmpeg_command, stdin=subprocess.PIPE)
+    ffmpeg_process = subprocess.Popen(command, stdin=subprocess.PIPE)
 
-    return ffmpeg_process
+    return ffmpeg_process, video_filepath
 
-def stop_recording(ffmpeg_process):
+def stop_recording(ffmpeg_process, video_filepath):
+    '''Function for stopping the video and saving it. Key note is that we are not directly uploading after recording videos'''
 
     ffmpeg_process.stdin.write(b'q\n')
     ffmpeg_process.stdin.flush()
     # Wait for the process to terminate
     ffmpeg_process.wait()
+
+    hashSignUploadThread = threading.Thread(target=main, args=(video_filepath, camera_number_string, save_video_filepath,))
+    hashSignUploadThread.start()
 
     return None
 
@@ -180,7 +206,7 @@ def capture_image():
     ''' Initialized camera and takes picture'''
     
     # Initialize the camera (use the appropriate video device)
-    camera = cv2.VideoCapture(0)
+    camera = cv2.VideoCapture(2)
 
     if not camera.isOpened():
         print("\tError: Camera not found or could not be opened.")
@@ -192,16 +218,31 @@ def capture_image():
 
     if ret:
         image = frame
-        image_filename = "NewImage.png"
-        cv2.imwrite(image_filename, image)
-
-        return image
+        # Start automatic processing and upload process for images
+        hashSignUploadThread = threading.Thread(target=main, args=(image, camera_number_string, save_image_filepath,))
+        hashSignUploadThread.start()
 
     else:
         print("\tError: Failed to capture an image.")
-        return None
 
 # --------------------------------------------------------------------
+
+def count_files(directory_path):
+    '''Helper function for returning number of PNG files in the directory'''
+
+    if not os.path.exists(directory_path):
+        print(f"Directory not found: {directory_path}")
+        return 0
+
+    count = 0
+    # Iterate over all files in the directory
+    for file_name in os.listdir(directory_path):
+        if file_name.lower().endswith('.avi'):
+            count += 1
+
+    return count
+
+# -------------------------------------------------------------------
 
 if __name__ == '__main__':
     setup_gpio()
