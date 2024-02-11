@@ -33,6 +33,7 @@ have_started = False
 camera_number_string = "1"
 save_video_filepath = os.path.join(os.getcwd(), "tmpVideos")
 save_image_filepath = os.path.join(os.getcwd(), "tmpImages")
+video_filepath = None
 # --------------------------------------------------------------------
 
 class PhotoLockGUI(FloatLayout):
@@ -148,6 +149,7 @@ def handle_capture():
     global is_recording
     global have_started
     global ffmpeg_process
+    global video_filepath
 
     if image_mode == False and is_recording == True and have_started == False:
         ffmpeg_process, video_filepath = start_recording()
