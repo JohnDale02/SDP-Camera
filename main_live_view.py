@@ -103,7 +103,7 @@ class PhotoLockGUI(FloatLayout):
             
 class PhotoLockApp(App):
     def build(self):
-        self.capture = cv2.VideoCapture(0)
+        self.capture = cv2.VideoCapture(2)
         self.capture.set(cv2.CAP_PROP_FRAME_WIDTH, 320)
         self.capture.set(cv2.CAP_PROP_FRAME_HEIGHT, 240)
         return PhotoLockGUI(self.capture)
@@ -180,7 +180,7 @@ def start_recording():
         'ffmpeg',
         '-framerate', '30',
         '-video_size', '1280x720',
-        '-i', '/dev/video2',
+        '-i', '/dev/video0',
         '-f', 'alsa', '-i', 'default',
         '-c:v', 'h264_v4l2m2m',
         '-pix_fmt', 'yuv420p',
@@ -215,7 +215,7 @@ def capture_image():
     ''' Initialized camera and takes picture'''
     
     # Initialize the camera (use the appropriate video device)
-    camera = cv2.VideoCapture(2)   # /dev/video2 is for low quality capture (direct from /dev/video0)
+    camera = cv2.VideoCapture(0)   # /dev/video2 is for low quality capture (direct from /dev/video0)
 
     if not camera.isOpened():
         print("\tError: Camera not found or could not be opened.")
