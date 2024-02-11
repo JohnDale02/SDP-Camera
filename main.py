@@ -13,7 +13,7 @@ from save_image import save_image
 from save_metadata import save_metadata
 import os
 
-def main(media_input, camera_number_string, save_media_filepath):
+def main(media_input, camera_number_string, save_media_filepath, gps_lock):
 	'''main function for processing media for signing and uploading
 				media_input : for images = imread(image) ; for videos = video_filpath for reading bytes from
 				camera_number_string : number representing the actual device 
@@ -89,7 +89,7 @@ def main(media_input, camera_number_string, save_media_filepath):
 
 	#---------- Capture GNSS Data (Time and Location) ------------------------
 
-		lat_value, long_value, time_value =  read_gps_data()
+		lat_value, long_value, time_value =  read_gps_data(gps_lock)
 		location = (f"{lat_value}, {long_value}")
 		time = (f"{time_value}")
 		print(f"Recieved Time and GNSS Data: {time}{location}")

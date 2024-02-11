@@ -57,26 +57,25 @@ def parse_nmea_sentence(sentence):
     return None, None, None
 
 
-def read_gps_data():
-    
-    ser = serial.Serial('/dev/ttyS0', 9600, timeout=5)
-    try: 
-        start_time = time.time()
-        while True:
-            sentence = ser.readline().decode('utf-8', errors='ignore').strip()
-            if sentence:
-                latitude, longitude, formatted_time = parse_nmea_sentence(sentence)
-                if latitude is not None and longitude is not None and formatted_time is not None:
-                    #print(f"Latitude: {latitude}, Longitude: {longitude}, time: {formatted_time}")
-                    return latitude, longitude, formatted_time
-            # Check if timeout is reached
-            if time.time() - start_time > ser.timeout:
-                print("Timeout reached. No GPS data received.")
-                break
-    except KeyboardInterrupt:
-        print("Program terminated!")
-    finally:
-        ser.close()
+def read_gps_data(gps_lock):
+    with gps_lock:
+        ser = serial.Serial('/dev/ttyS0', 9600, timeout=5)
+        try: 
+            start_time = time.time()
+            while True:
+                sentence = ser.readline().decode('utf-8', errors='ignore').strip()
+                if sentence:
+                    latitude, longitude, formatted_time = parse_nmea_sentence(sentence)
+                    if latitude is not None and longitude is not None and formatted_time is not None:
+                        return latitude, longitude, formatted_time
+                # Check if timeout is reached
+                if time.time() - start_time > ser.timeout:
+                    print("Timeout reached. No GPS data received.")
+                    break
+        except KeyboardInterrupt:
+            print("Program terminated!")
+        finally:
+            ser.close()
     return "None", "None", "None"
 
     

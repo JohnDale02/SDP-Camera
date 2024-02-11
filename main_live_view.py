@@ -2,12 +2,14 @@
 # GPS cannot be read by mulitple threads (need to implement locking for the GPS reading)
 
 import threading 
+from threading import Lock
 import RPi.GPIO as GPIO
 import time
 import subprocess
 import cv2
 import os
 from main import main
+
 
 from kivy.config import Config
 Config.set('graphics', 'width', '800')
@@ -33,6 +35,7 @@ is_recording = False
 ffmpeg_process = None
 have_started = False
 camera_object = cv2.VideoCapture(0)  
+gps_lock = Lock()
 
 camera_number_string = "1"
 save_video_filepath = os.path.join(os.getcwd(), "tmpVideos")
@@ -212,7 +215,7 @@ def stop_recording(ffmpeg_process, video_filepath):
     # Wait for the process to terminate
     ffmpeg_process.wait()
 
-    hashSignUploadThread = threading.Thread(target=main, args=(video_filepath, camera_number_string, save_video_filepath,))
+    hashSignUploadThread = threading.Thread(target=main, args=(video_filepath, camera_number_string, save_video_filepath, gps_lock,))
     hashSignUploadThread.start()
 
     return None
@@ -233,7 +236,7 @@ def capture_image():
     if ret:
         image = frame
         # Start automatic processing and upload process for images
-        hashSignUploadThread = threading.Thread(target=main, args=(image, camera_number_string, save_image_filepath,))
+        hashSignUploadThread = threading.Thread(target=main, args=(image, camera_number_string, save_image_filepath, gps_lock,))
         hashSignUploadThread.start()
 
     else:
