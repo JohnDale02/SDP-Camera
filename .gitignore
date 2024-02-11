@@ -5,6 +5,7 @@
 *.mp4
 *.mkv
 *.webm
+v4l2loopback
 
 # Ignore .txt files
 #*.txt
