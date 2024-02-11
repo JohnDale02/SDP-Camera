@@ -115,6 +115,11 @@ def gui_thread():
 
 def toggle_image_mode(channel):
     global image_mode
+    global have_started
+
+    if have_started:  # if someone tried to change video mode while recording
+        return
+    
     image_mode = not image_mode
 
 def toggle_recording(channel):
@@ -141,9 +146,8 @@ def handle_capture():
     '''Function for monitoring modes and recording states and starting and stopping recording accordingly.'''
     global image_mode
     global is_recording
-
-    ffmpeg_process = None
-    have_started = False
+    global have_started
+    global ffmpeg_process
 
     if image_mode == False and is_recording == True and have_started == False:
         ffmpeg_process = start_recording()
