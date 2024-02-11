@@ -1,3 +1,6 @@
+# PROBLEMS:
+# GPS cannot be read by mulitple threads (need to implement locking for the GPS reading)
+
 import threading 
 import RPi.GPIO as GPIO
 import time
@@ -100,7 +103,7 @@ class PhotoLockGUI(FloatLayout):
             
 class PhotoLockApp(App):
     def build(self):
-        self.capture = cv2.VideoCapture(2)
+        self.capture = cv2.VideoCapture(0)
         self.capture.set(cv2.CAP_PROP_FRAME_WIDTH, 320)
         self.capture.set(cv2.CAP_PROP_FRAME_HEIGHT, 240)
         return PhotoLockGUI(self.capture)
