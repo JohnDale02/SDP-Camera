@@ -217,17 +217,19 @@ def capture_image():
     ''' Initialized camera and takes picture'''
     
     # Initialize the camera (use the appropriate video device)
-    camera_object = cv2.VideoCapture(0) 
-    camera_object.set(cv2.CAP_PROP_FRAME_WIDTH, 1920)
-    camera_object.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080)
-    time.sleep(2)
+    camera = cv2.VideoCapture(0, cv2.CAP_DSHOW)
+    camera.set(cv2.CAP_PROP_FPS, 30.0)
+    camera.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter.fourcc('m','j','p','g'))
+    camera.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter.fourcc('M','J','P','G'))
+    camera.set(cv2.CAP_PROP_FRAME_WIDTH, 3840)
+    camera.set(cv2.CAP_PROP_FRAME_HEIGHT, 2160)
 
-    if not camera_object.isOpened():
+    if not camera.isOpened():
         print("\tError: Camera not found or could not be opened.")
         return None
 
     # Capture a single frame from the camera
-    ret, frame = camera_object.read()
+    ret, frame = camera.read()
 
     if ret:
         image = frame
@@ -237,6 +239,8 @@ def capture_image():
 
     else:
         print("\tError: Failed to capture an image.")
+
+    camera.release()
 
 # --------------------------------------------------------------------
 
