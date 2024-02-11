@@ -109,6 +109,8 @@ class PhotoLockApp(App):
         self.capture = cv2.VideoCapture(2)
         self.capture.set(cv2.CAP_PROP_FRAME_WIDTH, 320)
         self.capture.set(cv2.CAP_PROP_FRAME_HEIGHT, 240)
+        self.capture.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter.fourcc('m','j','p','g'))
+        self.capture.set(cv2.CAP_PROP_FPS, 20.0)
         return PhotoLockGUI(self.capture)
 
     def on_stop(self):
@@ -180,7 +182,7 @@ def start_recording():
 
     command = [            # /dev/video3 is for high quality capture (direct from /dev/video0)
         'ffmpeg',
-        '-framerate', '30',
+        '-framerate', '24',
         '-video_size', '1920x1080',
         '-i', '/dev/video0',
         '-f', 'alsa', '-i', 'default',
@@ -223,7 +225,7 @@ def capture_image():
     camera.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter.fourcc('M','J','P','G'))
     camera.set(cv2.CAP_PROP_FRAME_WIDTH, 3840)
     camera.set(cv2.CAP_PROP_FRAME_HEIGHT, 2160)
-    time.sleep(1)
+    time.sleep(5)
 
     if not camera.isOpened():
         print("\tError: Camera not found or could not be opened.")
