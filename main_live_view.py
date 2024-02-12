@@ -50,7 +50,7 @@ class PhotoLockGUI(FloatLayout):
         self.capture = capture
 
         # Create a layout for the status label with a background
-        self.status_layout = BoxLayout(size_hint=(None, None), size=(100, 40),
+        self.status_layout = BoxLayout(size_hint=(None, None), size=(140, 50),
                                        pos_hint={'center_x': 0.5, 'center_y': 0.05})
 
         with self.status_layout.canvas.before:
@@ -66,7 +66,7 @@ class PhotoLockGUI(FloatLayout):
 
         self.bind(size=self.adjust_video_size)
 
-        self.status_label = Label(text='Image', color=(1, 1, 1, 1), font_size='40sp')
+        self.status_label = Label(text='Image', color=(1, 1, 1, 1), font_size='30sp')
         self.status_layout.add_widget(self.status_label)
         self.add_widget(self.status_layout)
 
@@ -74,7 +74,7 @@ class PhotoLockGUI(FloatLayout):
         self.bg_color = Color(0, 0, 0, 0)  # Initially transparent
         self.bg_rect = Rectangle()
         
-        self.countdown_label = Label(text="", font_size='48sp', size_hint=(None, None),
+        self.countdown_label = Label(text="", font_size='30sp', size_hint=(None, None),
                                      size=(100, 50), pos_hint={'center_x': 0.5, 'center_y': 0.5})
 
         with self.canvas.before:
