@@ -49,9 +49,9 @@ class PhotoLockGUI(FloatLayout):
         super(PhotoLockGUI, self).__init__(**kwargs)
         self.capture = capture
 
-        # Create a layout for the status label with a background
+        # Create a layout for the image/video text box with a background
         self.status_layout = BoxLayout(size_hint=(None, None), size=(100, 40),
-                                       pos_hint={'right': 1, 'y': 0})
+                                       pos_hint={'right': .5, 'y': 0})
 
         with self.status_layout.canvas.before:
             Color(0, 0, 0, 0.7)  # Semi-transparent black background
@@ -62,8 +62,6 @@ class PhotoLockGUI(FloatLayout):
         self.status_layout.bind(pos=self.update_rect, size=self.update_rect)
         self.img1 = Image(keep_ratio=True, allow_stretch=True)
         self.add_widget(self.img1)
-
-        self.bind(size=self.adjust_video_size)
 
         self.status_label = Label(text='Image', font_size='30sp', color=(1, 1, 1, .7),
                                   size_hint=(None, None), halign='center', valign='middle')
@@ -92,7 +90,6 @@ class PhotoLockGUI(FloatLayout):
         self.bg_rect.size = (220, 120)
         self.countdown_label.pos = (self.width / 2 - 100, self.height / 2 - 50)
 
-
     def update(self, dt):
         ret, frame = self.capture.read()
         if ret:
@@ -106,27 +103,6 @@ class PhotoLockGUI(FloatLayout):
             self.status_label.text = f"{mode_text}"
 
             self.recording_color.a = 1 if have_started else 0
-
-        
-    def adjust_video_size(self, *args):
-        # Aspect ratio of the video feed
-        video_aspect_ratio = 16.0 / 9.0
-
-        # Calculate the maximum possible size of the video feed within the window
-        window_width, window_height = self.size
-
-        video_width = window_width
-        video_height = video_width / video_aspect_ratio
-
-        # Center the video in the window
-        self.img1.size = (video_width, video_height)
-        self.img1.pos = ((window_width - video_width) / 2, 0)
-
-        
-    def update_rect(self, instance, value):
-        self.rect.pos = instance.pos
-        self.rect.size = instance.size
-
 
     def start_countdown(self, duration=5):
         self.countdown = duration
