@@ -50,7 +50,8 @@ class PhotoLockGUI(FloatLayout):
         self.capture = capture
 
         # Create a layout for the status label with a background
-        self.status_layout = BoxLayout(size=(100, 60), pos=(100, 100))
+        self.status_layout = BoxLayout(size_hint=(None, None), size=(100, 40),
+                                       pos_hint={'right': 1, 'y': 0})
 
         with self.status_layout.canvas.before:
             Color(0, 0, 0, 0.7)  # Semi-transparent black background
@@ -64,45 +65,31 @@ class PhotoLockGUI(FloatLayout):
 
         self.bind(size=self.adjust_video_size)
 
-        self.status_label = Label(text='Image', font_size='30sp', color=(1, 1, 1, 1),
-                                  size_hint=(None, None), pos_hint={'center_x': 0.5, 'y': 0})
+        self.status_label = Label(text='Image', color=(1, 1, 1, 1), font_size='40sp')
         self.status_layout.add_widget(self.status_label)
+        self.add_widget(self.status_layout)
 
-       # Status Label Background and Label
-        self.status_label_bg_color = Color(0, 0, 0, 0.7)  # Semi-transparent black
-        self.status_label_bg_rect = Rectangle()
+        # Countdown label and its background
+        self.bg_color = Color(0, 0, 0, 0)  # Initially transparent
+        self.bg_rect = Rectangle()
         
         self.countdown_label = Label(text="", font_size='48sp', size_hint=(None, None),
                                      size=(100, 50), pos_hint={'center_x': 0.5, 'center_y': 0.5})
-        # Adding the background and label to the canvas and widget tree
-        with self.canvas.before:
-            self.canvas.add(self.status_label_bg_color)
-            self.canvas.add(self.status_label_bg_rect)
-            self.add_widget(self.status_label)
-            self.add_widget(self.status_layout)
 
+        with self.canvas.before:
+            self.canvas.add(self.bg_color)
+            self.canvas.add(self.bg_rect)
         
         self.add_widget(self.countdown_label)
+        
         self.bind(size=self._update_bg_and_label_pos, pos=self._update_bg_and_label_pos)
         
         Clock.schedule_interval(self.update, 1.0 / 33.0)
 
-
     def _update_bg_and_label_pos(self, *args):
-        # Update the position and size of the status label background rectangle
-        padding = 10  # Padding around the label text
-        self.status_label.texture_update()  # Make sure the texture size is updated
-        self.status_label.size = self.status_label.texture_size  # Adjust label size to fit text
-        
-        # Calculate the position and size for the background rectangle
-        bg_size = (self.status_label.width + padding * 2, self.status_label.height + padding * 2)
-        bg_pos = (self.width / 2 - bg_size[0] / 2, 10)  # 10 pixels from the bottom
-        
-        self.status_label_bg_rect.pos = bg_pos
-        self.status_label_bg_rect.size = bg_size
-
-        # Update the label's position
-        self.status_label.pos = (bg_pos[0] + padding, bg_pos[1] + padding / 2)
+        self.bg_rect.pos = (self.width / 2 - 110, self.height / 2 - 60)
+        self.bg_rect.size = (220, 120)
+        self.countdown_label.pos = (self.width / 2 - 100, self.height / 2 - 50)
 
 
     def update(self, dt):
