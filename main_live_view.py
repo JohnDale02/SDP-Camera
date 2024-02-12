@@ -107,7 +107,7 @@ class PhotoLockGUI(FloatLayout):
             mode_text = "Image" if image_mode else "Video"
             self.status_label.text = f"{mode_text}"
 
-            self.recording_color.a = 1 if recording_indicator else 0
+            self.recording_color.a = 1 if (recording_indicator or capturing_image) else 0
 
         
     def adjust_video_size(self, *args):
@@ -319,7 +319,7 @@ def capture_image():
 
     # Capture a single frame from the camera
     frame = None
-    for i in range(30):
+    for i in range(20):
         ret, frame = camera.read()
     
     if ret:
