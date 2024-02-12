@@ -19,7 +19,6 @@ from kivy.app import App
 from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.label import Label
 from kivy.uix.image import Image
-from kivy.clock import Clock
 from kivy.graphics.texture import Texture
 from kivy.graphics import Color, Rectangle, Ellipse
 from kivy.uix.boxlayout import BoxLayout
@@ -32,7 +31,10 @@ Window.show_cursor = False
 image_mode = True
 is_recording = False
 ffmpeg_process = None
+
 have_started = False
+capturing_image = False
+
 gps_lock = Lock()
 
 camera_number_string = "1"
@@ -73,6 +75,10 @@ class PhotoLockGUI(FloatLayout):
         self.status_label = Label(text='Image', color=(1, 1, 1, 1), font_size='20sp')  # White text for visibility
         self.status_layout.add_widget(self.status_label)
         self.add_widget(self.status_layout)
+
+        #////////////////////////////////////////
+        self.start_countdown(duration=5)
+        #////////////////////////////////////////
         
         Clock.schedule_interval(self.update, 1.0 / 33.0)
     
@@ -107,7 +113,7 @@ class PhotoLockGUI(FloatLayout):
             mode_text = "Image" if image_mode else "Video"
             self.status_label.text = f"{mode_text}"
 
-            self.recording_color.a = 1 if is_recording else 0
+            self.recording_color.a = 1 if have_started else 0
 
 
     def start_countdown(self, duration=5):
@@ -151,16 +157,19 @@ def gui_thread():
 def toggle_image_mode(channel):
     global image_mode
     global have_started
-    global camera_object
+    global capturing_image
 
-    if have_started:  # if someone tried to change video mode while recording
+    if have_started or capturing_image:  # if someone tried to change video mode while recording or capturing image still
         return
     image_mode = not image_mode
 
 def toggle_recording(channel):
     global is_recording
-    is_recording = not is_recording
-    handle_capture()
+    global capturing_image
+
+    if not capturing_image:
+        is_recording = not is_recording
+        handle_capture()
 
 # --------------------------------------------------------------------
 
@@ -184,19 +193,21 @@ def handle_capture():
     global have_started
     global ffmpeg_process
     global object_count
+    global capturing_image
 
-    if image_mode == False and is_recording == True and have_started == False:
+    if image_mode == False and is_recording == True and have_started == False and capturing_image == False:
         object_count = count_files(save_video_filepath)
         ffmpeg_process = start_recording(object_count)
         have_started = True
 
-    elif image_mode == False and is_recording == False and have_started == True:
+    elif image_mode == False and is_recording == False and have_started == True and capturing_image == False:
         ffmpeg_process = stop_recording(ffmpeg_process, object_count)
-        have_started = False
 
-    elif image_mode == True and is_recording == True:
+    elif image_mode == True and is_recording == True and have_started == False and capturing_image == False:
+        capturing_image = True
         capture_image()
         is_recording = False
+        capturing_image = False
 
     else:
         pass
@@ -233,6 +244,7 @@ def start_recording(object_count):
 
 def stop_recording(ffmpeg_process, object_count):
     '''Function for stopping the video and saving it. Key note is that we are not directly uploading after recording videos'''
+    global have_started
 
     ffmpeg_process.stdin.write(b'q\n')
     ffmpeg_process.stdin.flush()
@@ -241,7 +253,8 @@ def stop_recording(ffmpeg_process, object_count):
 
     print("Stopped raw recording")
 
-    
+    have_started = False
+
     video_filepath = os.path.join(save_video_filepath, f'{object_count}.avi')
     video_filepath_raw = os.path.join(save_video_filepath, f'{object_count}raw.avi')
     
