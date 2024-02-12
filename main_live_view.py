@@ -56,7 +56,7 @@ class PhotoLockGUI(FloatLayout):
         self.add_widget(self.img1)
 
         self.status_label = Label(text='Image', font_size='30sp', color=(1, 1, 1, .7),
-                                  size_hint=(None, None), halign='center', valign='middle')
+                                  size_hint=(None, None), pos_hint={'center_x': 0.5, 'center_y': 0.1})
         
         self.add_widget(self.status_label)
 
