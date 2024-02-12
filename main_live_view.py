@@ -53,8 +53,10 @@ class PhotoLockGUI(FloatLayout):
         self.status_layout = BoxLayout(size_hint=(None, None), size=(100, 40),
                                        pos_hint={'right': 1, 'y': 0})
         
-        self.countdown_label = Label(text="", font_size='48sp', size_hint=(None, None), size=(200, 100),
-                                     pos_hint={'center_x': 0.5, 'center_y': 0.5})
+        # Create the countdown label with explicit positioning
+        self.countdown_label = Label(text="", font_size='48sp',
+                                     size_hint=(None, None), size=(200, 100),
+                                     pos=(320, 200))
         self.add_widget(self.countdown_label)
 
         with self.status_layout.canvas.before:
