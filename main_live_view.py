@@ -59,6 +59,10 @@ class PhotoLockGUI(FloatLayout):
             self.recording_color = Color(1, 0, 0, 0)  # Start with transparent (invisible)
             self.recording_indicator = Ellipse(size=(50, 50), pos=(740, 410))
         
+        with self.canvas.before:  # Use canvas instructions to draw the background before adding widgets
+            Color(0, 0, 0, 1)  # Set color to black for the background
+            self.bg_rect = Rectangle(pos=self.center, size=(200, 100))
+
         # Update the rectangle size and position when the layout changes
         self.status_layout.bind(pos=self.update_rect, size=self.update_rect)
         
@@ -67,6 +71,7 @@ class PhotoLockGUI(FloatLayout):
 
         # Bind to size changes of the layout to adjust the video size
         self.bind(size=self.adjust_video_size)
+        self.bind(size=self._update_bg_rect, pos=self._update_bg_rect)
         
         self.status_label = Label(text='Image', color=(1, 1, 1, 1), font_size='20sp')  # White text for visibility
         self.status_layout.add_widget(self.status_label)
@@ -97,6 +102,11 @@ class PhotoLockGUI(FloatLayout):
     def update_rect(self, instance, value):
         self.rect.pos = instance.pos
         self.rect.size = instance.size
+
+    def _update_bg_rect(self, *args):
+        # Update the position and size of the background rectangle to match the countdown label
+        self.bg_rect.pos = self.countdown_label.pos
+        self.bg_rect.size = self.countdown_label.size
 
     def update(self, dt):
         ret, frame = self.capture.read()
@@ -292,15 +302,17 @@ def capture_image():
 
     Clock.schedule_once(lambda dt: gui_instance.start_countdown(duration=5), 0)
 
-    time.sleep(5)
+    time.sleep(4)
 
     if not camera.isOpened():
         print("\tError: Camera not found or could not be opened.")
         return None
 
     # Capture a single frame from the camera
-    ret, frame = camera.read()
-
+    frame = None
+    for i in range(30):
+        ret, frame = camera.read()
+    
     if ret:
         image = frame
         # Start automatic processing and upload process for images
