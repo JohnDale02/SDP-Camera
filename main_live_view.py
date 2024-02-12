@@ -34,7 +34,7 @@ ffmpeg_process = None
 
 have_started = False
 capturing_image = False
-recording_indicator = True
+recording_indicator = False
 
 gps_lock = Lock()
 
