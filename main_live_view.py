@@ -226,7 +226,7 @@ def start_recording(object_count):
     ffmpeg_process = subprocess.Popen(command, stdin=subprocess.PIPE)
 
     print("Starting GUI countdown Now")
-    gui_instance.start_countdown(duration=5)  
+    Clock.schedule_once(lambda dt: gui_instance.start_countdown(duration=5), 0)
     print("Ended GUI countdown Now")
     
     return ffmpeg_process
@@ -279,7 +279,7 @@ def capture_image():
     camera.set(cv2.CAP_PROP_FRAME_WIDTH, 3840)
     camera.set(cv2.CAP_PROP_FRAME_HEIGHT, 2160)
 
-    gui_instance.start_countdown(duration=5)  # Use gui_instance here
+    Clock.schedule_once(lambda dt: gui_instance.start_countdown(duration=5), 0)
 
     time.sleep(5)
 
