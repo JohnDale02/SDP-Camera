@@ -65,7 +65,8 @@ class PhotoLockGUI(FloatLayout):
 
         self.bind(size=self.adjust_video_size)
 
-        self.status_label = Label(text='Image', color=(1, 1, 1, 1), font_size='40sp')
+        self.status_label = Label(text='Image', font_size='30sp', color=(1, 1, 1, .7),
+                                  size_hint=(None, None), halign='center', valign='middle')
         self.status_layout.add_widget(self.status_label)
         self.add_widget(self.status_layout)
 
