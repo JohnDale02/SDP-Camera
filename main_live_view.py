@@ -49,7 +49,7 @@ class PhotoLockGUI(FloatLayout):
         super(PhotoLockGUI, self).__init__(**kwargs)
         self.capture = capture
 
-        # Create a layout for the status label with a background for the "Image" "Video"
+        # Create a layout for the status label with a background
         self.status_layout = BoxLayout(size_hint=(None, None), size=(100, 45),
                                        pos_hint={'center_x': 0.5, 'center_y': 0.05})
 
@@ -58,6 +58,8 @@ class PhotoLockGUI(FloatLayout):
             self.rect = Rectangle(size=self.status_layout.size, pos=self.status_layout.pos)
             self.recording_color = Color(1, 0, 0, 0)  # Start with transparent (invisible)
             self.recording_indicator = Ellipse(size=(50, 50), pos=(740, 410))
+        
+        self.status_layout.bind(pos=self.update_rect, size=self.update_rect)
         
         self.img1 = Image(keep_ratio=True, allow_stretch=True)
         self.add_widget(self.img1)
@@ -119,6 +121,12 @@ class PhotoLockGUI(FloatLayout):
         # Center the video in the window
         self.img1.size = (video_width, video_height)
         self.img1.pos = ((window_width - video_width) / 2, 0)
+
+        
+    def update_rect(self, instance, value):
+        self.rect.pos = instance.pos
+        self.rect.size = instance.size
+
 
     def start_countdown(self, duration=5):
         self.countdown = duration
