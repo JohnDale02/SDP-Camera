@@ -59,8 +59,12 @@ class PhotoLockGUI(FloatLayout):
             self.recording_color = Color(1, 0, 0, 0)  # Start with transparent (invisible)
             self.recording_indicator = Ellipse(size=(50, 50), pos=(740, 410))
         
+        self.status_layout.bind(pos=self.update_rect, size=self.update_rect)
+        
         self.img1 = Image(keep_ratio=True, allow_stretch=True)
         self.add_widget(self.img1)
+
+        self.bind(size=self.adjust_video_size)
 
         self.status_label = Label(text='Image', color=(1, 1, 1, 1), font_size='40sp')
         self.status_layout.add_widget(self.status_label)
@@ -102,6 +106,26 @@ class PhotoLockGUI(FloatLayout):
             self.status_label.text = f"{mode_text}"
 
             self.recording_color.a = 1 if have_started else 0
+
+        
+    def adjust_video_size(self, *args):
+        # Aspect ratio of the video feed
+        video_aspect_ratio = 16.0 / 9.0
+
+        # Calculate the maximum possible size of the video feed within the window
+        window_width, window_height = self.size
+
+        video_width = window_width
+        video_height = video_width / video_aspect_ratio
+
+        # Center the video in the window
+        self.img1.size = (video_width, video_height)
+        self.img1.pos = ((window_width - video_width) / 2, 0)
+
+        
+    def update_rect(self, instance, value):
+        self.rect.pos = instance.pos
+        self.rect.size = instance.size
 
 
     def start_countdown(self, duration=5):
