@@ -49,7 +49,7 @@ class PhotoLockGUI(FloatLayout):
         super(PhotoLockGUI, self).__init__(**kwargs)
         self.capture = capture
 
-        # Create a layout for the status label with a background for the "Image" "Video" Text box
+        # Create a layout for the status label with a background for the "Image" "Video"
         self.status_layout = BoxLayout(size_hint=(None, None), size=(100, 45),
                                        pos_hint={'center_x': 0.5, 'center_y': 0.05})
 
@@ -72,23 +72,25 @@ class PhotoLockGUI(FloatLayout):
         self.bg_color = Color(0, 0, 0, 0)  # Initially transparent
         self.bg_rect = Rectangle()
         
-                # Create a layout for the status label with a background
-        self.countdown_layout = BoxLayout(size_hint=(None, None), size=(50, 50),
-                                       pos_hint={'center_x': 0.5, 'center_y': 0.5})
-        
-        with self.countdown_layout.canvas.before:
-            Color(0, 0, 0, 0.4)  # Semi-transparent black background
-            self.rect = Rectangle(size=self.countdown_layout.size, pos=self.countdown_layout.pos)
-
         self.countdown_label = Label(text="", font_size='30sp', size_hint=(None, None),
                                      size=(100, 50), pos_hint={'center_x': 0.5, 'center_y': 0.5})
+
+        with self.canvas.before:
+            self.canvas.add(self.bg_color)
+            self.canvas.add(self.bg_rect)
         
         self.add_widget(self.countdown_label)
-
+        
+        self.bind(size=self._update_bg_and_label_pos, pos=self._update_bg_and_label_pos)
         
         Clock.schedule_interval(self.update, 1.0 / 33.0)
 
-        
+    def _update_bg_and_label_pos(self, *args):
+        self.bg_rect.pos = (self.width / 2 - 110, self.height / 2 - 60)
+        self.bg_rect.size = (220, 120)
+        self.countdown_label.pos = (self.width / 2 - 100, self.height / 2 - 50)
+
+
     def update(self, dt):
         ret, frame = self.capture.read()
         if ret:
