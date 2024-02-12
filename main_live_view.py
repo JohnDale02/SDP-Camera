@@ -51,7 +51,7 @@ class PhotoLockGUI(FloatLayout):
 
         # Create a layout for the status label with a background
         self.status_layout = BoxLayout(size_hint=(None, None), size=(100, 40),
-                                       pos_hint={'right': 1, 'y': 0})
+                                       pos_hint={'center_x': 0.5, 'center_y': 0.05})
 
         with self.status_layout.canvas.before:
             Color(0, 0, 0, 0.7)  # Semi-transparent black background
@@ -145,9 +145,6 @@ class PhotoLockGUI(FloatLayout):
         self.countdown_label.text = ""
         self.bg_color.rgba = (0, 0, 0, 0)  # Make the background transparent again
         Clock.unschedule(self.update_countdown)
-
-
-
             
 class PhotoLockApp(App):
     def build(self):
