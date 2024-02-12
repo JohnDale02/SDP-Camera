@@ -1,5 +1,3 @@
-# PROBLEMS:
-# GPS cannot be read by mulitple threads (need to implement locking for the GPS reading)
 
 import threading 
 from threading import Lock
@@ -25,6 +23,7 @@ from kivy.clock import Clock
 from kivy.graphics.texture import Texture
 from kivy.graphics import Color, Rectangle, Ellipse
 from kivy.uix.boxlayout import BoxLayout
+from kivy.clock import Clock
 
 from kivy.core.window import Window
 Window.show_cursor = False
@@ -40,6 +39,8 @@ camera_number_string = "1"
 save_video_filepath = os.path.join(os.getcwd(), "tmpVideos")
 save_image_filepath = os.path.join(os.getcwd(), "tmpImages")
 video_filepath = None
+object_count = None
+gui_instance = None
 # --------------------------------------------------------------------
 
 class PhotoLockGUI(FloatLayout):
@@ -50,6 +51,11 @@ class PhotoLockGUI(FloatLayout):
         # Create a layout for the status label with a background
         self.status_layout = BoxLayout(size_hint=(None, None), size=(100, 40),
                                        pos_hint={'right': 1, 'y': 0})
+        
+        self.countdown_label = Label(text="", font_size='48sp', size_hint=(None, None), size=(200, 100),
+                                     pos_hint={'center_x': 0.5, 'center_y': 0.5})
+        self.add_widget(self.countdown_label)
+
         with self.status_layout.canvas.before:
             Color(0, 0, 0, 0.7)  # Semi-transparent black background
             self.rect = Rectangle(size=self.status_layout.size, pos=self.status_layout.pos)
@@ -103,15 +109,36 @@ class PhotoLockGUI(FloatLayout):
             self.status_label.text = f"{mode_text}"
 
             self.recording_color.a = 1 if is_recording else 0
+
+
+    def start_countdown(self, duration=5):
+        """Starts a countdown displayed in the center of the screen."""
+        self.countdown = duration
+        self.countdown_label.text = str(self.countdown)
+        self.countdown_label.opacity = 1  # Make the label visible
+        Clock.schedule_interval(self.update_countdown, 1)
+
+    def update_countdown(self, dt):
+        """Updates the countdown every second."""
+        self.countdown -= 1
+        if self.countdown > 0:
+            self.countdown_label.text = str(self.countdown)
+        else:
+            self.countdown_label.text = ""
+            self.countdown_label.opacity = 0  # Hide the label
+            Clock.unschedule(self.update_countdown)
             
 class PhotoLockApp(App):
     def build(self):
+        global gui_instance
         self.capture = cv2.VideoCapture(2)
         self.capture.set(cv2.CAP_PROP_FRAME_WIDTH, 320)
         self.capture.set(cv2.CAP_PROP_FRAME_HEIGHT, 240)
         self.capture.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter.fourcc('m','j','p','g'))
         self.capture.set(cv2.CAP_PROP_FPS, 20.0)
-        return PhotoLockGUI(self.capture)
+        
+        gui_instance = PhotoLockGUI(self.capture)  # Assign the instance to the global variable
+        return gui_instance
 
     def on_stop(self):
         self.capture.release()
@@ -158,9 +185,11 @@ def handle_capture():
     global have_started
     global ffmpeg_process
     global video_filepath
+    global object_count
 
     if image_mode == False and is_recording == True and have_started == False:
-        ffmpeg_process, video_filepath = start_recording()
+        object_count = count_files(save_video_filepath)
+        ffmpeg_process, video_filepath = start_recording(object_count)
         have_started = True
 
     elif image_mode == False and is_recording == False and have_started == True:
@@ -175,12 +204,11 @@ def handle_capture():
         pass
 
 
-def start_recording():
+def start_recording(object_count):
 
-    object_count = count_files(save_video_filepath)
-    video_filepath = os.path.join(save_video_filepath, f'{object_count}.avi')
+    video_filepath_raw = os.path.join(save_video_filepath, f'{object_count}raw.avi')
 
-    command = [            # /dev/video3 is for high quality capture (direct from /dev/video0)
+    command = [ 
         'ffmpeg',
         '-framerate', '24',
         '-video_size', '1920x1080',
@@ -193,21 +221,41 @@ def start_recording():
         '-c:a', 'aac',
         '-b:a', '128k',
         '-threads', '4',
-        video_filepath
+        video_filepath_raw
     ]
     
     # Start FFmpeg process
     ffmpeg_process = subprocess.Popen(command, stdin=subprocess.PIPE)
 
-    return ffmpeg_process, video_filepath
+    gui_instance.start_countdown(duration=5)  # Use gui_instance here
+    
+    return ffmpeg_process
 
-def stop_recording(ffmpeg_process, video_filepath):
+def stop_recording(ffmpeg_process, object_count):
     '''Function for stopping the video and saving it. Key note is that we are not directly uploading after recording videos'''
 
     ffmpeg_process.stdin.write(b'q\n')
     ffmpeg_process.stdin.flush()
     # Wait for the process to terminate
     ffmpeg_process.wait()
+
+    
+    video_filepath = os.path.join(save_video_filepath, f'{object_count}.avi')
+    video_filepath_raw = os.path.join(save_video_filepath, f'{object_count}raw.avi')
+    
+
+    ffmpeg_cut_command = [
+    'ffmpeg',
+    '-i', video_filepath_raw,  # Input file path
+    '-ss', '5',  # Start trimming 5 seconds into the video
+    '-c:v', 'copy',  # Copy the video stream without re-encoding
+    '-c:a', 'copy',  # Copy the audio stream without re-encoding
+    '-threads', '4',
+    video_filepath  # Output file path
+    ]
+
+    ffmpeg_cut_process = subprocess.Popen(ffmpeg_cut_command, stdin=subprocess.PIPE)
+    ffmpeg_cut_process.wait()
 
     hashSignUploadThread = threading.Thread(target=main, args=(video_filepath, camera_number_string, save_video_filepath, gps_lock,))
     hashSignUploadThread.start()
@@ -217,7 +265,7 @@ def stop_recording(ffmpeg_process, video_filepath):
 
 def capture_image():
     ''' Initialized camera and takes picture'''
-    
+    global gui_instance
     # Initialize the camera (use the appropriate video device)
     camera = cv2.VideoCapture(0)
     camera.set(cv2.CAP_PROP_FPS, 30.0)
@@ -225,6 +273,9 @@ def capture_image():
     camera.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter.fourcc('M','J','P','G'))
     camera.set(cv2.CAP_PROP_FRAME_WIDTH, 3840)
     camera.set(cv2.CAP_PROP_FRAME_HEIGHT, 2160)
+
+    gui_instance.start_countdown(duration=5)  # Use gui_instance here
+
     time.sleep(5)
 
     if not camera.isOpened():
