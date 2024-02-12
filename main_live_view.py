@@ -38,7 +38,6 @@ gps_lock = Lock()
 camera_number_string = "1"
 save_video_filepath = os.path.join(os.getcwd(), "tmpVideos")
 save_image_filepath = os.path.join(os.getcwd(), "tmpImages")
-video_filepath = None
 object_count = None
 gui_instance = None
 # --------------------------------------------------------------------
@@ -184,16 +183,15 @@ def handle_capture():
     global is_recording
     global have_started
     global ffmpeg_process
-    global video_filepath
     global object_count
 
     if image_mode == False and is_recording == True and have_started == False:
         object_count = count_files(save_video_filepath)
-        ffmpeg_process, video_filepath = start_recording(object_count)
+        ffmpeg_process = start_recording(object_count)
         have_started = True
 
     elif image_mode == False and is_recording == False and have_started == True:
-        ffmpeg_process = stop_recording(ffmpeg_process, video_filepath)
+        ffmpeg_process = stop_recording(ffmpeg_process, object_count)
         have_started = False
 
     elif image_mode == True and is_recording == True:
