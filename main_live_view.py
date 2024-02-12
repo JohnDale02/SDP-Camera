@@ -89,7 +89,7 @@ class PhotoLockGUI(FloatLayout):
 
     def _update_bg_and_label_pos(self, *args):
         self.bg_rect.pos = (self.width / 2 - 110, self.height / 2 - 60)
-        self.bg_rect.size = (220, 120)
+        self.bg_rect.size = (50, 50)
         self.countdown_label.pos = (self.width / 2 - 100, self.height / 2 - 50)
 
 
