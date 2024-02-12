@@ -58,10 +58,7 @@ class PhotoLockGUI(FloatLayout):
             self.rect = Rectangle(size=self.status_layout.size, pos=self.status_layout.pos)
             self.recording_color = Color(1, 0, 0, 0)  # Start with transparent (invisible)
             self.recording_indicator = Ellipse(size=(50, 50), pos=(740, 410))
-            self.bg_rect = Rectangle(pos=self.center, size=(200, 100))
         
-
-
         # Update the rectangle size and position when the layout changes
         self.status_layout.bind(pos=self.update_rect, size=self.update_rect)
         
@@ -70,7 +67,10 @@ class PhotoLockGUI(FloatLayout):
 
         # Bind to size changes of the layout to adjust the video size
         self.bind(size=self.adjust_video_size)
-        self.bind(size=self._update_bg_rect, pos=self._update_bg_rect)
+        
+        with self.canvas.after:
+            self.bg_color = Color(0, 0, 0, 1)  # Black color for background
+            self.bg_rect = Rectangle(size=(220, 120), pos=(self.width/2 - 110, self.height/2 - 60))
         
         self.status_label = Label(text='Image', color=(1, 1, 1, 1), font_size='20sp')  # White text for visibility
         self.status_layout.add_widget(self.status_label)
@@ -80,6 +80,8 @@ class PhotoLockGUI(FloatLayout):
         self.countdown_label = Label(text="", font_size='48sp', size_hint=(None, None), size=(200, 100),
                                      pos_hint={'center_x': 0.5, 'center_y': 0.5})
         self.add_widget(self.countdown_label)  # This ensures it's layered above the video frames
+
+        self.bind(size=self._update_bg_and_label_pos, pos=self._update_bg_and_label_pos)
         
         Clock.schedule_interval(self.update, 1.0 / 33.0)
     
@@ -102,10 +104,10 @@ class PhotoLockGUI(FloatLayout):
         self.rect.pos = instance.pos
         self.rect.size = instance.size
 
-    def _update_bg_rect(self, *args):
-        # Update the position and size of the background rectangle to match the countdown label
-        self.bg_rect.pos = self.countdown_label.pos
-        self.bg_rect.size = self.countdown_label.size
+    def _update_bg_and_label_pos(self, *args):
+        # Adjust the position of the background rectangle and label
+        self.bg_rect.pos = (self.width/2 - 110, self.height/2 - 60)
+        self.countdown_label.pos = (self.width/2 - 100, self.height/2 - 50)
 
     def update(self, dt):
         ret, frame = self.capture.read()
