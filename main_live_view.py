@@ -158,7 +158,6 @@ class PhotoLockApp(App):
         self.capture.set(cv2.CAP_PROP_FPS, 20.0)
         
         gui_instance = PhotoLockGUI(self.capture)  # Assign the instance to the global variable
-        Clock.schedule_once(lambda dt: gui_instance.start_countdown(duration=5), 3)  # Delay the countdown start by 1 second after app launch
         return gui_instance
 
     def on_stop(self):
@@ -254,7 +253,7 @@ def start_recording(object_count):
     # Start FFmpeg process
     ffmpeg_process = subprocess.Popen(command, stdin=subprocess.PIPE)
 
-    Clock.schedule_once(lambda dt: gui_instance.start_countdown(duration=5), 0)
+    Clock.schedule_once(lambda dt: gui_instance.start_countdown(duration=7), 0)
     time.sleep(5)
     recording_indicator = True
     
@@ -311,9 +310,9 @@ def capture_image():
     camera.set(cv2.CAP_PROP_FRAME_WIDTH, 1920)
     camera.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080)
 
-    Clock.schedule_once(lambda dt: gui_instance.start_countdown(duration=5), 0)
+    Clock.schedule_once(lambda dt: gui_instance.start_countdown(duration=6), 0)
 
-    time.sleep(4)
+    time.sleep(3.4)
 
     if not camera.isOpened():
         print("\tError: Camera not found or could not be opened.")
