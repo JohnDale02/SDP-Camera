@@ -49,26 +49,26 @@ class PhotoLockGUI(FloatLayout):
         super(PhotoLockGUI, self).__init__(**kwargs)
         self.capture = capture
 
-        self.recording_color = Color(1, 0, 0, 0)  # Start with transparent (invisible)
-        self.recording_indicator = Ellipse(size=(50, 50), pos=(740, 410))
+        # Create a layout for the status label with a background
+        self.status_layout = BoxLayout(size_hint=(None, None), size=(100, 40),
+                                       pos_hint={'right': 1, 'y': 0})
+
+        with self.status_layout.canvas.before:
+            Color(0, 0, 0, 0.7)  # Semi-transparent black background
+            self.rect = Rectangle(size=self.status_layout.size, pos=self.status_layout.pos)
+            self.recording_color = Color(1, 0, 0, 0)  # Start with transparent (invisible)
+            self.recording_indicator = Ellipse(size=(50, 50), pos=(740, 410))
+        
+        self.status_layout.bind(pos=self.update_rect, size=self.update_rect)
         
         self.img1 = Image(keep_ratio=True, allow_stretch=True)
         self.add_widget(self.img1)
 
-        bg_width = 200  # Hardcoded background width
-        bg_height = 50  # Hardcoded background height
-        bg_pos_x = (self.width / 2) - (bg_width / 2)  # Center horizontally
-        bg_pos_y = 20  # Position from the bottom
+        self.bind(size=self.adjust_video_size)
 
-        # Create and add the background first
-        with self.canvas.before:
-            Color(0, 0, 0, 0.7)  # Semi-transparent black background
-            self.bg_rect = Rectangle(size=(bg_width, bg_height), pos=(bg_pos_x, bg_pos_y))
-
-        self.status_label = Label(text='Image', font_size='30sp', color=(1, 1, 1, 1),
-                                  size_hint=(None, None), pos_hint={'center_x': 0.5, 'center_y': 0.05})
-    
-        self.add_widget(self.status_label)
+        self.status_label = Label(text='Image', color=(1, 1, 1, 1), font_size='40sp')
+        self.status_layout.add_widget(self.status_label)
+        self.add_widget(self.status_layout)
 
         # Countdown label and its background
         self.bg_color = Color(0, 0, 0, 0)  # Initially transparent
@@ -76,10 +76,22 @@ class PhotoLockGUI(FloatLayout):
         
         self.countdown_label = Label(text="", font_size='48sp', size_hint=(None, None),
                                      size=(100, 50), pos_hint={'center_x': 0.5, 'center_y': 0.5})
+
+        with self.canvas.before:
+            self.canvas.add(self.bg_color)
+            self.canvas.add(self.bg_rect)
         
         self.add_widget(self.countdown_label)
         
+        self.bind(size=self._update_bg_and_label_pos, pos=self._update_bg_and_label_pos)
+        
         Clock.schedule_interval(self.update, 1.0 / 33.0)
+
+    def _update_bg_and_label_pos(self, *args):
+        self.bg_rect.pos = (self.width / 2 - 110, self.height / 2 - 60)
+        self.bg_rect.size = (220, 120)
+        self.countdown_label.pos = (self.width / 2 - 100, self.height / 2 - 50)
+
 
     def update(self, dt):
         ret, frame = self.capture.read()
@@ -94,6 +106,27 @@ class PhotoLockGUI(FloatLayout):
             self.status_label.text = f"{mode_text}"
 
             self.recording_color.a = 1 if have_started else 0
+
+        
+    def adjust_video_size(self, *args):
+        # Aspect ratio of the video feed
+        video_aspect_ratio = 16.0 / 9.0
+
+        # Calculate the maximum possible size of the video feed within the window
+        window_width, window_height = self.size
+
+        video_width = window_width
+        video_height = video_width / video_aspect_ratio
+
+        # Center the video in the window
+        self.img1.size = (video_width, video_height)
+        self.img1.pos = ((window_width - video_width) / 2, 0)
+
+        
+    def update_rect(self, instance, value):
+        self.rect.pos = instance.pos
+        self.rect.size = instance.size
+
 
     def start_countdown(self, duration=5):
         self.countdown = duration
@@ -112,7 +145,6 @@ class PhotoLockGUI(FloatLayout):
         self.countdown_label.text = ""
         self.bg_color.rgba = (0, 0, 0, 0)  # Make the background transparent again
         Clock.unschedule(self.update_countdown)
-
 
 
 
