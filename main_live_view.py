@@ -213,8 +213,9 @@ def handle_capture():
 
     if image_mode == False and is_recording == True and have_started == False and capturing_image == False:
         object_count = count_files(save_video_filepath)
-        ffmpeg_process = start_recording(object_count)
         have_started = True
+        ffmpeg_process = start_recording(object_count)
+
 
     elif image_mode == False and is_recording == False and have_started == True and capturing_image == False:
         ffmpeg_process = stop_recording(ffmpeg_process, object_count)
@@ -254,6 +255,7 @@ def start_recording(object_count):
     ffmpeg_process = subprocess.Popen(command, stdin=subprocess.PIPE)
 
     Clock.schedule_once(lambda dt: gui_instance.start_countdown(duration=5), 0)
+    time.sleep(5)
     recording_indicator = True
     
     return ffmpeg_process
