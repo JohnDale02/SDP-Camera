@@ -55,9 +55,13 @@ class PhotoLockGUI(FloatLayout):
         self.img1 = Image(keep_ratio=True, allow_stretch=True)
         self.add_widget(self.img1)
 
-        self.status_label = Label(text='Image', font_size='30sp', color=(1, 1, 1, .7),
-                                  size_hint=(None, None), pos_hint={'center_x': 0.5, 'center_y': 0.1})
+        self.status_label = Label(text='Image', font_size='30sp', color=(1, 1, 1, 1),
+                                  size_hint=(None, None), pos_hint={'center_x': 0.5, 'center_y': 0.05})
         
+        self.status_label_bg = Rectangle(size=(200, 50), color=(0, 0, 0, .7),
+                            size_hint=(None, None), pos_hint={'center_x': 0.5, 'center_y': 0.05})
+        
+        self.add_widget(self.status_label_bg)
         self.add_widget(self.status_label)
 
         # Countdown label and its background
