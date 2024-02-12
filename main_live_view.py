@@ -107,7 +107,7 @@ class PhotoLockGUI(FloatLayout):
             mode_text = "Image" if image_mode else "Video"
             self.status_label.text = f"{mode_text}"
 
-            self.recording_color.a = 1 if (recording_indicator or capturing_image) else 0
+            self.recording_color.a = 1 if recording_indicator else 0
 
         
     def adjust_video_size(self, *args):
@@ -300,7 +300,7 @@ def stop_recording(ffmpeg_process, object_count):
 
 def capture_image():
     ''' Initialized camera and takes picture'''
-    global gui_instance
+    global gui_instance, recording_indicator
     # Initialize the camera (use the appropriate video device)
     camera = cv2.VideoCapture(0)
     camera.set(cv2.CAP_PROP_FPS, 30.0)
@@ -318,6 +318,7 @@ def capture_image():
         return None
 
     # Capture a single frame from the camera
+    recording_indicator = True
     frame = None
     for i in range(20):
         ret, frame = camera.read()
@@ -332,6 +333,8 @@ def capture_image():
         print("\tError: Failed to capture an image.")
 
     camera.release()
+
+    recording_indicator = False
 
 # --------------------------------------------------------------------
 
