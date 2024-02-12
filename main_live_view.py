@@ -34,6 +34,7 @@ ffmpeg_process = None
 
 have_started = False
 capturing_image = False
+recording_indicator = True
 
 gps_lock = Lock()
 
@@ -42,6 +43,7 @@ save_video_filepath = os.path.join(os.getcwd(), "tmpVideos")
 save_image_filepath = os.path.join(os.getcwd(), "tmpImages")
 object_count = None
 gui_instance = None
+
 # --------------------------------------------------------------------
 
 class PhotoLockGUI(FloatLayout):
@@ -228,6 +230,7 @@ def handle_capture():
 
 
 def start_recording(object_count):
+    global recording_indicator
 
     video_filepath_raw = os.path.join(save_video_filepath, f'{object_count}raw.avi')
 
@@ -250,15 +253,14 @@ def start_recording(object_count):
     # Start FFmpeg process
     ffmpeg_process = subprocess.Popen(command, stdin=subprocess.PIPE)
 
-    print("Starting GUI countdown Now")
     Clock.schedule_once(lambda dt: gui_instance.start_countdown(duration=5), 0)
-    print("Ended GUI countdown Now")
+    recording_indicator = True
     
     return ffmpeg_process
 
 def stop_recording(ffmpeg_process, object_count):
     '''Function for stopping the video and saving it. Key note is that we are not directly uploading after recording videos'''
-    global have_started
+    global have_started, recording_indicator
 
     ffmpeg_process.stdin.write(b'q\n')
     ffmpeg_process.stdin.flush()
@@ -268,6 +270,7 @@ def stop_recording(ffmpeg_process, object_count):
     print("Stopped raw recording")
 
     have_started = False
+    recording_indicator = False
 
     video_filepath = os.path.join(save_video_filepath, f'{object_count}.avi')
     video_filepath_raw = os.path.join(save_video_filepath, f'{object_count}raw.avi')
