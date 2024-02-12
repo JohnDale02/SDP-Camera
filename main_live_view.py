@@ -77,10 +77,6 @@ class PhotoLockGUI(FloatLayout):
         self.status_label = Label(text='Image', color=(1, 1, 1, 1), font_size='20sp')  # White text for visibility
         self.status_layout.add_widget(self.status_label)
         self.add_widget(self.status_layout)
-
-        #////////////////////////////////////////
-        self.start_countdown(duration=5)
-        #////////////////////////////////////////
         
         Clock.schedule_interval(self.update, 1.0 / 33.0)
     
@@ -145,6 +141,7 @@ class PhotoLockApp(App):
         self.capture.set(cv2.CAP_PROP_FPS, 20.0)
         
         gui_instance = PhotoLockGUI(self.capture)  # Assign the instance to the global variable
+        Clock.schedule_once(lambda dt: gui_instance.start_countdown(duration=5), 3)  # Delay the countdown start by 1 second after app launch
         return gui_instance
 
     def on_stop(self):
