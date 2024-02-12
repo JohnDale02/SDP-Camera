@@ -64,6 +64,7 @@ class PhotoLockGUI(FloatLayout):
 
         self.status_label = Label(text='Image', font_size='30sp', color=(1, 1, 1, .7),
                                   size_hint=(None, None), halign='center', valign='middle')
+        
         self.status_layout.add_widget(self.status_label)
         self.add_widget(self.status_layout)
 
@@ -73,11 +74,6 @@ class PhotoLockGUI(FloatLayout):
         
         self.countdown_label = Label(text="", font_size='48sp', size_hint=(None, None),
                                      size=(100, 50), pos_hint={'center_x': 0.5, 'center_y': 0.5})
-        
-
-        with self.canvas.before:
-            self.canvas.add(self.bg_color)
-            self.canvas.add(self.bg_rect)
         
         self.add_widget(self.countdown_label)
         
