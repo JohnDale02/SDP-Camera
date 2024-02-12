@@ -227,7 +227,9 @@ def start_recording(object_count):
     # Start FFmpeg process
     ffmpeg_process = subprocess.Popen(command, stdin=subprocess.PIPE)
 
-    gui_instance.start_countdown(duration=5)  # Use gui_instance here
+    print("Starting GUI countdown Now")
+    gui_instance.start_countdown(duration=5)  
+    print("Ended GUI countdown Now")
     
     return ffmpeg_process
 
@@ -238,6 +240,8 @@ def stop_recording(ffmpeg_process, object_count):
     ffmpeg_process.stdin.flush()
     # Wait for the process to terminate
     ffmpeg_process.wait()
+
+    print("Stopped raw recording")
 
     
     video_filepath = os.path.join(save_video_filepath, f'{object_count}.avi')
@@ -254,8 +258,11 @@ def stop_recording(ffmpeg_process, object_count):
     video_filepath  # Output file path
     ]
 
+    
+    print("Began cutting recording")
     ffmpeg_cut_process = subprocess.Popen(ffmpeg_cut_command, stdin=subprocess.PIPE)
     ffmpeg_cut_process.wait()
+    print("Stopped cutting recording")
 
     hashSignUploadThread = threading.Thread(target=main, args=(video_filepath, camera_number_string, save_video_filepath, gps_lock,))
     hashSignUploadThread.start()
