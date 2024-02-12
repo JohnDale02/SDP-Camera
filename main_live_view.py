@@ -59,7 +59,6 @@ class PhotoLockGUI(FloatLayout):
             self.recording_color = Color(1, 0, 0, 0)  # Start with transparent (invisible)
             self.recording_indicator = Ellipse(size=(50, 50), pos=(740, 410))
         
-        self.status_layout.bind(pos=self.update_rect, size=self.update_rect)
         self.img1 = Image(keep_ratio=True, allow_stretch=True)
         self.add_widget(self.img1)
 
@@ -74,6 +73,7 @@ class PhotoLockGUI(FloatLayout):
         
         self.countdown_label = Label(text="", font_size='48sp', size_hint=(None, None),
                                      size=(100, 50), pos_hint={'center_x': 0.5, 'center_y': 0.5})
+        
 
         with self.canvas.before:
             self.canvas.add(self.bg_color)
