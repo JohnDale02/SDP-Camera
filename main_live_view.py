@@ -59,55 +59,35 @@ class PhotoLockGUI(FloatLayout):
             self.recording_color = Color(1, 0, 0, 0)  # Start with transparent (invisible)
             self.recording_indicator = Ellipse(size=(50, 50), pos=(740, 410))
         
-        # Update the rectangle size and position when the layout changes
-        self.status_layout.bind(pos=self.update_rect, size=self.update_rect)
-        
         self.img1 = Image(keep_ratio=True, allow_stretch=True)
         self.add_widget(self.img1)
 
-        # Bind to size changes of the layout to adjust the video size
-        self.bind(size=self.adjust_video_size)
-        
-        with self.canvas.after:
-            self.bg_color = Color(0, 0, 0, 1)  # Black color for background
-            self.bg_rect = Rectangle(size=(220, 120), pos=(self.width/2 - 110, self.height/2 - 60))
-        
-        self.status_label = Label(text='Image', color=(1, 1, 1, 1), font_size='20sp')  # White text for visibility
+        self.status_label = Label(text='Image', color=(1, 1, 1, 1), font_size='20sp')
         self.status_layout.add_widget(self.status_label)
         self.add_widget(self.status_layout)
 
-        # Ensure the countdown label is on top by adding it last
-        self.countdown_label = Label(text="", font_size='48sp', size_hint=(None, None), size=(200, 100),
-                                     pos_hint={'center_x': 0.5, 'center_y': 0.5})
-        self.add_widget(self.countdown_label)  # This ensures it's layered above the video frames
+        # Countdown label and its background
+        self.bg_color = Color(0, 0, 0, 0)  # Initially transparent
+        self.bg_rect = Rectangle()
+        
+        self.countdown_label = Label(text="", font_size='48sp', size_hint=(None, None),
+                                     size=(200, 100), pos_hint={'center_x': 0.5, 'center_y': 0.5})
 
+        with self.canvas.before:
+            self.canvas.add(self.bg_color)
+            self.canvas.add(self.bg_rect)
+        
+        self.add_widget(self.countdown_label)
+        
         self.bind(size=self._update_bg_and_label_pos, pos=self._update_bg_and_label_pos)
         
         Clock.schedule_interval(self.update, 1.0 / 33.0)
-    
-    def adjust_video_size(self, *args):
-        # Aspect ratio of the video feed
-        video_aspect_ratio = 16.0 / 9.0
-
-        # Calculate the maximum possible size of the video feed within the window
-        window_width, window_height = self.size
-
-        video_width = window_width
-        video_height = video_width / video_aspect_ratio
-
-        # Center the video in the window
-        self.img1.size = (video_width, video_height)
-        self.img1.pos = ((window_width - video_width) / 2, 0)
-
-        
-    def update_rect(self, instance, value):
-        self.rect.pos = instance.pos
-        self.rect.size = instance.size
 
     def _update_bg_and_label_pos(self, *args):
-        # Adjust the position of the background rectangle and label
-        self.bg_rect.pos = (self.width/2 - 110, self.height/2 - 60)
-        self.countdown_label.pos = (self.width/2 - 100, self.height/2 - 50)
+        self.bg_rect.pos = (self.width / 2 - 110, self.height / 2 - 60)
+        self.bg_rect.size = (220, 120)
+        self.countdown_label.pos = (self.width / 2 - 100, self.height / 2 - 50)
+
 
     def update(self, dt):
         ret, frame = self.capture.read()
@@ -123,23 +103,28 @@ class PhotoLockGUI(FloatLayout):
 
             self.recording_color.a = 1 if have_started else 0
 
-
+            
     def start_countdown(self, duration=5):
-        """Starts a countdown displayed in the center of the screen."""
         self.countdown = duration
         self.countdown_label.text = str(self.countdown)
-        self.countdown_label.opacity = 1  # Make the label visible
+        self.bg_color.rgba = (0, 0, 0, 1)  # Make the background visible
         Clock.schedule_interval(self.update_countdown, 1)
 
     def update_countdown(self, dt):
-        """Updates the countdown every second."""
         self.countdown -= 1
         if self.countdown > 0:
             self.countdown_label.text = str(self.countdown)
         else:
-            self.countdown_label.text = ""
-            self.countdown_label.opacity = 0  # Hide the label
-            Clock.unschedule(self.update_countdown)
+            self.end_countdown()
+
+    def end_countdown(self):
+        self.countdown_label.text = ""
+        self.bg_color.rgba = (0, 0, 0, 0)  # Make the background transparent again
+        Clock.unschedule(self.update_countdown)
+
+
+
+
             
 class PhotoLockApp(App):
     def build(self):
