@@ -52,12 +52,6 @@ class PhotoLockGUI(FloatLayout):
         # Create a layout for the status label with a background
         self.status_layout = BoxLayout(size_hint=(None, None), size=(100, 40),
                                        pos_hint={'right': 1, 'y': 0})
-        
-        # Create the countdown label with explicit positioning
-        self.countdown_label = Label(text="", font_size='48sp',
-                                     size_hint=(None, None), size=(200, 100),
-                                     pos=(320, 200))
-        self.add_widget(self.countdown_label)
 
         with self.status_layout.canvas.before:
             Color(0, 0, 0, 0.7)  # Semi-transparent black background
@@ -77,6 +71,11 @@ class PhotoLockGUI(FloatLayout):
         self.status_label = Label(text='Image', color=(1, 1, 1, 1), font_size='20sp')  # White text for visibility
         self.status_layout.add_widget(self.status_label)
         self.add_widget(self.status_layout)
+
+        # Ensure the countdown label is on top by adding it last
+        self.countdown_label = Label(text="", font_size='48sp', size_hint=(None, None), size=(200, 100),
+                                     pos_hint={'center_x': 0.5, 'center_y': 0.5})
+        self.add_widget(self.countdown_label)  # This ensures it's layered above the video frames
         
         Clock.schedule_interval(self.update, 1.0 / 33.0)
     
