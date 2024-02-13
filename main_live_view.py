@@ -174,17 +174,25 @@ def toggle_image_mode(channel):
     global have_started
     global capturing_image
 
+    print(f"Image Mode: {image_mode}")
+
     if have_started or capturing_image:  # if someone tried to change video mode while recording or capturing image still
+        print(f"Have started or capturing image == True {have_started} {capturing_image}")
         return
+    
     image_mode = not image_mode
 
 def toggle_recording(channel):
     global is_recording
     global capturing_image
 
-    if not capturing_image or have_started:
+    print(f'Should we record right now? : {is_recording}')
+
+    if not capturing_image or not have_started:
+        print(f"not capturing image, not started recording: toggling from {is_recording}")
         is_recording = not is_recording
         handle_capture()
+        print("Finished capture")
 
 # --------------------------------------------------------------------
 
