@@ -98,7 +98,7 @@ class PhotoLockGUI(FloatLayout):
     def update(self, dt):
         ret, frame = self.capture.read()
         if ret:
-            buf1 = cv2.flip(frame, -1)
+            buf1 = cv2.flip(frame, 1)
             buf = buf1.tobytes()
             texture = Texture.create(size=(frame.shape[1], frame.shape[0]), colorfmt='bgr')
             texture.blit_buffer(buf, colorfmt='bgr', bufferfmt='ubyte')
@@ -244,7 +244,7 @@ def start_recording(object_count):
 
     command = [ 
         'ffmpeg',
-        '-framerate', '24',
+        '-framerate', '30',
         '-video_size', '1920x1080',
         '-i', '/dev/video0',
         '-f', 'alsa', '-i', 'default',
