@@ -188,7 +188,7 @@ def toggle_recording(channel):
 
     print(f'Should we record right now? : {is_recording}')
 
-    if not capturing_image or not have_started:
+    if not capturing_image and not have_started:
         print(f"not capturing image, not started recording: toggling from {is_recording}")
         is_recording = not is_recording
         handle_capture()
@@ -219,8 +219,8 @@ def handle_capture():
     global capturing_image
 
     if image_mode == False and is_recording == True and have_started == False and capturing_image == False:
-        object_count = count_files(save_video_filepath)
         have_started = True
+        object_count = count_files(save_video_filepath)
         ffmpeg_process = start_recording(object_count)
 
 
