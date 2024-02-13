@@ -182,7 +182,7 @@ def toggle_recording(channel):
     global is_recording
     global capturing_image
 
-    if not capturing_image:
+    if not capturing_image or have_started:
         is_recording = not is_recording
         handle_capture()
 
