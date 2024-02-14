@@ -39,7 +39,7 @@ recording_indicator = False
 gps_lock = Lock()
 
 camera_number_string = "1"
-save_video_filepath = os.path.join(os.getcwd(), "SDP-Camera/tmpVideos")
+save_video_filepath = "/home/sdp/SDP-Camera/tmpVideos"
 save_image_filepath = os.path.join(os.getcwd(), "tmpImages")
 object_count = None
 gui_instance = None
