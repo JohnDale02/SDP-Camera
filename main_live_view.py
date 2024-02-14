@@ -39,7 +39,7 @@ recording_indicator = False
 gps_lock = Lock()
 
 camera_number_string = "1"
-save_video_filepath = os.path.join(os.getcwd(), "tmpVideos")
+save_video_filepath = os.path.join(os.getcwd(), "SDP-Camera/tmpVideos")
 save_image_filepath = os.path.join(os.getcwd(), "tmpImages")
 object_count = None
 gui_instance = None
@@ -173,8 +173,6 @@ def toggle_image_mode(channel):
     global have_started
     global capturing_image
 
-    print(f"Image Mode: {image_mode}")
-
     if have_started or capturing_image:  # if someone tried to change video mode while recording or capturing image still
         print(f"Have started or capturing image == True {have_started} {capturing_image}")
         return
@@ -185,13 +183,9 @@ def toggle_recording(channel):
     global is_recording
     global capturing_image
 
-    print(f'Should we record right now? : {is_recording}')
-
     if not capturing_image:
-        print(f"not capturing image, not started recording: toggling from {is_recording}")
         is_recording = not is_recording
         handle_capture()
-        print("Finished capture")
 
 # --------------------------------------------------------------------
 
@@ -224,9 +218,11 @@ def handle_capture():
 
 
     elif image_mode == False and is_recording == False and have_started == True and capturing_image == False:
+        # Video mode, dont want to record anymore, currently recording
         ffmpeg_process = stop_recording(ffmpeg_process, object_count)
 
     elif image_mode == True and is_recording == True and have_started == False and capturing_image == False:
+        # Image mode, we want to start capture, currently not capturing
         capturing_image = True
         is_recording = False
         capture_image()
@@ -260,8 +256,7 @@ def start_recording(object_count):
     # Start FFmpeg process
     ffmpeg_process = subprocess.Popen(command, stdin=subprocess.PIPE)
 
-    Clock.schedule_once(lambda dt: gui_instance.start_countdown(duration=7), 0)
-    time.sleep(5)
+    Clock.schedule_once(lambda dt: gui_instance.start_countdown(duration=2), 0)
     recording_indicator = True
     
     return ffmpeg_process
@@ -317,9 +312,7 @@ def capture_image():
     camera.set(cv2.CAP_PROP_FRAME_WIDTH, 1920)
     camera.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080)
 
-    Clock.schedule_once(lambda dt: gui_instance.start_countdown(duration=6), 0)
-
-    time.sleep(3.4)
+    Clock.schedule_once(lambda dt: gui_instance.start_countdown(duration=2), 0)
 
     if not camera.isOpened():
         print("\tError: Camera not found or could not be opened.")
