@@ -166,7 +166,6 @@ class PhotoLockApp(App):
 def gui_thread():
     PhotoLockApp().run()
 
-
 # --------------------------------------------------------------------
 
 def toggle_image_mode(channel):
@@ -366,6 +365,5 @@ def count_files(directory_path):
 
 if __name__ == '__main__':
     setup_gpio()
-    threading.Thread(target=handle_capture, daemon=True).start()
     gui_thread()  # This will start the Kivy application
     GPIO.cleanup()
