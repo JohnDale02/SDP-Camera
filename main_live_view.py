@@ -197,8 +197,8 @@ def setup_gpio():
     GPIO.setup(mode_button, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
     # Setup event detection
-    GPIO.add_event_detect(mode_button, GPIO.FALLING, callback=toggle_image_mode, bouncetime=400)
-    GPIO.add_event_detect(record_button, GPIO.FALLING, callback=toggle_recording, bouncetime=400)
+    GPIO.add_event_detect(mode_button, GPIO.RISING, callback=toggle_image_mode, bouncetime=400)
+    GPIO.add_event_detect(record_button, GPIO.RISING, callback=toggle_recording, bouncetime=2000)
     
 # --------------------------------------------------------------------
 
