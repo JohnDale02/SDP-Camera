@@ -38,7 +38,7 @@ def create_signature(digest):
     print("Signature stdout: ", result.stdout)
     print("Signature stderr: ", result.stderr)
     print("Exit Code:", result.returncode)
-    
+
     # Delete the temporary hash file
     os.remove(digest_file)
 
@@ -58,5 +58,5 @@ def create_signature(digest):
 
         return signature_string
     else:
-        raise Exception("Error in generating signature: " + result.stderr.decode())
+        raise Exception("Error in generating signature: " + result.stderr)
 
