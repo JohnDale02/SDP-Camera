@@ -11,8 +11,12 @@ import cv2
 import base64
 from save_image import save_image
 import os
+import threading
 
 def main(camera_number_string, save_image_filepath):
+	
+	for thread in threading.enumerate():
+		print(f"Thread Name: {thread.name}. Daemon: {thread.daemon}")
 #---------------------- Wait for Camera input and take picture ----------------------------
 	image = create_image()  # take the image
 	_, encoded_image = cv2.imencode('.png', image)  # we send the encoded image to the cloud 
