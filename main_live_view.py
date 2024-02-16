@@ -201,9 +201,6 @@ def toggle_recording(channel):
     global object_count
     global recording_indicator 
     global record_lock
-
-    if recording_indicator:
-        return 
     
     record_lock.aquire()
     print("Aquired lock in toggle_recording()")
