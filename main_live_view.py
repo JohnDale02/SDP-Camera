@@ -29,11 +29,10 @@ Window.show_cursor = False
 
 # -------------Global Variables ------------------------------
 image_mode = True
-is_recording = False
 ffmpeg_process = None
+record_button = 37
+mode_button = 38
 
-have_started = False
-capturing_image = False
 recording_indicator = False
 
 gps_lock = Lock()
@@ -170,70 +169,64 @@ def gui_thread():
 
 def toggle_image_mode(channel):
     global image_mode
-    global have_started
-    global capturing_image
-
-    if have_started or capturing_image:  # if someone tried to change video mode while recording or capturing image still
-        print(f"Have started or capturing image == True {have_started} {capturing_image}")
-        return
-    
     image_mode = not image_mode
 
-def toggle_recording(channel):
-    global is_recording
-    global capturing_image
 
-    if not capturing_image:
-        is_recording = not is_recording
-        handle_capture()
+def toggle_recording(channel):
+    global mode_button, record_button
+
+    GPIO.remove_event_detect(mode_button)  # Remove event detection, either taking photo of video right now
+    GPIO.remove_event_detect(record_button)
+    handle_capture()
 
 # --------------------------------------------------------------------
 
 def setup_gpio():
+    global mode_button, record_button
     GPIO.setmode(GPIO.BOARD)
-    record_button = 37
-    mode_button = 38
     GPIO.setup(record_button, GPIO.IN, pull_up_down=GPIO.PUD_UP)
     GPIO.setup(mode_button, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
     # Setup event detection
-    GPIO.add_event_detect(mode_button, GPIO.RISING, callback=toggle_image_mode, bouncetime=2000)
-    GPIO.add_event_detect(record_button, GPIO.RISING, callback=toggle_recording, bouncetime=2000)
+    GPIO.add_event_detect(mode_button, GPIO.FALLING, callback=toggle_image_mode, bouncetime=1000)
+    GPIO.add_event_detect(record_button, GPIO.FALLING, callback=toggle_recording, bouncetime=2000)
     
 # --------------------------------------------------------------------
 
 def handle_capture():
     '''Function for monitoring modes and recording states and starting and stopping recording accordingly.'''
     global image_mode
-    global is_recording
-    global have_started
     global ffmpeg_process
     global object_count
-    global capturing_image
+    global recording_indicator 
 
-    if image_mode == False and is_recording == True and have_started == False and capturing_image == False:
-        have_started = True
+    if image_mode == False and recording_indicator == False:
         object_count = count_files(save_video_filepath)
+        recording_indicator = True
         ffmpeg_process = start_recording(object_count)
 
 
-    elif image_mode == False and is_recording == False and have_started == True and capturing_image == False:
+    elif image_mode == False and recording_indicator == True:
         # Video mode, dont want to record anymore, currently recording
         ffmpeg_process = stop_recording(ffmpeg_process, object_count)
+        recording_indicator = False
 
-    elif image_mode == True and is_recording == True and have_started == False and capturing_image == False:
+    elif image_mode == True:
         # Image mode, we want to start capture, currently not capturing
-        capturing_image = True
-        is_recording = False
+        recording_indicator= True
         capture_image()
-        capturing_image = False
+        recording_indicator = False
 
     else:
         pass
 
+    # Setup event detection again after removing
+    GPIO.add_event_detect(mode_button, GPIO.FALLING, callback=toggle_image_mode, bouncetime=1000)
+    GPIO.add_event_detect(record_button, GPIO.FALLING, callback=toggle_recording, bouncetime=2000)
+
+
 
 def start_recording(object_count):
-    global recording_indicator
 
     video_filepath_raw = os.path.join(save_video_filepath, f'{object_count}raw.avi')
 
@@ -256,14 +249,12 @@ def start_recording(object_count):
     # Start FFmpeg process
     ffmpeg_process = subprocess.Popen(command, stdin=subprocess.PIPE)
 
-    Clock.schedule_once(lambda dt: gui_instance.start_countdown(duration=2), 0)
-    recording_indicator = True
+    Clock.schedule_once(lambda dt: gui_instance.start_countdown(duration=3), 0)
     
     return ffmpeg_process
 
 def stop_recording(ffmpeg_process, object_count):
     '''Function for stopping the video and saving it. Key note is that we are not directly uploading after recording videos'''
-    global have_started, recording_indicator
 
     ffmpeg_process.stdin.write(b'q\n')
     ffmpeg_process.stdin.flush()
@@ -271,9 +262,6 @@ def stop_recording(ffmpeg_process, object_count):
     ffmpeg_process.wait()
 
     print("Stopped raw recording")
-
-    have_started = False
-    recording_indicator = False
 
     video_filepath = os.path.join(save_video_filepath, f'{object_count}.avi')
     video_filepath_raw = os.path.join(save_video_filepath, f'{object_count}raw.avi')
@@ -288,7 +276,6 @@ def stop_recording(ffmpeg_process, object_count):
     '-threads', '4',
     video_filepath  # Output file path
     ]
-
     
     print("Began cutting recording")
     ffmpeg_cut_process = subprocess.Popen(ffmpeg_cut_command, stdin=subprocess.PIPE)
@@ -303,7 +290,7 @@ def stop_recording(ffmpeg_process, object_count):
 
 def capture_image():
     ''' Initialized camera and takes picture'''
-    global gui_instance, recording_indicator
+    global gui_instance
     # Initialize the camera (use the appropriate video device)
     camera = cv2.VideoCapture(0)
     camera.set(cv2.CAP_PROP_FPS, 30.0)
@@ -312,14 +299,13 @@ def capture_image():
     camera.set(cv2.CAP_PROP_FRAME_WIDTH, 1920)
     camera.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080)
 
-    Clock.schedule_once(lambda dt: gui_instance.start_countdown(duration=2), 0)
+    Clock.schedule_once(lambda dt: gui_instance.start_countdown(duration=3), 0)
 
     if not camera.isOpened():
         print("\tError: Camera not found or could not be opened.")
         return None
 
     # Capture a single frame from the camera
-    recording_indicator = True
     frame = None
     for i in range(20):
         ret, frame = camera.read()
@@ -335,7 +321,6 @@ def capture_image():
 
     camera.release()
 
-    recording_indicator = False
 
 # --------------------------------------------------------------------
 

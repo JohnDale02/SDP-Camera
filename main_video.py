@@ -72,6 +72,7 @@ def main_video(camera_number_string, save_video_filepath):
 # --------------- Callback function for re-connecting to  Wi-Fi ----------------------
 	# check SD card and upload all photos
 
+'''
 camera_number_string = "1"  # camera number used to search for public key
 
 if not os.path.exists(os.path.join(os.getcwd(), "tmpVideos")): # make a directory for tmpImages if it doesnt exist
@@ -80,3 +81,5 @@ if not os.path.exists(os.path.join(os.getcwd(), "tmpVideos")): # make a director
 save_video_filepath = os.path.join(os.getcwd(), "tmpVideos")
 
 main_video(camera_number_string, save_video_filepath)
+
+'''

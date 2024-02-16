@@ -23,7 +23,7 @@ def create_video(save_video_filepath):
 
 def capture_video(video_filename):
     ''' Initialized camera and takes picture'''
-
+    
     # Define the command and arguments
     command = [
         'ffmpeg',
@@ -41,7 +41,6 @@ def capture_video(video_filename):
         video_filename
     ]
     
-    print("Starting to record!!!")
     # Execute the command
     process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     stdout, stderr = process.communicate()

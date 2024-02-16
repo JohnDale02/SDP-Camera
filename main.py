@@ -116,8 +116,6 @@ def main(media_input, camera_number_string, save_media_filepath, gps_lock):
 	#---------------- Create Metadata ------------------------------------
 
 		metadata = create_metadata(camera_number_string, time, location, signature_string)   # creates a dictionary for the strings [string, string, string, byte64]
-
-	#------------------ We are not instantly uploading videos -----------------------------
 		
 		object_count = save_video_filepath.replace(".avi", "")
 		save_metadata(object_count, metadata, save_video_filepath)
