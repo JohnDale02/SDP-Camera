@@ -39,6 +39,7 @@ recording_indicator = False
 
 gps_lock = Lock()
 record_lock = Lock()
+mid_video = False
 
 camera_number_string = "1"
 save_video_filepath = "/home/sdp/SDP-Camera/tmpVideos"
@@ -201,14 +202,19 @@ def toggle_recording(channel):
     global object_count
     global recording_indicator 
     global record_lock
+    global mid_video
+
+    if recording_indicator and not mid_video:
+        return 
     
-    record_lock.aquire()
+    record_lock.acquire()
     print("Aquired lock in toggle_recording()")
 
     if image_mode == False and recording_indicator == False:
         object_count = count_files(save_video_filepath)
         recording_indicator = True
         ffmpeg_process = start_recording(object_count)
+        mid_video = True
         record_lock.release()
         print("Released lock after starting video in toggle_recording()")
 
@@ -216,6 +222,7 @@ def toggle_recording(channel):
     elif image_mode == False and recording_indicator == True:
         # Video mode, dont want to record anymore, currently recording
         ffmpeg_process = stop_recording(ffmpeg_process, object_count)
+        mid_video = False
         recording_indicator = False
         record_lock.release()
         print("Released lock after stopping video in toggle_recording()")
