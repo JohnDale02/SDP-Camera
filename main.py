@@ -14,7 +14,7 @@ import os
 import threading
 
 def main(camera_number_string, save_image_filepath):
-	
+
 	for thread in threading.enumerate():
 		print(f"Thread Name: {thread.name}. Daemon: {thread.daemon}")
 #---------------------- Wait for Camera input and take picture ----------------------------
@@ -86,4 +86,4 @@ if not os.path.exists(os.path.join(os.getcwd(), "tmpImages")): # make a director
 
 save_image_filepath = os.path.join(os.getcwd(), "tmpImages")
 
-#main(camera_number_string, save_image_filepath)
+main(camera_number_string, save_image_filepath)
