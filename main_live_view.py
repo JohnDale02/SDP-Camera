@@ -7,6 +7,7 @@ import subprocess
 import cv2
 import os
 from main import main
+from nothing import sleep
 from threading import Lock
 
 from kivy.config import Config
@@ -37,7 +38,7 @@ ignore_button_presses = False  # This flag indicates whether to ignore button ev
 recording_indicator = False
 
 gps_lock = Lock()
-capture_and_mode_lock = Lock()
+record_lock = Lock()
 
 camera_number_string = "1"
 save_video_filepath = "/home/sdp/SDP-Camera/tmpVideos"
@@ -45,8 +46,21 @@ save_image_filepath = os.path.join(os.getcwd(), "tmpImages")
 object_count = None
 gui_instance = None
 
+
 # --------------------------------------------------------------------
 
+def setup_gpio():
+    global mode_button, record_button
+    GPIO.setmode(GPIO.BOARD)
+    GPIO.setup(record_button, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+    GPIO.setup(mode_button, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+
+    # Setup event detection
+    GPIO.add_event_detect(mode_button, GPIO.FALLING, callback=toggle_image_mode, bouncetime=2000)
+    GPIO.add_event_detect(record_button, GPIO.FALLING, callback=toggle_recording, bouncetime=2000)
+    
+# --------------------------------------------------------------------
+    
 class PhotoLockGUI(FloatLayout):
     def __init__(self, capture, **kwargs):
         super(PhotoLockGUI, self).__init__(**kwargs)
@@ -172,41 +186,53 @@ def gui_thread():
 def toggle_image_mode(channel):
     global image_mode
     global recording_indicator
-    global capture_and_mode_lock
 
     if recording_indicator:  # if we are recording, we cannot change the mode
         return
 
-    capture_and_mode_lock.acquire()
     image_mode = not image_mode
-    capture_and_mode_lock.release()
 
 
 def toggle_recording(channel): 
     global mode_button
     global record_button
-    global capture_and_mode_lock
+    global image_mode
+    global ffmpeg_process
+    global object_count
+    global recording_indicator 
+    global record_lock
 
     if recording_indicator:
-        return
-
-    capture_and_mode_lock.acquire()
-    handle_capture()
-    capture_and_mode_lock.release()
-
-
-# --------------------------------------------------------------------
-
-def setup_gpio():
-    global mode_button, record_button
-    GPIO.setmode(GPIO.BOARD)
-    GPIO.setup(record_button, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-    GPIO.setup(mode_button, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-
-    # Setup event detection
-    GPIO.add_event_detect(mode_button, GPIO.FALLING, callback=toggle_image_mode, bouncetime=2000)
-    GPIO.add_event_detect(record_button, GPIO.FALLING, callback=toggle_recording, bouncetime=2000)
+        return 
     
+    record_lock.aquire()
+
+    if image_mode == False and recording_indicator == False:
+        object_count = count_files(save_video_filepath)
+        recording_indicator = True
+        ffmpeg_process = start_recording(object_count)
+        record_lock.release()
+
+
+    elif image_mode == False and recording_indicator == True:
+        # Video mode, dont want to record anymore, currently recording
+        ffmpeg_process = stop_recording(ffmpeg_process, object_count)
+        recording_indicator = False
+        record_lock.release()
+
+    elif image_mode == True:
+        # Image mode, we want to start capture, currently not capturing
+        recording_indicator= True
+        capture_image()
+        recording_indicator = False
+        record_lock.release()
+
+    else:
+        print("Error: Unknown state in the else case of handle_capture()")
+        record_lock.release()
+        quit()
+
+
 # --------------------------------------------------------------------
 
 def handle_capture():
@@ -294,7 +320,8 @@ def stop_recording(ffmpeg_process, object_count):
     ffmpeg_cut_process.wait()
     print("Stopped cutting recording")
 
-    hashSignUploadThread = threading.Thread(target=main, args=(video_filepath, camera_number_string, save_video_filepath, gps_lock,))
+    hashSignUploadThread = threading.Thread(target=sleep)
+    #hashSignUploadThread = threading.Thread(target=main, args=(video_filepath, camera_number_string, save_video_filepath, gps_lock,))
     hashSignUploadThread.start()
 
     return None
@@ -325,7 +352,8 @@ def capture_image():
     if ret:
         image = frame
         # Start automatic processing and upload process for images
-        hashSignUploadThread = threading.Thread(target=main, args=(image, camera_number_string, save_image_filepath, gps_lock,))
+        hashSignUploadThread = threading.Thread(target=sleep)
+        #hashSignUploadThread = threading.Thread(target=main, args=(image, camera_number_string, save_image_filepath, gps_lock,))
         hashSignUploadThread.start()
 
     else:
