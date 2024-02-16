@@ -50,6 +50,7 @@ def main(media_input, camera_number_string, save_media_filepath, gps_lock):
 
 		except Exception as e:
 			#print(str(e))
+			pass
 
 	# ---------------- Send image to TPM for Signing ------------------------
 		try:
@@ -57,6 +58,7 @@ def main(media_input, camera_number_string, save_media_filepath, gps_lock):
 			
 		except Exception as e:
 			#print(str(e))
+			pass
 
 	#---------------- Create Metadata ------------------------------------
 
@@ -105,14 +107,14 @@ def main(media_input, camera_number_string, save_media_filepath, gps_lock):
 
 		except Exception as e:
 			#print(str(e))
-
+			pass
 	# ---------------- Send image to TPM for Signing ------------------------
 		try:
 			signature_string = create_signature(digest)  # byte64 encoded signature
 			
 		except Exception as e:
 			#print(str(e))
-
+			pass
 	#---------------- Create Metadata ------------------------------------
 
 		metadata = create_metadata(camera_number_string, time, location, signature_string)   # creates a dictionary for the strings [string, string, string, byte64]
