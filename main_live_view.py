@@ -206,12 +206,14 @@ def toggle_recording(channel):
         return 
     
     record_lock.aquire()
+    print("Aquired lock in toggle_recording()")
 
     if image_mode == False and recording_indicator == False:
         object_count = count_files(save_video_filepath)
         recording_indicator = True
         ffmpeg_process = start_recording(object_count)
         record_lock.release()
+        print("Released lock after starting video in toggle_recording()")
 
 
     elif image_mode == False and recording_indicator == True:
@@ -219,6 +221,7 @@ def toggle_recording(channel):
         ffmpeg_process = stop_recording(ffmpeg_process, object_count)
         recording_indicator = False
         record_lock.release()
+        print("Released lock after stopping video in toggle_recording()")
 
     elif image_mode == True:
         # Image mode, we want to start capture, currently not capturing
@@ -226,6 +229,7 @@ def toggle_recording(channel):
         capture_image()
         recording_indicator = False
         record_lock.release()
+        print("Released lock after capturing video in toggle_recording()")
 
     else:
         print("Error: Unknown state in the else case of handle_capture()")
