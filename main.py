@@ -23,7 +23,7 @@ def main(media_input, camera_number_string, save_media_filepath, gps_lock):
 	
 	if save_media_filepath.endswith('Images'):
 
-		print("We are dealing with an image here folks")
+		#print("We are dealing with an image here folks")
 		save_image_filepath = save_media_filepath
 
 #---------------------- Receive Image input  ----------------------------
@@ -31,14 +31,14 @@ def main(media_input, camera_number_string, save_media_filepath, gps_lock):
 		# image = create_image()  # take the image
 
 		_, encoded_image = cv2.imencode('.png', image)  # we send the encoded image to the cloud 
-		print("main: Image captured")
+		#print("main: Image captured")
 
 	#---------- Capture GNSS Data (Time and Location) ------------------------
 
 		lat_value, long_value, time_value =  read_gps_data(gps_lock)
 		location = (f"{lat_value}, {long_value}")
 		time = (f"{time_value}")
-		print(f"Recieved Time and GNSS Data: {time}{location}")
+		#print(f"Recieved Time and GNSS Data: {time}{location}")
 
 	#-------------- combine number + image + Time + Location ----------------------------------------------
 
@@ -49,14 +49,14 @@ def main(media_input, camera_number_string, save_media_filepath, gps_lock):
 			digest = create_digest(combined_data)
 
 		except Exception as e:
-			print(str(e))
+			#print(str(e))
 
 	# ---------------- Send image to TPM for Signing ------------------------
 		try:
 			signature_string = create_signature(digest)  # byte64 encoded signature
 			
 		except Exception as e:
-			print(str(e))
+			#print(str(e))
 
 	#---------------- Create Metadata ------------------------------------
 
@@ -65,14 +65,14 @@ def main(media_input, camera_number_string, save_media_filepath, gps_lock):
 	#------------------ Check if we have Wi-FI -----------------------------
 
 		if is_internet_available():
-			print(f"Internet is available...Uploading")
+			#print(f"Internet is available...Uploading")
 
 			upload_image(encoded_image.tobytes(), metadata)   # cv2 png object, metadat
-			print(f"Uploaded Image")
+			#print(f"Uploaded Image")
 		
 		else: 
 			save_image(encoded_image.tobytes(), metadata, save_image_filepath)
-			print("No wifi")
+			#print("No wifi")
 
 	else: # if we are working with a video
 
@@ -85,15 +85,15 @@ def main(media_input, camera_number_string, save_media_filepath, gps_lock):
 		with open(video_filepath, 'rb') as video:
 			video_bytes = video.read()
 		
-		print("main: Image captured")
-		print("Last 10 bytes of video: ", video_bytes[-10:])
+		#print("main: Image captured")
+		#print("Last 10 bytes of video: ", video_bytes[-10:])
 
 	#---------- Capture GNSS Data (Time and Location) ------------------------
 
 		lat_value, long_value, time_value =  read_gps_data(gps_lock)
 		location = (f"{lat_value}, {long_value}")
 		time = (f"{time_value}")
-		print(f"Recieved Time and GNSS Data: {time}{location}")
+		#print(f"Recieved Time and GNSS Data: {time}{location}")
 
 	#-------------- combine number + image + Time + Location ----------------------------------------------
 
@@ -104,14 +104,14 @@ def main(media_input, camera_number_string, save_media_filepath, gps_lock):
 			digest = create_digest(combined_data)
 
 		except Exception as e:
-			print(str(e))
+			#print(str(e))
 
 	# ---------------- Send image to TPM for Signing ------------------------
 		try:
 			signature_string = create_signature(digest)  # byte64 encoded signature
 			
 		except Exception as e:
-			print(str(e))
+			#print(str(e))
 
 	#---------------- Create Metadata ------------------------------------
 
@@ -121,4 +121,4 @@ def main(media_input, camera_number_string, save_media_filepath, gps_lock):
 		save_metadata(object_count, metadata, save_video_filepath)
 
 		upload_video(video_bytes, metadata)  
-		print("Uplaoded Video successfully")
+		#print("Uplaoded Video successfully")
