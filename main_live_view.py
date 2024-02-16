@@ -7,7 +7,7 @@ import subprocess
 import cv2
 import os
 from main import main
-
+from threading import Lock
 
 from kivy.config import Config
 Config.set('graphics', 'width', '800')
@@ -33,9 +33,11 @@ ffmpeg_process = None
 record_button = 37
 mode_button = 38
 
+ignore_button_presses = False  # This flag indicates whether to ignore button events
 recording_indicator = False
 
 gps_lock = Lock()
+capture_and_mode_lock = Lock()
 
 camera_number_string = "1"
 save_video_filepath = "/home/sdp/SDP-Camera/tmpVideos"
@@ -169,15 +171,29 @@ def gui_thread():
 
 def toggle_image_mode(channel):
     global image_mode
+    global recording_indicator
+    global capture_and_mode_lock
+
+    if recording_indicator:  # if we are recording, we cannot change the mode
+        return
+
+    capture_and_mode_lock.acquire()
     image_mode = not image_mode
+    capture_and_mode_lock.release()
 
 
-def toggle_recording(channel):
-    global mode_button, record_button
+def toggle_recording(channel): 
+    global mode_button
+    global record_button
+    global capture_and_mode_lock
 
-    GPIO.remove_event_detect(mode_button)  # Remove event detection, either taking photo of video right now
-    GPIO.remove_event_detect(record_button)
+    if recording_indicator:
+        return
+
+    capture_and_mode_lock.acquire()
     handle_capture()
+    capture_and_mode_lock.release()
+
 
 # --------------------------------------------------------------------
 
@@ -188,7 +204,7 @@ def setup_gpio():
     GPIO.setup(mode_button, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
     # Setup event detection
-    GPIO.add_event_detect(mode_button, GPIO.FALLING, callback=toggle_image_mode, bouncetime=1000)
+    GPIO.add_event_detect(mode_button, GPIO.FALLING, callback=toggle_image_mode, bouncetime=400)
     GPIO.add_event_detect(record_button, GPIO.FALLING, callback=toggle_recording, bouncetime=2000)
     
 # --------------------------------------------------------------------
@@ -218,12 +234,8 @@ def handle_capture():
         recording_indicator = False
 
     else:
-        pass
-
-    # Setup event detection again after removing
-    GPIO.add_event_detect(mode_button, GPIO.FALLING, callback=toggle_image_mode, bouncetime=1000)
-    GPIO.add_event_detect(record_button, GPIO.FALLING, callback=toggle_recording, bouncetime=2000)
-
+        print("Error: Unknown state in the else case of handle_capture()")
+        quit()
 
 
 def start_recording(object_count):
