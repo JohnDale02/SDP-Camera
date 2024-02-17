@@ -125,7 +125,10 @@ def main(media_input, camera_number_string, save_media_filepath, gps_lock, signa
 			print(f"Could not create metadata for video: {str(e)}")
 			pass
 
-		object_count = save_video_filepath.replace(".avi", "")
+		object_count = os.path.basename(save_video_filepath).split('.')[0]
+		print("###############################")
+		print(f"Object Count : {object_count}")
+		print("###############################")
 
 		try:
 			save_metadata(object_count, metadata, save_video_filepath)
