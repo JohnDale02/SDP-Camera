@@ -338,11 +338,11 @@ def capture_image():
     global gui_instance
     # Initialize the camera (use the appropriate video device)
     camera = cv2.VideoCapture(0)
-    camera.set(cv2.CAP_PROP_FPS, 30.0)
+    camera.set(cv2.CAP_PROP_FPS, 10.0)
     camera.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter.fourcc('m','j','p','g'))
     camera.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter.fourcc('M','J','P','G'))
-    camera.set(cv2.CAP_PROP_FRAME_WIDTH, 1920)
-    camera.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080)
+    camera.set(cv2.CAP_PROP_FRAME_WIDTH, 3840)
+    camera.set(cv2.CAP_PROP_FRAME_HEIGHT, 2160)
 
     Clock.schedule_once(lambda dt: gui_instance.start_countdown(duration=3), 0)
 
