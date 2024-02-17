@@ -46,6 +46,13 @@ save_video_filepath = "/home/sdp/SDP-Camera/tmpVideos"
 save_image_filepath = os.path.join(os.getcwd(), "tmpImages")
 object_count = None
 gui_instance = None
+camera = cv2.VideoCapture(0)
+camera.set(cv2.CAP_PROP_AUTOFOCUS, 0)
+camera.set(cv2.CAP_PROP_FPS, 30.0)
+camera.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter.fourcc('m','j','p','g'))
+camera.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter.fourcc('M','J','P','G'))
+camera.set(cv2.CAP_PROP_FRAME_WIDTH, 1920)
+camera.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080)
 
 
 # --------------------------------------------------------------------
@@ -191,6 +198,18 @@ def toggle_image_mode(channel):
 
     if not recording_indicator:
         image_mode = not image_mode
+    
+    if image_mode == True and camera == None and recording_indicator == False:
+        camera = cv2.VideoCapture(0)
+        camera.set(cv2.CAP_PROP_AUTOFOCUS, 0)
+        camera.set(cv2.CAP_PROP_FPS, 30.0)
+        camera.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter.fourcc('m','j','p','g'))
+        camera.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter.fourcc('M','J','P','G'))
+        camera.set(cv2.CAP_PROP_FRAME_WIDTH, 1920)
+        camera.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080)
+
+    if image_mode == False and camera != None:
+        camera.release()
 
 
 def toggle_recording(channel): 
@@ -202,6 +221,7 @@ def toggle_recording(channel):
     global recording_indicator 
     global record_lock
     global mid_video
+    global camera
 
     if recording_indicator and not mid_video:
         return 
@@ -229,7 +249,7 @@ def toggle_recording(channel):
     elif image_mode == True and mid_video == False:
         # Image mode, we want to start capture, currently not capturing
         recording_indicator= True
-        capture_image()
+        capture_image(camera)
         recording_indicator = False
         record_lock.release()
         print("Released lock after capturing image in toggle_recording()")
@@ -334,16 +354,10 @@ def stop_recording(ffmpeg_process, object_count):
     return None
 
 
-def capture_image():
+def capture_image(camera):
     ''' Initialized camera and takes picture'''
     global gui_instance
     # Initialize the camera (use the appropriate video device)
-    camera = cv2.VideoCapture(0)
-    camera.set(cv2.CAP_PROP_FPS, 10.0)
-    camera.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter.fourcc('m','j','p','g'))
-    camera.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter.fourcc('M','J','P','G'))
-    camera.set(cv2.CAP_PROP_FRAME_WIDTH, 3840)
-    camera.set(cv2.CAP_PROP_FRAME_HEIGHT, 2160)
 
     Clock.schedule_once(lambda dt: gui_instance.start_countdown(duration=3), 0)
 
@@ -365,8 +379,6 @@ def capture_image():
 
     else:
         print("\tError: Failed to capture an image.")
-
-    camera.release()
 
 
 # --------------------------------------------------------------------
