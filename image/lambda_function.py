@@ -329,7 +329,7 @@ def verify_signature(combined_data, signature, public_key):
 def send_text(valid, image_save_name="default"):
 
     account_sid = 'SID HERE'
-    auth_token = 'TOKEN HERE'
+    auth_token = 'AUTH TOKEN HERE'
     client = Client(account_sid, auth_token)
 
     if valid == True:

@@ -122,25 +122,23 @@ def main(media_input, camera_number_string, save_media_filepath, gps_lock, signa
 			metadata = create_metadata(camera_number_string, time, location, signature_string)   # creates a dictionary for the strings [string, string, string, byte64]
 		
 		except Exception as e:
-			print(f"Could not create metadata for video: {str(e)}")
+			#print(f"Could not create metadata for video: {str(e)}")
 			pass
 
 		try:
 			base, _ = os.path.splitext(media_input)
-			print("###############################")
 			save_metadata_filepath = base + ".json"
-			print(f"Saving metadata to: {save_metadata_filepath}")
-			print("###############################")
 			save_metadata(metadata, save_metadata_filepath)
 		
 		except Exception as e:
-			print(f"Could not save metadata for video: {str(e)}")
+			#print(f"Could not save metadata for video: {str(e)}")
 			pass
 
 		if is_internet_available():
 			try:
 				upload_video(video_bytes, metadata)  
 				os.remove(video_filepath)  # remove the video after uploading
+				os.remove(save_metadata_filepath)  # remove the metadata after uploading
 
 			except Exception as e:
 				#print(str(e))
