@@ -187,11 +187,14 @@ def gui_thread():
 def toggle_image_mode(channel):
     global image_mode
     global recording_indicator
+    global record_lock
 
     if recording_indicator:  # if we are recording, we cannot change the mode
         return
 
+    record_lock.acquire()
     image_mode = not image_mode
+    record_lock.release()  
 
 
 def toggle_recording(channel): 
