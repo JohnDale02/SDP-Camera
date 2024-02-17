@@ -349,6 +349,7 @@ def stop_recording(ffmpeg_process, object_count):
     ffmpeg_cut_process = subprocess.Popen(ffmpeg_cut_command, stdin=subprocess.PIPE)
     ffmpeg_cut_process.wait()
     print("Stopped cutting recording")
+    os.remove(video_filepath_raw)  # remove the video after uploading
 
     hashSignUploadThread = threading.Thread(target=main, args=(video_filepath, camera_number_string, save_video_filepath, gps_lock, signature_lock,))
     hashSignUploadThread.start()

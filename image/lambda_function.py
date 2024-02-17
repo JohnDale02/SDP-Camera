@@ -212,7 +212,7 @@ def upload_verified(s3_client, camera_number, time_data, location_data, signatur
     destination_bucket_name = f'camera{int(camera_number)}verifiedimages'
 
     try:
-        media_number = get_number_of_most_recently_added_file(destination_bucket_name) + 1
+        media_number = get_next_number_for_new_file(destination_bucket_name)
 
     except Exception as e:
         pass
@@ -272,27 +272,28 @@ def upload_verified_mp4(s3_client, camera_number, temp_mp4_path, media_number):
         pass
 
 
-def get_number_of_most_recently_added_file(bucket_name):
+def get_next_number_for_new_file(bucket_name):
     s3 = boto3.client('s3')
+    
+    # Use paginator to ensure we check all objects if there are more than 1000
+    paginator = s3.get_paginator('list_objects_v2')
+    highest_number = 0
 
-    # Fetch only the most recently added object
-    response = s3.list_objects_v2(Bucket=bucket_name, MaxKeys=1, Prefix='', Delimiter='/', FetchOwner=False)
-
-    if 'Contents' in response:
-        # Get the key of the most recent file
-        most_recent_file = response['Contents'][0]['Key']
-        try:
-            # Extract the number from the file name
-            number = int(most_recent_file.split('.')[0])
-            return number
-        except ValueError:
-            # If the most recent file name does not start with a number, handle accordingly
-            print("Most recent file does not start with a number.")
-            return None
-    else:
-        # No files in the bucket
-        print("No files found in the bucket.")
-        return None
+    for page in paginator.paginate(Bucket=bucket_name):
+        for obj in page.get('Contents', []):
+            file_name = obj['Key']
+            try:
+                # Extract the number from the file name
+                number = int(file_name.split('.')[0])
+                if number > highest_number:
+                    highest_number = number
+            except ValueError:
+                # If the file name does not start with a number, ignore it
+                continue
+    
+    # Assuming the sequence is uninterrupted and follows the naming convention strictly
+    next_number = highest_number + 1
+    return next_number
 
 
 
