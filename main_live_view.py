@@ -327,7 +327,7 @@ def stop_recording(ffmpeg_process, object_count):
     print("Stopped cutting recording")
 
     hashSignUploadThread = threading.Thread(target=sleep)
-    #hashSignUploadThread = threading.Thread(target=main, args=(video_filepath, camera_number_string, save_video_filepath, gps_lock,))
+    hashSignUploadThread = threading.Thread(target=main, args=(video_filepath, camera_number_string, save_video_filepath, gps_lock,))
     hashSignUploadThread.start()
 
     return None
