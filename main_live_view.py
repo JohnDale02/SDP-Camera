@@ -168,6 +168,7 @@ class PhotoLockApp(App):
     def build(self):
         global gui_instance
         self.capture = cv2.VideoCapture(2)
+        self.capture.set(cv2.CAP_PROP_AUTOFOCUS, 0)
         self.capture.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
         self.capture.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
         self.capture.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter.fourcc('m','j','p','g'))
