@@ -44,7 +44,7 @@ mid_video = False
 
 camera_number_string = "1"
 save_video_filepath = "/home/sdp/SDP-Camera/tmpVideos"
-save_image_filepath = os.path.join(os.getcwd(), "tmpImages")
+save_image_filepath = "/home/sdp/SDP-Camera/tmpImages"
 object_count = None
 gui_instance = None
 camera = cv2.VideoCapture(0)
@@ -350,7 +350,6 @@ def stop_recording(ffmpeg_process, object_count):
     ffmpeg_cut_process.wait()
     print("Stopped cutting recording")
 
-    hashSignUploadThread = threading.Thread(target=sleep)
     hashSignUploadThread = threading.Thread(target=main, args=(video_filepath, camera_number_string, save_video_filepath, gps_lock, signature_lock,))
     hashSignUploadThread.start()
 
@@ -374,7 +373,6 @@ def capture_image(camera):
     if ret:
         image = frame
         # Start automatic processing and upload process for images
-        hashSignUploadThread = threading.Thread(target=sleep)
         hashSignUploadThread = threading.Thread(target=main, args=(image, camera_number_string, save_image_filepath, gps_lock, signature_lock,))
         hashSignUploadThread.start()
 

@@ -212,7 +212,7 @@ def upload_verified(s3_client, camera_number, time_data, location_data, signatur
     destination_bucket_name = f'camera{int(camera_number)}verifiedimages'
 
     try:
-        media_number = count_objects_in_bucket(destination_bucket_name) // 2
+        media_number = get_number_of_most_recently_added_file(destination_bucket_name) + 1
 
     except Exception as e:
         pass
@@ -272,16 +272,27 @@ def upload_verified_mp4(s3_client, camera_number, temp_mp4_path, media_number):
         pass
 
 
-def count_objects_in_bucket(bucket_name):
+def get_number_of_most_recently_added_file(bucket_name):
     s3 = boto3.client('s3')
-    total_objects = 0
 
-    # Use paginator to handle buckets with more than 1000 objects
-    paginator = s3.get_paginator('list_objects_v2')
-    for page in paginator.paginate(Bucket=bucket_name):
-        total_objects += len(page.get('Contents', []))
+    # Fetch only the most recently added object
+    response = s3.list_objects_v2(Bucket=bucket_name, MaxKeys=1, Prefix='', Delimiter='/', FetchOwner=False)
 
-    return total_objects
+    if 'Contents' in response:
+        # Get the key of the most recent file
+        most_recent_file = response['Contents'][0]['Key']
+        try:
+            # Extract the number from the file name
+            number = int(most_recent_file.split('.')[0])
+            return number
+        except ValueError:
+            # If the most recent file name does not start with a number, handle accordingly
+            print("Most recent file does not start with a number.")
+            return None
+    else:
+        # No files in the bucket
+        print("No files found in the bucket.")
+        return None
 
 
 

@@ -79,7 +79,8 @@ def main(media_input, camera_number_string, save_media_filepath, gps_lock, signa
 	else: # if we are working with a video
 
 		save_video_filepath = save_media_filepath
-		video_filepath = os.path.join(save_video_filepath, media_input)
+		#video_filepath = os.path.join(save_video_filepath, media_input)
+		video_filepath = media_input
 
 	#---------------------- Receive Video input  ----------------------------
 
@@ -117,10 +118,27 @@ def main(media_input, camera_number_string, save_media_filepath, gps_lock, signa
 			pass
 	#---------------- Create Metadata ------------------------------------
 
-		metadata = create_metadata(camera_number_string, time, location, signature_string)   # creates a dictionary for the strings [string, string, string, byte64]
+		try:
+			metadata = create_metadata(camera_number_string, time, location, signature_string)   # creates a dictionary for the strings [string, string, string, byte64]
 		
-		object_count = save_video_filepath.replace(".avi", "")
-		save_metadata(object_count, metadata, save_video_filepath)
+		except Exception as e:
+			print(f"Could not create metadata for video: {str(e)}")
+			pass
 
-		upload_video(video_bytes, metadata)  
-		#print("Uplaoded Video successfully")
+		object_count = save_video_filepath.replace(".avi", "")
+
+		try:
+			save_metadata(object_count, metadata, save_video_filepath)
+		
+		except Exception as e:
+			print(f"Could not save metadata for video: {str(e)}")
+			pass
+
+		if is_internet_available():
+			try:
+				upload_video(video_bytes, metadata)  
+				os.remove(video_filepath)  # remove the video after uploading
+
+			except Exception as e:
+				#print(str(e))
+				pass
