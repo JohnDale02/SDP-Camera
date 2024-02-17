@@ -339,8 +339,8 @@ def stop_recording(ffmpeg_process, object_count):
     ffmpeg_cut_process.wait()
     print("Stopped cutting recording")
 
-    hashSignUploadThread = threading.Thread(target=sleep)
-    #hashSignUploadThread = threading.Thread(target=main, args=(video_filepath, camera_number_string, save_video_filepath, gps_lock,))
+    #hashSignUploadThread = threading.Thread(target=sleep)
+    hashSignUploadThread = threading.Thread(target=main, args=(video_filepath, camera_number_string, save_video_filepath, gps_lock,))
     hashSignUploadThread.start()
 
     return None
@@ -371,8 +371,8 @@ def capture_image():
     if ret:
         image = frame
         # Start automatic processing and upload process for images
-        hashSignUploadThread = threading.Thread(target=sleep)
-        #hashSignUploadThread = threading.Thread(target=main, args=(image, camera_number_string, save_image_filepath, gps_lock,))
+        #hashSignUploadThread = threading.Thread(target=sleep)
+        hashSignUploadThread = threading.Thread(target=main, args=(image, camera_number_string, save_image_filepath, gps_lock,))
         hashSignUploadThread.start()
 
     else:
