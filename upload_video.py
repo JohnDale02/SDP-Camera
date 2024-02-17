@@ -10,7 +10,7 @@ def upload_video(video_bytes, metadata):
 
     try:
         # Open the video file in binary mode and upload it
-        response = s3_client.put_object(Bucket=bucket_name, Key=file_key, Body=video_bytes, Metadata=metadata)
+        response = s3_client.put_object(Bucket=bucket_name, Key=file_key, Body=video_bytes, Metadata=metadata, ContentDisposition='attachment')
         print(f"Upload successful. Response: {response}")
 
     except Exception as e:
