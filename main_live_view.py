@@ -362,8 +362,6 @@ def capture_image(camera):
     global gui_instance
     # Initialize the camera (use the appropriate video device)
 
-    Clock.schedule_once(lambda dt: gui_instance.start_countdown(duration=3), 0)
-
     if not camera.isOpened():
         print("\tError: Camera not found or could not be opened.")
         return None
