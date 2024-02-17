@@ -40,11 +40,6 @@ recording_indicator = False
 gps_lock = Lock()
 record_lock = Lock()
 mid_video = False
-last_press_time = {
-    'mode_button': 0,
-    'record_button': 0
-}
-debounce_interval = 2  # 2 seconds
 
 camera_number_string = "1"
 save_video_filepath = "/home/sdp/SDP-Camera/tmpVideos"
@@ -62,8 +57,8 @@ def setup_gpio():
     GPIO.setup(mode_button, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
     # Setup event detection
-    GPIO.add_event_detect(mode_button, GPIO.FALLING, callback=toggle_image_mode, bouncetime=2000)
-    GPIO.add_event_detect(record_button, GPIO.FALLING, callback=toggle_recording, bouncetime=2000)
+    GPIO.add_event_detect(mode_button, GPIO.FALLING, callback=toggle_image_mode, bouncetime=10000)
+    GPIO.add_event_detect(record_button, GPIO.FALLING, callback=toggle_recording, bouncetime=10000)
     
 # --------------------------------------------------------------------
     
@@ -192,12 +187,8 @@ def gui_thread():
 def toggle_image_mode(channel):
     global image_mode
     global recording_indicator
-    global record_lock
-    global last_press_time
-    current_time = time.time()
-    if (current_time - last_press_time['mode_button']) >= debounce_interval:
-        last_press_time['mode_button'] = current_time
 
+    if not recording_indicator:
         image_mode = not image_mode
 
 
@@ -210,46 +201,42 @@ def toggle_recording(channel):
     global recording_indicator 
     global record_lock
     global mid_video
-    global last_press_time
-    current_time = time.time()
-    if (current_time - last_press_time['record_button']) >= debounce_interval:
-        last_press_time['record_button'] = current_time
 
-        if recording_indicator and not mid_video:
-            return 
-        
-        record_lock.acquire()
-        print("Aquired lock in toggle_recording()")
+    if recording_indicator and not mid_video:
+        return 
+    
+    record_lock.acquire()
+    print("Aquired lock in toggle_recording()")
 
-        if image_mode == False and mid_video == False:
-            object_count = count_files(save_video_filepath)
-            recording_indicator = True
-            ffmpeg_process = start_recording(object_count)
-            mid_video = True
-            record_lock.release()
-            print("Released lock after starting video in toggle_recording()")
+    if image_mode == False and mid_video == False:
+        object_count = count_files(save_video_filepath)
+        recording_indicator = True
+        ffmpeg_process = start_recording(object_count)
+        mid_video = True
+        record_lock.release()
+        print("Released lock after starting video in toggle_recording()")
 
 
-        elif mid_video == True:
-            # Video mode, dont want to record anymore, currently recording
-            ffmpeg_process = stop_recording(ffmpeg_process, object_count)
-            mid_video = False
-            recording_indicator = False
-            record_lock.release()
-            print("Released lock after stopping video in toggle_recording()")
+    elif mid_video == True:
+        # Video mode, dont want to record anymore, currently recording
+        ffmpeg_process = stop_recording(ffmpeg_process, object_count)
+        mid_video = False
+        recording_indicator = False
+        record_lock.release()
+        print("Released lock after stopping video in toggle_recording()")
 
-        elif image_mode == True and mid_video == False:
-            # Image mode, we want to start capture, currently not capturing
-            recording_indicator= True
-            capture_image()
-            recording_indicator = False
-            record_lock.release()
-            print("Released lock after capturing video in toggle_recording()")
+    elif image_mode == True and mid_video == False:
+        # Image mode, we want to start capture, currently not capturing
+        recording_indicator= True
+        capture_image()
+        recording_indicator = False
+        record_lock.release()
+        print("Released lock after capturing video in toggle_recording()")
 
-        else:
-            print("Error: Unknown state in the else case of handle_capture()")
-            record_lock.release()
-            quit()
+    else:
+        print("Error: Unknown state in the else case of handle_capture()")
+        record_lock.release()
+        quit()
 
 
 # --------------------------------------------------------------------
@@ -339,8 +326,8 @@ def stop_recording(ffmpeg_process, object_count):
     ffmpeg_cut_process.wait()
     print("Stopped cutting recording")
 
-    #hashSignUploadThread = threading.Thread(target=sleep)
-    hashSignUploadThread = threading.Thread(target=main, args=(video_filepath, camera_number_string, save_video_filepath, gps_lock,))
+    hashSignUploadThread = threading.Thread(target=sleep)
+    #hashSignUploadThread = threading.Thread(target=main, args=(video_filepath, camera_number_string, save_video_filepath, gps_lock,))
     hashSignUploadThread.start()
 
     return None
@@ -371,8 +358,8 @@ def capture_image():
     if ret:
         image = frame
         # Start automatic processing and upload process for images
-        #hashSignUploadThread = threading.Thread(target=sleep)
-        hashSignUploadThread = threading.Thread(target=main, args=(image, camera_number_string, save_image_filepath, gps_lock,))
+        hashSignUploadThread = threading.Thread(target=sleep)
+        #hashSignUploadThread = threading.Thread(target=main, args=(image, camera_number_string, save_image_filepath, gps_lock,))
         hashSignUploadThread.start()
 
     else:
