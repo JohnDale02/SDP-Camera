@@ -14,7 +14,7 @@ from save_metadata import save_metadata
 import os
 from upload_video import upload_video
 
-def main(media_input, camera_number_string, save_media_filepath, gps_lock):
+def main(media_input, camera_number_string, save_media_filepath, gps_lock, signature_lock):
 	'''main function for processing media for signing and uploading
 				media_input : for images = imread(image) ; for videos = video_filpath for reading bytes from
 				camera_number_string : number representing the actual device 
@@ -54,7 +54,7 @@ def main(media_input, camera_number_string, save_media_filepath, gps_lock):
 
 	# ---------------- Send image to TPM for Signing ------------------------
 		try:
-			signature_string = create_signature(digest)  # byte64 encoded signature
+			signature_string = create_signature(digest, signature_lock)  # byte64 encoded signature
 			
 		except Exception as e:
 			#print(str(e))

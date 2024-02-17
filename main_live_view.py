@@ -38,6 +38,7 @@ ignore_button_presses = False  # This flag indicates whether to ignore button ev
 recording_indicator = False
 
 gps_lock = Lock()
+signature_lock = Lock()
 record_lock = Lock()
 mid_video = False
 
@@ -348,7 +349,7 @@ def stop_recording(ffmpeg_process, object_count):
     print("Stopped cutting recording")
 
     hashSignUploadThread = threading.Thread(target=sleep)
-    hashSignUploadThread = threading.Thread(target=main, args=(video_filepath, camera_number_string, save_video_filepath, gps_lock,))
+    hashSignUploadThread = threading.Thread(target=main, args=(video_filepath, camera_number_string, save_video_filepath, gps_lock, signature_lock,))
     hashSignUploadThread.start()
 
     return None
@@ -374,7 +375,7 @@ def capture_image(camera):
         image = frame
         # Start automatic processing and upload process for images
         hashSignUploadThread = threading.Thread(target=sleep)
-        hashSignUploadThread = threading.Thread(target=main, args=(image, camera_number_string, save_image_filepath, gps_lock,))
+        hashSignUploadThread = threading.Thread(target=main, args=(image, camera_number_string, save_image_filepath, gps_lock, signature_lock,))
         hashSignUploadThread.start()
 
     else:
