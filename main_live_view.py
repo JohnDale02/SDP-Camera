@@ -231,7 +231,7 @@ def toggle_recording(channel):
         capture_image()
         recording_indicator = False
         record_lock.release()
-        print("Released lock after capturing video in toggle_recording()")
+        print("Released lock after capturing image in toggle_recording()")
 
     else:
         print("Error: Unknown state in the else case of handle_capture()")
