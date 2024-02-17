@@ -196,6 +196,7 @@ def gui_thread():
 def toggle_image_mode(channel):
     global image_mode
     global recording_indicator
+    global camera
 
     if not recording_indicator:
         image_mode = not image_mode
@@ -211,6 +212,7 @@ def toggle_image_mode(channel):
 
     if image_mode == False and camera != None:
         camera.release()
+        camera = None
 
 
 def toggle_recording(channel): 
