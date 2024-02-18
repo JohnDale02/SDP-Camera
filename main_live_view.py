@@ -180,7 +180,7 @@ class PhotoLockApp(App):
         self.capture.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
         self.capture.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
         self.capture.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter.fourcc('m','j','p','g'))
-        self.capture.set(cv2.CAP_PROP_FPS, 20.0)
+        self.capture.set(cv2.CAP_PROP_FPS, 60.0)
         
         gui_instance = PhotoLockGUI(self.capture)  # Assign the instance to the global variable
         return gui_instance

@@ -16,90 +16,91 @@ def handler(event, context):
         # Parse the JSON string in the body
         body = json.loads(event['body'])
 
-        # Access the 'image' key directly
-        binary_image = base64.b64decode(body['image'])
+        media_type = base64.b64decode(body['type'])
 
     except Exception as e:
         errors = "Error decoding image from event: " + str(e)
     
-    try:
-        image = binary_image_to_numpy(binary_image)
-    except Exception as e:
-        errors = errors + "Error:" + f"Error converting binary image to numpy: {str(e)}"
+    if media_type == b'image/png':
+        try:
+            binary_image = base64.b64decode(body['image'])
+            image = binary_image_to_numpy(binary_image)
+        except Exception as e:
+            errors = errors + "Error:" + f"Error converting binary image to numpy: {str(e)}"
 
-    try:
-        details = get_json_details(binary_image)
+        try:
+            details = get_json_details(binary_image)
 
-        if details  != False:
-            camera_number = details[0]
-            time_data = details[1]
-            location_data = details[2]
-            signature_string = details[3]
-            signature = signature = base64.b64decode(signature_string)
+            if details  != False:
+                camera_number = details[0]
+                time_data = details[1]
+                location_data = details[2]
+                signature_string = details[3]
+                signature = signature = base64.b64decode(signature_string)
 
-    except Exception as e:
-        errors = errors + "Error:" + f"Error getting JSON details: {str(e)}"
+        except Exception as e:
+            errors = errors + "Error:" + f"Error getting JSON details: {str(e)}"
 
-    try:
-        combined_data = create_combined(camera_number, image, time_data, location_data)
-    
-    except Exception as e:
-        errors = errors + "Error:" + f"Error combining data: {str(e)}"
+        try:
+            combined_data = create_combined(camera_number, image, time_data, location_data)
+        
+        except Exception as e:
+            errors = errors + "Error:" + f"Error combining data: {str(e)}"
 
-    try:
-        public_key_base64 = get_public_key(int(camera_number))
-        public_key = base64.b64decode(public_key_base64)
+        try:
+            public_key_base64 = get_public_key(int(camera_number))
+            public_key = base64.b64decode(public_key_base64)
 
-    except Exception as e:
-        errors = errors + "Error:" + f"Public key error: {str(e)}"
+        except Exception as e:
+            errors = errors + "Error:" + f"Public key error: {str(e)}"
 
-    try: 
-        valid = verify_signature(combined_data, signature, public_key)
+        try: 
+            valid = verify_signature(combined_data, signature, public_key)
 
-    except Exception as e:
-        valid = False   # something went wrong verifying signature
-        errors = errors + "Error:" + f"Error verifying or denying signature {str(e)}"
+        except Exception as e:
+            valid = False   # something went wrong verifying signature
+            errors = errors + "Error:" + f"Error verifying or denying signature {str(e)}"
 
-    try:
-        if valid:
-            # Return true with metadata
+        try:
+            if valid:
+                # Return true with metadata
+                return {
+                    'statusCode': 200,
+                    'headers': {
+                        'Content-Type': 'application/json',
+                        'Access-Control-Allow-Origin': '*'
+                    },
+                    'body': json.dumps({
+                        "result": "True",
+                        "metadata": {
+                            "camera_number": camera_number,
+                            "time_data": time_data,
+                            "location_data": location_data,
+                            "signature": signature_string
+                        }
+                    })
+                }
+            else:
+                # Return false without metadata
+                return {
+                    'statusCode': 200,
+                    'headers': {
+                        'Content-Type': 'application/json',
+                        'Access-Control-Allow-Origin': '*'
+                    },
+                    'body': json.dumps({"result": "False"})
+                }
+
+        except Exception as e:
+            errors = "Unhandled exception: " + str(e)
             return {
-                'statusCode': 200,
+                'statusCode': 500,
                 'headers': {
                     'Content-Type': 'application/json',
                     'Access-Control-Allow-Origin': '*'
                 },
-                'body': json.dumps({
-                    "result": "True",
-                    "metadata": {
-                        "camera_number": camera_number,
-                        "time_data": time_data,
-                        "location_data": location_data,
-                        "signature": signature_string
-                    }
-                })
+                'body': json.dumps({"error": errors})
             }
-        else:
-            # Return false without metadata
-            return {
-                'statusCode': 200,
-                'headers': {
-                    'Content-Type': 'application/json',
-                    'Access-Control-Allow-Origin': '*'
-                },
-                'body': json.dumps({"result": "False"})
-            }
-
-    except Exception as e:
-        errors = "Unhandled exception: " + str(e)
-        return {
-            'statusCode': 500,
-            'headers': {
-                'Content-Type': 'application/json',
-                'Access-Control-Allow-Origin': '*'
-            },
-            'body': json.dumps({"error": errors})
-        }
 
 
 def get_hash_for_query(binary_image):
