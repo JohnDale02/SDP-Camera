@@ -140,8 +140,8 @@ class PhotoLockGUI(FloatLayout):
         window_width, window_height = self.size
         print("Max window width:c ", window_height, window_width)
 
-        video_width = 1000
-        video_height = 480
+        video_width = 800
+        video_height = 400
 
         # Center the video in the window
         self.img1.size = (video_width, video_height)
