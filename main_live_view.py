@@ -135,13 +135,14 @@ class PhotoLockGUI(FloatLayout):
 
         
     def adjust_video_size(self, *args):
+        # Aspect ratio of the video feed
+        video_aspect_ratio = 16.0 / 9.0
 
         # Calculate the maximum possible size of the video feed within the window
         window_width, window_height = self.size
-        print("Max window width:c ", window_height, window_width)
 
-        video_width = 800
-        video_height = 400
+        video_width = window_width
+        video_height = video_width / video_aspect_ratio
 
         # Center the video in the window
         self.img1.size = (video_width, video_height)
@@ -176,10 +177,10 @@ class PhotoLockApp(App):
         global gui_instance
         self.capture = cv2.VideoCapture(2)
         self.capture.set(cv2.CAP_PROP_AUTOFOCUS, 0)
-        self.capture.set(cv2.CAP_PROP_FRAME_WIDTH, 1024)
-        self.capture.set(cv2.CAP_PROP_FRAME_HEIGHT, 576)
+        self.capture.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
+        self.capture.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
         self.capture.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter.fourcc('m','j','p','g'))
-        self.capture.set(cv2.CAP_PROP_FPS, 60.0)
+        self.capture.set(cv2.CAP_PROP_FPS, 30.0)
         
         gui_instance = PhotoLockGUI(self.capture)  # Assign the instance to the global variable
         return gui_instance
