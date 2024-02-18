@@ -134,24 +134,24 @@ class PhotoLockGUI(FloatLayout):
             self.recording_color.a = 1 if recording_indicator else 0
 
         
-def adjust_video_size(self, *args):
-    # Screen aspect ratio
-    screen_aspect_ratio = self.width / self.height
+    def adjust_video_size(self, *args):
+        # Screen aspect ratio
+        screen_aspect_ratio = self.width / self.height
 
-    # Calculate the maximum possible size of the video feed within the window
-    video_aspect_ratio = 4.0 / 3.0  # Change this based on your actual video feed aspect ratio
-    if screen_aspect_ratio >= video_aspect_ratio:
-        # Screen is wider than video aspect ratio
-        video_height = self.height
-        video_width = video_height * video_aspect_ratio
-    else:
-        # Screen is narrower than video aspect ratio
-        video_width = self.width
-        video_height = video_width / video_aspect_ratio
+        # Calculate the maximum possible size of the video feed within the window
+        video_aspect_ratio = 4.0 / 3.0  # Change this based on your actual video feed aspect ratio
+        if screen_aspect_ratio >= video_aspect_ratio:
+            # Screen is wider than video aspect ratio
+            video_height = self.height
+            video_width = video_height * video_aspect_ratio
+        else:
+            # Screen is narrower than video aspect ratio
+            video_width = self.width
+            video_height = video_width / video_aspect_ratio
 
-    # Center the video in the window
-    self.img1.size = (video_width, video_height)
-    self.img1.pos = ((self.width - video_width) / 2, (self.height - video_height) / 2)
+        # Center the video in the window
+        self.img1.size = (video_width, video_height)
+        self.img1.pos = ((self.width - video_width) / 2, (self.height - video_height) / 2)
 
         
     def update_rect(self, instance, value):
