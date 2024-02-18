@@ -177,8 +177,8 @@ class PhotoLockApp(App):
         global gui_instance
         self.capture = cv2.VideoCapture(2)
         self.capture.set(cv2.CAP_PROP_AUTOFOCUS, 0)
-        self.capture.set(cv2.CAP_PROP_FRAME_WIDTH, 1920)
-        self.capture.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080)
+        self.capture.set(cv2.CAP_PROP_FRAME_WIDTH, 1024)
+        self.capture.set(cv2.CAP_PROP_FRAME_HEIGHT, 576)
         self.capture.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter.fourcc('m','j','p','g'))
         self.capture.set(cv2.CAP_PROP_FPS, 60.0)
         
