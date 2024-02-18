@@ -136,7 +136,7 @@ class PhotoLockGUI(FloatLayout):
         
     def adjust_video_size(self, *args):
         # Aspect ratio of the video feed
-        video_aspect_ratio = 16.0 / 9.0
+        video_aspect_ratio = 15.0 / 9.0
 
         # Calculate the maximum possible size of the video feed within the window
         window_width, window_height = self.size
