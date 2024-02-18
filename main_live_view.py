@@ -135,26 +135,18 @@ class PhotoLockGUI(FloatLayout):
 
         
     def adjust_video_size(self, *args):
-        # Aspect ratio of the video feed, change this as per your feed
-        video_aspect_ratio = 640.0 / 480.0  # Assuming a 4:3 aspect ratio for the example
+        # Aspect ratio of the video feed
+        video_aspect_ratio = 16.0 / 9.0
 
         # Calculate the maximum possible size of the video feed within the window
         window_width, window_height = self.size
 
-        # Calculate the size of the video feed based on the aspect ratio
-        if window_width / window_height > video_aspect_ratio:
-            video_height = window_height
-            video_width = video_height * video_aspect_ratio
-        else:
-            video_width = window_width
-            video_height = video_width / video_aspect_ratio
+        video_width = window_width
+        video_height = video_width / video_aspect_ratio
 
-        # Calculate the position of the video feed to center it
-        video_x = (window_width - video_width) / 2
-        video_y = (window_height - video_height) / 2
-
+        # Center the video in the window
         self.img1.size = (video_width, video_height)
-        self.img1.pos = (video_x, video_y)
+        self.img1.pos = ((window_width - video_width) / 2, 0)
 
         
     def update_rect(self, instance, value):
