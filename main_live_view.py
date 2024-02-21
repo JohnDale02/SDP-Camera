@@ -31,7 +31,7 @@ Window.show_cursor = False
 # -------------Global Variables ------------------------------
 image_mode = True
 ffmpeg_process = None
-record_button = 37
+record_button = 40
 mode_button = 38
 
 ignore_button_presses = False  # This flag indicates whether to ignore button events
