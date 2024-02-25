@@ -19,7 +19,6 @@ Config.set('graphics', 'fullscreen', 'auto')
 from kivy.app import App
 from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.label import Label
-from kivy.uix.image import AsyncImage  # Use AsyncImage for potentially better handling of image loading
 from kivy.uix.image import Image  # Use AsyncImage for potentially better handling of image loading
 from kivy.graphics.texture import Texture
 from kivy.graphics import Color, Rectangle, Ellipse
@@ -76,8 +75,13 @@ class PhotoLockGUI(FloatLayout):
         super(PhotoLockGUI, self).__init__(**kwargs)
         self.capture = capture
 
-        self.wifi_status_image = AsyncImage(source='nowifi.png', size_hint=(None, None), size=(100, 45),
-                                    pos_hint={'center_x': 0.5, 'center_y': 0.5}, keep_ratio=True, allow_stretch=True)
+        self.wifi_status_image = Image(source='nowifi.png', size_hint=(None, None), size=(100, 45),
+                                            pos_hint={'center_x': 0.5, 'center_y': 0.5})
+
+                # Schedule a check for the WiFi status
+        self.add_widget(self.wifi_status_image)
+        Clock.schedule_interval(self.check_wifi_status, 10)
+        self.check_wifi_status(0)  # Immediately check the WiFi status upon start
         # Create a layout for the status label with a background
         self.status_layout = BoxLayout(size_hint=(None, None), size=(100, 45),
                                        pos_hint={'center_x': 0.5, 'center_y': 0.05})
@@ -99,10 +103,7 @@ class PhotoLockGUI(FloatLayout):
         self.status_layout.add_widget(self.status_label)
         self.add_widget(self.status_layout)
 
-        # Schedule a check for the WiFi status
-        self.add_widget(self.wifi_status_image)
-        Clock.schedule_interval(self.check_wifi_status, 10)
-        self.check_wifi_status(0)  # Immediately check the WiFi status upon start
+
 
         # Countdown label and its background
         self.bg_color = Color(0, 0, 0, 0)  # Initially transparent
