@@ -76,8 +76,7 @@ class PhotoLockGUI(FloatLayout):
         super(PhotoLockGUI, self).__init__(**kwargs)
         self.capture = capture
         
-        self.wifi_status_image = Image(source='nowifi.png', size_hint=(None, None), size=(100, 45),
-                                pos_hint={'right': 1, 'top': 0.96})
+        self.wifi_status_image = Image(source='nowifi.png', size_hint=(None, None), size=(100, 45))
     
         self.gps_status_image = Image(source='nogps.png', size_hint=(None, None), size=(120, 54))
 
@@ -159,7 +158,7 @@ class PhotoLockGUI(FloatLayout):
             # If there is no connectivity, update the source to show the no WiFi icon
             self.wifi_status_image.source = 'nowifi.png'
 
-    def adjust_wifi_image_position(self, instance, value):
+    def adjust_wifi_image_position(self):
         # Adjust these offsets to move the image closer/further from the edges
         left_offset = 10  # Distance from the right edge
         top_offset = 10    # Distance from the top edge
