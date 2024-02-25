@@ -78,10 +78,6 @@ class PhotoLockGUI(FloatLayout):
         self.wifi_status_image = Image(source='nowifi.png', size_hint=(None, None), size=(100, 45),
                                             pos_hint={'center_x': 0.5, 'center_y': 0.5})
 
-                # Schedule a check for the WiFi status
-        self.add_widget(self.wifi_status_image)
-        Clock.schedule_interval(self.check_wifi_status, 10)
-        self.check_wifi_status(0)  # Immediately check the WiFi status upon start
         # Create a layout for the status label with a background
         self.status_layout = BoxLayout(size_hint=(None, None), size=(100, 45),
                                        pos_hint={'center_x': 0.5, 'center_y': 0.05})
@@ -103,7 +99,7 @@ class PhotoLockGUI(FloatLayout):
         self.status_layout.add_widget(self.status_label)
         self.add_widget(self.status_layout)
 
-
+        self.add_widget(self.wifi_status_image)
 
         # Countdown label and its background
         self.bg_color = Color(0, 0, 0, 0)  # Initially transparent
@@ -121,6 +117,9 @@ class PhotoLockGUI(FloatLayout):
         self.bind(size=self._update_bg_and_label_pos, pos=self._update_bg_and_label_pos)
         
         Clock.schedule_interval(self.update, 1.0 / 33.0)
+
+        Clock.schedule_interval(self.check_wifi_status, 10)
+        self.check_wifi_status(0)  # Immediately check the WiFi status upon start
 
     def _update_bg_and_label_pos(self, *args):
         self.bg_rect.pos = (self.width / 2 - 25, self.height / 2 - 25)
