@@ -79,8 +79,8 @@ class PhotoLockGUI(FloatLayout):
         self.status_layout = BoxLayout(size_hint=(None, None), size=(100, 45),
                                        pos_hint={'center_x': 0.5, 'center_y': 0.05})
         
-        self.wifi_status_image = Image(source='no_wifi.png', size_hint=(None, None), size=(100, 45),
-                                            pos_hint={'right': 1, 'y': 0.05}, keep_ratio=True, allow_stretch=True)
+        self.wifi_status_image = Image(source='nowifi.png', size_hint=(None, None), size=(100, 45),
+                                       pos_hint={'center_x': 0.5, 'center_y': 0.5}, keep_ratio=True, allow_stretch=True)
 
         with self.status_layout.canvas.before:
             Color(0, 0, 0, 0.4)  # Semi-transparent black background
