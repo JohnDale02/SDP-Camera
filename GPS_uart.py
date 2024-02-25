@@ -59,7 +59,7 @@ def parse_nmea_sentence(sentence):
 
 def read_gps_data(gps_lock):
     with gps_lock:
-        ser = serial.Serial('/dev/ttyS0', 9600, timeout=5)
+        ser = serial.Serial('/dev/ttyS0', 9600, timeout=1)
         try: 
             start_time = time.time()
             while True:

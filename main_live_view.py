@@ -9,6 +9,7 @@ import os
 from main import main
 from nothing import sleep
 from threading import Lock
+from GPS_uart import read_gps_data
 
 from kivy.config import Config
 Config.set('graphics', 'width', '800')
@@ -74,9 +75,12 @@ class PhotoLockGUI(FloatLayout):
     def __init__(self, capture, **kwargs):
         super(PhotoLockGUI, self).__init__(**kwargs)
         self.capture = capture
-
+        
         self.wifi_status_image = Image(source='nowifi.png', size_hint=(None, None), size=(100, 45),
                                 pos_hint={'right': 1, 'top': 0.96})
+    
+        self.gps_status_image = Image(source='nogps.png', size_hint=(None, None), size=(100, 45),
+                        pos_hint={'right': 0, 'top': 0.96})
 
         # Create a layout for the status label with a background
         self.status_layout = BoxLayout(size_hint=(None, None), size=(100, 45),
@@ -101,6 +105,8 @@ class PhotoLockGUI(FloatLayout):
 
         self.add_widget(self.wifi_status_image)
         self.bind(size=self.adjust_wifi_image_position)
+        self.add_widget(self.gps_status_image)
+        self.bind(size=self.adjust_gps_image_position)
 
         # Countdown label and its background
         self.bg_color = Color(0, 0, 0, 0)  # Initially transparent
@@ -121,6 +127,8 @@ class PhotoLockGUI(FloatLayout):
 
         Clock.schedule_interval(self.check_wifi_status, 10)
         self.check_wifi_status(0)  # Immediately check the WiFi status upon start
+        Clock.schedule_interval(self.check_gps_status, 10)
+        self.check_gps_status(0)  # Immediately check the WiFi status upon start
 
     def _update_bg_and_label_pos(self, *args):
         self.bg_rect.pos = (self.width / 2 - 25, self.height / 2 - 25)
@@ -159,6 +167,26 @@ class PhotoLockGUI(FloatLayout):
         
         self.wifi_status_image.pos = (self.width - self.wifi_status_image.width - right_offset, 
                                       self.height - self.wifi_status_image.height - top_offset)
+        
+
+    def check_gps_status(self, dt, gps_lock):
+        # Check for internet connectivity by pinging Google's DNS server
+        latitude, longitude, formatted_time = read_gps_data(gps_lock)
+        if latitude != "None":
+            # If there is connectivity, update the source to show the WiFi icon
+            self.gps_status_image.source = 'gps.png'
+        else:
+            # If there is no connectivity, update the source to show the no WiFi icon
+            self.gps_status_image.source = 'nogps.png'
+
+    def adjust_gps_image_position(self, instance, value):
+        # Adjust these offsets to move the image closer/further from the edges
+        left_offset = 10  # Distance from the left edge
+        top_offset = 10    # Distance from the top edge
+        
+        # Position the GPS status image in the top left corner with specified offsets
+        self.gps_status_image.pos = (left_offset, 
+                                    self.height - self.gps_status_image.height - top_offset)
 
     def adjust_video_size(self, *args):
         # Aspect ratio of the video feed
