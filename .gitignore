@@ -1,6 +1,6 @@
 # Ignore .jpg files
 *.jpg
-*.png
+#*.png
 *.avi
 *.mp4
 *.mkv
