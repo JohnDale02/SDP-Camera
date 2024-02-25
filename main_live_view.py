@@ -79,8 +79,7 @@ class PhotoLockGUI(FloatLayout):
         self.wifi_status_image = Image(source='nowifi.png', size_hint=(None, None), size=(100, 45),
                                 pos_hint={'right': 1, 'top': 0.96})
     
-        self.gps_status_image = Image(source='nogps.png', size_hint=(None, None), size=(100, 45),
-                        pos_hint={'right': 0, 'top': 0.96})
+        self.gps_status_image = Image(source='nogps.png', size_hint=(None, None), size=(100, 45))
 
         # Create a layout for the status label with a background
         self.status_layout = BoxLayout(size_hint=(None, None), size=(100, 45),
@@ -179,7 +178,7 @@ class PhotoLockGUI(FloatLayout):
             # If there is no connectivity, update the source to show the no WiFi icon
             self.gps_status_image.source = 'nogps.png'
 
-    def adjust_gps_image_position(self, instance, value):
+    def adjust_gps_image_position(self):
         # Adjust these offsets to move the image closer/further from the edges
         left_offset = 10  # Distance from the left edge
         top_offset = 10    # Distance from the top edge
