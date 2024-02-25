@@ -1,5 +1,6 @@
 
 import threading 
+from threading import Lock, Thread
 import RPi.GPIO as GPIO
 import time
 import subprocess
@@ -8,7 +9,6 @@ import os
 from main import main
 from nothing import sleep
 from threading import Lock
-from threading import Thread
 from GPS_uart import read_gps_data
 
 from kivy.config import Config
@@ -34,6 +34,9 @@ image_mode = True
 ffmpeg_process = None
 record_button = 40
 mode_button = 38
+
+wifi_status = False
+gps_status = False
 
 ignore_button_presses = False  # This flag indicates whether to ignore button events
 recording_indicator = False
@@ -66,10 +69,39 @@ def setup_gpio():
     GPIO.setup(mode_button, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
     # Setup event detection
-    GPIO.add_event_detect(mode_button, GPIO.FALLING, callback=toggle_image_mode, bouncetime=10000)
-    GPIO.add_event_detect(record_button, GPIO.FALLING, callback=toggle_recording, bouncetime=5000)
+    GPIO.add_event_detect(mode_button, GPIO.FALLING, callback=toggle_image_mode, bouncetime=3000)
+    GPIO.add_event_detect(record_button, GPIO.FALLING, callback=toggle_recording, bouncetime=2000)
     
 # --------------------------------------------------------------------
+    
+def update_gps_data_continuously(gps_lock):
+    global gps_status
+    while True:
+        latitude, longitude, formatted_time = read_gps_data(gps_lock)
+        if latitude != "None":
+            gps_status = True
+        else:
+            gps_status = False
+        # Adjust the sleep time as needed based on how often you want to update GPS data
+        time.sleep(10)
+
+# --------------------------------------------------------------------
+
+def update_wifi_status_continuously():
+    global wifi_status
+    # Check for internet connectivity by pinging Google's DNS server
+    response = subprocess.run(['ping', '-c', '1', '8.8.8.8'], stdout=subprocess.DEVNULL)
+    while True:
+        # Check for internet connectivity by pinging Google's DNS server
+        if response.returncode == 0:
+            wifi_status = True
+            # If there is connectivity, update the source to show the WiFi icon
+            
+        else:
+            # If there is no connectivity, update the source to show the no WiFi icon
+            wifi_status = False
+
+        time.sleep(5)
     
 class PhotoLockGUI(FloatLayout):
     def __init__(self, capture, **kwargs):
@@ -123,10 +155,10 @@ class PhotoLockGUI(FloatLayout):
         
         Clock.schedule_interval(self.update, 1.0 / 33.0)
 
-        Clock.schedule_interval(self.check_wifi_status, 10)
+        Clock.schedule_interval(self.check_wifi_status, 5)
         self.check_wifi_status(0)  # Immediately check the WiFi status upon start
-        Clock.schedule_interval(lambda dt: Thread(target=self.threaded_check_gps_status, args=(gps_lock,)).start(), 10)
-        self.threaded_check_gps_status(0, gps_lock)  # Immediately check the GPS status upon start
+        Clock.schedule_interval(self.check_gps_status, 10)
+        self.check_gps_status(0, gps_lock)  # Immediately check the GPS status upon start
 
     def _update_bg_and_label_pos(self, *args):
         self.bg_rect.pos = (self.width / 2 - 25, self.height / 2 - 25)
@@ -149,14 +181,14 @@ class PhotoLockGUI(FloatLayout):
             self.recording_color.a = 1 if recording_indicator else 0
 
     def check_wifi_status(self, dt):
-        # Check for internet connectivity by pinging Google's DNS server
-        response = subprocess.run(['ping', '-c', '1', '8.8.8.8'], stdout=subprocess.DEVNULL)
-        if response.returncode == 0:
-            # If there is connectivity, update the source to show the WiFi icon
+        global wifi_status
+
+        if wifi_status == True:
             self.wifi_status_image.source = 'wifi.png'
+
         else:
-            # If there is no connectivity, update the source to show the no WiFi icon
             self.wifi_status_image.source = 'nowifi.png'
+
 
     def adjust_wifi_image_position(self, instance, value):
         # Adjust these offsets to move the image closer/further from the edges
@@ -167,18 +199,15 @@ class PhotoLockGUI(FloatLayout):
                                     self.height - self.wifi_status_image.height - top_offset)
         
 
-    def threaded_check_gps_status(self, dt, gps_lock):
-
-        def update_ui(latitude):
-            if latitude != "None":
-                # If there is connectivity, update the source to show the gps icon
-                self.gps_status_image.source = 'gps.png'
-            else:
-                # If there is no connectivity, update the source to show the no gps icon
-                self.gps_status_image.source = 'nogps.png'
-
-        latitude, longitude, formatted_time = read_gps_data(gps_lock)
-        Clock.schedule_once(lambda dt: update_ui(latitude))
+    def check_gps_status(self, dt):
+        # Check for internet connectivity by pinging Google's DNS server
+        global gps_status
+        if gps_status == True:
+            # If there is connectivity, update the source to show the WiFi icon
+            self.gps_status_image.source = 'gps.png'
+        else:
+            # If there is no connectivity, update the source to show the no WiFi icon
+            self.gps_status_image.source = 'nogps.png'
 
     def adjust_gps_image_position(self, instance, value):
         # Adjust these offsets to move the image closer/further from the edges
@@ -456,6 +485,14 @@ def count_files(directory_path):
 # -------------------------------------------------------------------
 
 if __name__ == '__main__':
+    gps_update_thread = Thread(target=update_gps_data_continuously, args=(gps_lock,))
+    gps_update_thread.daemon = True  # Optional: makes the thread exit when the main thread does
+    wifi_update_thread = Thread(target=update_wifi_status_continuously)
+    wifi_update_thread.daemon = True  # Makes this thread a daemon thread, so it exits when the main program does
+
+    gps_update_thread.start()
+    wifi_update_thread.start()
+
     setup_gpio()
     gui_thread()  # This will start the Kivy application
     GPIO.cleanup()
