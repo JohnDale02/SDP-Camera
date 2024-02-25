@@ -126,7 +126,7 @@ class PhotoLockGUI(FloatLayout):
         Clock.schedule_interval(self.check_wifi_status, 10)
         self.check_wifi_status(0)  # Immediately check the WiFi status upon start
         Clock.schedule_interval(lambda dt: Thread(target=self.threaded_check_gps_status, args=(gps_lock,)).start(), 10)
-        self.threaded_check_gps_status(gps_lock)  # Immediately check the GPS status upon start
+        self.threaded_check_gps_status(0, gps_lock)  # Immediately check the GPS status upon start
 
     def _update_bg_and_label_pos(self, *args):
         self.bg_rect.pos = (self.width / 2 - 25, self.height / 2 - 25)
