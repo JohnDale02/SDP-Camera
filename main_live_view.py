@@ -160,7 +160,7 @@ class PhotoLockGUI(FloatLayout):
 
     def adjust_wifi_image_position(self, instance, value):
         # Adjust these offsets to move the image closer/further from the edges
-        left_offset = 40  # Distance from the right edge
+        left_offset = 8  # Distance from the right edge
         top_offset = 10    # Distance from the top edge
         
         self.wifi_status_image.pos = (left_offset, 
