@@ -79,7 +79,7 @@ class PhotoLockGUI(FloatLayout):
         self.wifi_status_image = Image(source='nowifi.png', size_hint=(None, None), size=(100, 45),
                                 pos_hint={'right': 1, 'top': 0.96})
     
-        self.gps_status_image = Image(source='nogps.png', size_hint=(None, None), size=(100, 45))
+        self.gps_status_image = Image(source='nogps.png', size_hint=(None, None), size=(120, 54))
 
         # Create a layout for the status label with a background
         self.status_layout = BoxLayout(size_hint=(None, None), size=(100, 45),
@@ -161,11 +161,11 @@ class PhotoLockGUI(FloatLayout):
 
     def adjust_wifi_image_position(self, instance, value):
         # Adjust these offsets to move the image closer/further from the edges
-        right_offset = 10  # Distance from the right edge
+        left_offset = 10  # Distance from the right edge
         top_offset = 10    # Distance from the top edge
         
-        self.wifi_status_image.pos = (self.width - self.wifi_status_image.width - right_offset, 
-                                      self.height - self.wifi_status_image.height - top_offset)
+        self.wifi_status_image.pos = (left_offset, 
+                                    self.height - self.wifi_status_image.height - top_offset)
         
 
     def check_gps_status(self, dt, gps_lock):
@@ -180,8 +180,8 @@ class PhotoLockGUI(FloatLayout):
 
     def adjust_gps_image_position(self, instance, value):
         # Adjust these offsets to move the image closer/further from the edges
-        left_offset = 10  # Distance from the left edge
-        top_offset = 10    # Distance from the top edge
+        left_offset = 6  # Distance from the left edge
+        top_offset = 40    # Distance from the top edge
         
         # Position the GPS status image in the top left corner with specified offsets
         self.gps_status_image.pos = (left_offset, 
