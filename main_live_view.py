@@ -75,8 +75,8 @@ class PhotoLockGUI(FloatLayout):
         super(PhotoLockGUI, self).__init__(**kwargs)
         self.capture = capture
 
-        self.wifi_status_image = Image(source='/home/sdp/SDP-Camera/nowifi.png', size_hint=(None, None), size=(100, 45),
-                                pos_hint={'right': 0.97, 'top': 0.95})
+        self.wifi_status_image = Image(source='nowifi.png', size_hint=(None, None), size=(100, 45),
+                                pos_hint={'right': 1, 'top': 0.96})
 
         # Create a layout for the status label with a background
         self.status_layout = BoxLayout(size_hint=(None, None), size=(100, 45),
@@ -100,6 +100,7 @@ class PhotoLockGUI(FloatLayout):
         self.add_widget(self.status_layout)
 
         self.add_widget(self.wifi_status_image)
+        self.bind(size=self.adjust_wifi_image_position)
 
         # Countdown label and its background
         self.bg_color = Color(0, 0, 0, 0)  # Initially transparent
@@ -146,10 +147,18 @@ class PhotoLockGUI(FloatLayout):
         response = subprocess.run(['ping', '-c', '1', '8.8.8.8'], stdout=subprocess.DEVNULL)
         if response.returncode == 0:
             # If there is connectivity, update the source to show the WiFi icon
-            self.wifi_status_image.source = '/home/sdp/SDP-Camera/wifi.png'
+            self.wifi_status_image.source = 'wifi.png'
         else:
             # If there is no connectivity, update the source to show the no WiFi icon
             self.wifi_status_image.source = 'nowifi.png'
+
+    def adjust_wifi_image_position(self, instance, value):
+        # Adjust these offsets to move the image closer/further from the edges
+        right_offset = 10  # Distance from the right edge
+        top_offset = 10    # Distance from the top edge
+        
+        self.wifi_status_image.pos = (self.width - self.wifi_status_image.width - right_offset, 
+                                      self.height - self.wifi_status_image.height - top_offset)
 
     def adjust_video_size(self, *args):
         # Aspect ratio of the video feed
