@@ -178,7 +178,7 @@ class PhotoLockGUI(FloatLayout):
             # If there is no connectivity, update the source to show the no WiFi icon
             self.gps_status_image.source = 'nogps.png'
 
-    def adjust_gps_image_position(self):
+    def adjust_gps_image_position(self, instance, value):
         # Adjust these offsets to move the image closer/further from the edges
         left_offset = 10  # Distance from the left edge
         top_offset = 10    # Distance from the top edge
