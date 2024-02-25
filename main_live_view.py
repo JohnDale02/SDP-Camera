@@ -1,6 +1,5 @@
 
 import threading 
-from threading import Lock
 import RPi.GPIO as GPIO
 import time
 import subprocess
@@ -9,6 +8,7 @@ import os
 from main import main
 from nothing import sleep
 from threading import Lock
+from threading import Thread
 from GPS_uart import read_gps_data
 
 from kivy.config import Config
@@ -125,7 +125,7 @@ class PhotoLockGUI(FloatLayout):
 
         Clock.schedule_interval(self.check_wifi_status, 10)
         self.check_wifi_status(0)  # Immediately check the WiFi status upon start
-        Clock.schedule_interval(lambda dt: self.check_gps_status(dt, gps_lock), 10)
+        Clock.schedule_interval(lambda dt: Thread(target=self.threaded_check_gps_status, args=(gps_lock,)).start(), 10)
         self.check_gps_status(0, gps_lock)  # Immediately check the GPS status upon start
 
     def _update_bg_and_label_pos(self, *args):
@@ -167,15 +167,18 @@ class PhotoLockGUI(FloatLayout):
                                     self.height - self.wifi_status_image.height - top_offset)
         
 
-    def check_gps_status(self, dt, gps_lock):
-        # Check for internet connectivity by pinging Google's DNS server
+    def threaded_check_gps_status(self, dt, gps_lock):
+
+        def update_ui(latitude):
+            if latitude != "None":
+                # If there is connectivity, update the source to show the gps icon
+                self.gps_status_image.source = 'gps.png'
+            else:
+                # If there is no connectivity, update the source to show the no gps icon
+                self.gps_status_image.source = 'nogps.png'
+
         latitude, longitude, formatted_time = read_gps_data(gps_lock)
-        if latitude != "None":
-            # If there is connectivity, update the source to show the WiFi icon
-            self.gps_status_image.source = 'gps.png'
-        else:
-            # If there is no connectivity, update the source to show the no WiFi icon
-            self.gps_status_image.source = 'nogps.png'
+        Clock.schedule_once(lambda dt: update_ui(latitude))
 
     def adjust_gps_image_position(self, instance, value):
         # Adjust these offsets to move the image closer/further from the edges
