@@ -75,6 +75,8 @@ class PhotoLockGUI(FloatLayout):
         super(PhotoLockGUI, self).__init__(**kwargs)
         self.capture = capture
 
+        self.wifi_status_image = Image(source='nowifi.png', size_hint=(None, None), size=(100, 45),
+                                       pos_hint={'center_x': 0.5, 'center_y': 0.5}, keep_ratio=True, allow_stretch=True)
         # Create a layout for the status label with a background
         self.status_layout = BoxLayout(size_hint=(None, None), size=(100, 45),
                                        pos_hint={'center_x': 0.5, 'center_y': 0.05})
@@ -95,6 +97,11 @@ class PhotoLockGUI(FloatLayout):
         self.status_label = Label(text='Image', color=(1, 1, 1, 1), font_size='30sp')
         self.status_layout.add_widget(self.status_label)
         self.add_widget(self.status_layout)
+
+        # Schedule a check for the WiFi status
+        self.add_widget(self.wifi_status_image)
+        Clock.schedule_interval(self.check_wifi_status, 10)
+        self.check_wifi_status(0)  # Immediately check the WiFi status upon start
 
         # Countdown label and its background
         self.bg_color = Color(0, 0, 0, 0)  # Initially transparent
@@ -133,7 +140,16 @@ class PhotoLockGUI(FloatLayout):
 
             self.recording_color.a = 1 if recording_indicator else 0
 
-        
+    def check_wifi_status(self, dt):
+        # Check for internet connectivity by pinging Google's DNS server
+        response = subprocess.run(['ping', '-c', '1', '8.8.8.8'], stdout=subprocess.DEVNULL)
+        if response.returncode == 0:
+            # If there is connectivity, update the source to show the WiFi icon
+            self.wifi_status_image.source = 'wifi.png'
+        else:
+            # If there is no connectivity, update the source to show the no WiFi icon
+            self.wifi_status_image.source = 'nowifi.png'
+            
     def adjust_video_size(self, *args):
         # Aspect ratio of the video feed
         video_aspect_ratio = 15.0 / 9.0
