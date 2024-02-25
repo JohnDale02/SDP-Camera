@@ -10,6 +10,7 @@ from main import main
 from nothing import sleep
 from threading import Lock
 
+from kivy.uix.image import Image
 from kivy.config import Config
 Config.set('graphics', 'width', '800')
 Config.set('graphics', 'height', '480')
@@ -149,7 +150,7 @@ class PhotoLockGUI(FloatLayout):
         else:
             # If there is no connectivity, update the source to show the no WiFi icon
             self.wifi_status_image.source = 'nowifi.png'
-            
+
     def adjust_video_size(self, *args):
         # Aspect ratio of the video feed
         video_aspect_ratio = 15.0 / 9.0
