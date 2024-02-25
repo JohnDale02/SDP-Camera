@@ -158,7 +158,7 @@ class PhotoLockGUI(FloatLayout):
             # If there is no connectivity, update the source to show the no WiFi icon
             self.wifi_status_image.source = 'nowifi.png'
 
-    def adjust_wifi_image_position(self):
+    def adjust_wifi_image_position(self, instance, value):
         # Adjust these offsets to move the image closer/further from the edges
         left_offset = 10  # Distance from the right edge
         top_offset = 10    # Distance from the top edge
