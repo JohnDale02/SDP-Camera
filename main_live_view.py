@@ -76,7 +76,7 @@ class PhotoLockGUI(FloatLayout):
         self.capture = capture
 
         self.wifi_status_image = Image(source='/home/sdp/SDP-Camera/nowifi.png', size_hint=(None, None), size=(100, 45),
-                                            pos_hint={'center_x': 0.5, 'center_y': 0.5})
+                                pos_hint={'right': 0.95, 'top': 0.95})
 
         # Create a layout for the status label with a background
         self.status_layout = BoxLayout(size_hint=(None, None), size=(100, 45),
