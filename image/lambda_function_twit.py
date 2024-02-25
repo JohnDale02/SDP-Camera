@@ -16,15 +16,21 @@ def handler(event, context):
         # Parse the JSON string in the body
         body = json.loads(event['body'])
 
-        media_type = base64.b64decode(body['type'])
+        content_type = body['type']
+        # Access the 'image' key directly
+        binary_media  = base64.b64decode(body['image'])
 
     except Exception as e:
-        errors = "Error decoding image from event: " + str(e)
+        errors = "Error decoding media from event: " + str(e)
     
-    if media_type == b'image/png':
+    if content_type == "image/png":
+        binary_image = binary_media
+
         try:
-            binary_image = base64.b64decode(body['image'])
             image = binary_image_to_numpy(binary_image)
+            _, encoded_image = cv2.imencode('.png', image)  # we send the encoded image to the cloud
+            encoded_media = encoded_image.tobytes()
+
         except Exception as e:
             errors = errors + "Error:" + f"Error converting binary image to numpy: {str(e)}"
 
@@ -42,7 +48,7 @@ def handler(event, context):
             errors = errors + "Error:" + f"Error getting JSON details: {str(e)}"
 
         try:
-            combined_data = create_combined(camera_number, image, time_data, location_data)
+            combined_data = create_combined(camera_number, encoded_media, time_data, location_data)
         
         except Exception as e:
             errors = errors + "Error:" + f"Error combining data: {str(e)}"
@@ -101,6 +107,84 @@ def handler(event, context):
                 },
                 'body': json.dumps({"error": errors})
             }
+
+    else:    # content type is video/avi
+        binary_video = binary_media
+
+        try:
+            details = get_json_details(binary_video)
+
+            if details  != False:
+                camera_number = details[0]
+                time_data = details[1]
+                location_data = details[2]
+                signature_string = details[3]
+                signature = signature = base64.b64decode(signature_string)
+
+        except Exception as e:
+            errors = errors + "Error:" + f"Error getting JSON details for video: {str(e)}"
+
+        try:
+            combined_data = create_combined(camera_number, binary_video, time_data, location_data)
+        
+        except Exception as e:
+            errors = errors + "Error:" + f"Error combining data: {str(e)}"
+
+        try:
+            public_key_base64 = get_public_key(int(camera_number))
+            public_key = base64.b64decode(public_key_base64)
+
+        except Exception as e:
+            errors = errors + "Error:" + f"Public key error: {str(e)}"
+
+        try: 
+            valid = verify_signature(combined_data, signature, public_key)
+
+        except Exception as e:
+            valid = False   # something went wrong verifying signature
+            errors = errors + "Error:" + f"Error verifying or denying signature {str(e)}"
+
+        try:
+            if valid:
+                # Return true with metadata
+                return {
+                    'statusCode': 200,
+                    'headers': {
+                        'Content-Type': 'application/json',
+                        'Access-Control-Allow-Origin': '*'
+                    },
+                    'body': json.dumps({
+                        "result": "True",
+                        "metadata": {
+                            "camera_number": camera_number,
+                            "time_data": time_data,
+                            "location_data": location_data,
+                            "signature": signature_string
+                        }
+                    })
+                }
+            else:
+                # Return false without metadata
+                return {
+                    'statusCode': 200,
+                    'headers': {
+                        'Content-Type': 'application/json',
+                        'Access-Control-Allow-Origin': '*'
+                    },
+                    'body': json.dumps({"result": "False"})
+                }
+
+        except Exception as e:
+            errors = "Unhandled exception: " + str(e)
+            return {
+                'statusCode': 500,
+                'headers': {
+                    'Content-Type': 'application/json',
+                    'Access-Control-Allow-Origin': '*'
+                },
+                'body': json.dumps({"error": errors})
+            }
+
 
 
 def get_hash_for_query(binary_image):
@@ -170,20 +254,18 @@ def get_json_details(binary_image):
 
 
 
-def create_combined(camera_number: str, image: bytes, time: str, location: str) -> bytes:
-    '''Takes in camera number, image, time, location and encodes then combines to form one byte object'''
 
-    # Encode the image as a PNG byte array
-    _, encoded_image = cv2.imencode(".png", image)
-    encoded_image = encoded_image.tobytes()
+def create_combined(camera_number: str, media: bytes, time: str, location: str) -> bytes:
+    '''Takes in camera number, image, time, location and encodes then combines to form one byte object'''
 
     encoded_number = camera_number.encode('utf-8')
     encoded_time = time.encode('utf-8')
     encoded_location = location.encode('utf-8')
 
-    combined_data = encoded_number + encoded_image + encoded_time + encoded_location
+    combined_data = encoded_number + media + encoded_time + encoded_location
 
     return combined_data
+
 
 
 
