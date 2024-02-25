@@ -10,7 +10,6 @@ from main import main
 from nothing import sleep
 from threading import Lock
 
-from kivy.uix.image import Image
 from kivy.config import Config
 Config.set('graphics', 'width', '800')
 Config.set('graphics', 'height', '480')
@@ -20,7 +19,8 @@ Config.set('graphics', 'fullscreen', 'auto')
 from kivy.app import App
 from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.label import Label
-from kivy.uix.image import Image
+from kivy.uix.image import AsyncImage  # Use AsyncImage for potentially better handling of image loading
+from kivy.uix.image import Image  # Use AsyncImage for potentially better handling of image loading
 from kivy.graphics.texture import Texture
 from kivy.graphics import Color, Rectangle, Ellipse
 from kivy.uix.boxlayout import BoxLayout
@@ -76,8 +76,8 @@ class PhotoLockGUI(FloatLayout):
         super(PhotoLockGUI, self).__init__(**kwargs)
         self.capture = capture
 
-        self.wifi_status_image = Image(source='nowifi.png', size_hint=(None, None), size=(100, 45),
-                                       pos_hint={'center_x': 0.5, 'center_y': 0.5}, keep_ratio=True, allow_stretch=True)
+        self.wifi_status_image = AsyncImage(source='nowifi.png', size_hint=(None, None), size=(100, 45),
+                                    pos_hint={'center_x': 0.5, 'center_y': 0.5}, keep_ratio=True, allow_stretch=True)
         # Create a layout for the status label with a background
         self.status_layout = BoxLayout(size_hint=(None, None), size=(100, 45),
                                        pos_hint={'center_x': 0.5, 'center_y': 0.05})
