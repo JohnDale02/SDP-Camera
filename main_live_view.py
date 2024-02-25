@@ -78,14 +78,10 @@ class PhotoLockGUI(FloatLayout):
         # Create a layout for the status label with a background
         self.status_layout = BoxLayout(size_hint=(None, None), size=(100, 45),
                                        pos_hint={'center_x': 0.5, 'center_y': 0.05})
-        
-        self.wifi_status_image = Image(source='nowifi.png', size_hint=(None, None), size=(100, 45),
-                                       pos_hint={'center_x': 0.5, 'center_y': 0.5}, keep_ratio=True, allow_stretch=True)
 
         with self.status_layout.canvas.before:
             Color(0, 0, 0, 0.4)  # Semi-transparent black background
             self.rect = Rectangle(size=self.status_layout.size, pos=self.status_layout.pos)
-            self.wifi_bg_rect = Rectangle(size=self.wifi_status_image.size, pos=self.wifi_status_image.pos)
             self.recording_color = Color(1, 0, 0, 0)  # Start with transparent (invisible)
             self.recording_indicator = Ellipse(size=(50, 50), pos=(740, 410))
         
@@ -93,11 +89,6 @@ class PhotoLockGUI(FloatLayout):
         
         self.img1 = Image(keep_ratio=False, allow_stretch=True)
         self.add_widget(self.img1)
-
-
-        self.add_widget(self.wifi_status_image)
-        Clock.schedule_interval(self.check_wifi_status, 10)
-        self.check_wifi_status(0)  # Check immediately upon start
 
         self.bind(size=self.adjust_video_size)
 
@@ -161,16 +152,6 @@ class PhotoLockGUI(FloatLayout):
     def update_rect(self, instance, value):
         self.rect.pos = instance.pos
         self.rect.size = instance.size
-
-    def check_wifi_status(self, dt):
-        # Ping Google's DNS server to check for internet connectivity
-        response = subprocess.run(['ping', '-c', '1', '8.8.8.8'], stdout=subprocess.DEVNULL)
-        if response.returncode == 0:
-            # If ping is successful, show WiFi icon
-            self.wifi_status_image.source = 'wifi.png'
-        else:
-            # If ping fails, show no WiFi icon
-            self.wifi_status_image.source = 'nowifi.png'
 
 
     def start_countdown(self, duration=5):
