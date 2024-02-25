@@ -160,7 +160,7 @@ class PhotoLockGUI(FloatLayout):
 
     def adjust_wifi_image_position(self, instance, value):
         # Adjust these offsets to move the image closer/further from the edges
-        left_offset = 6  # Distance from the right edge
+        left_offset = 40  # Distance from the right edge
         top_offset = 10    # Distance from the top edge
         
         self.wifi_status_image.pos = (left_offset, 
@@ -180,7 +180,7 @@ class PhotoLockGUI(FloatLayout):
     def adjust_gps_image_position(self, instance, value):
         # Adjust these offsets to move the image closer/further from the edges
         left_offset = 0  # Distance from the left edge
-        top_offset = 60    # Distance from the top edge
+        top_offset = 70    # Distance from the top edge
         
         # Position the GPS status image in the top left corner with specified offsets
         self.gps_status_image.pos = (left_offset, 
