@@ -135,8 +135,6 @@ class PhotoLockGUI(FloatLayout):
         
         self.countdown_label = Label(text="", font_size='30sp', size_hint=(None, None),
                                      size=(100, 50), pos_hint={'center_x': 0.5, 'center_y': 0.5})
-            
-        self.bind(size=self.adjust_indicators_background, pos=self.adjust_indicators_background)
 
         with self.canvas.before:
             self.canvas.add(self.bg_color)
@@ -144,7 +142,7 @@ class PhotoLockGUI(FloatLayout):
             Color(1, 0, 0, 0.4)  # Semi-transparent black background
             self.indicators_bg_rect = Rectangle(size=(150, 130), pos=(650, 350))
         
-        
+        self.add_widget(self.indicators_bg_rect)
         self.add_widget(self.wifi_status_image)
         self.bind(size=self.adjust_wifi_image_position)
         self.add_widget(self.gps_status_image)
