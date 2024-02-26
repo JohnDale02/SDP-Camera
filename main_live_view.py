@@ -136,20 +136,23 @@ class PhotoLockGUI(FloatLayout):
         
         self.countdown_label = Label(text="", font_size='30sp', size_hint=(None, None),
                                      size=(100, 50), pos_hint={'center_x': 0.5, 'center_y': 0.5})
-
-        with self.canvas.before:
-            Color(1, 0, 0, 0.4)  # Red color with semi-transparency
-            #self.canvas.add(self.bg_color)
-            #self.canvas.add(self.bg_rect)
-            self.indicators_bg_rect = Rectangle(size=(800, 480), pos=(650, 350))
-
         
         self.add_widget(self.wifi_status_image)
         self.bind(size=self.adjust_wifi_image_position)
         self.add_widget(self.gps_status_image)
         self.bind(size=self.adjust_gps_image_position)
         self.add_widget(self.countdown_label)
-        self.bind(size=self.adjust_indicators_background, pos=self.adjust_indicators_background)
+
+        with self.canvas.before:
+            Color(1, 0, 0, 0.4)  # Red color with semi-transparency
+            #self.canvas.add(self.bg_color)
+            #self.canvas.add(self.bg_rect)
+            self.indicators_bg_rect = Rectangle(size=(800, 480), pos=(0, 0))
+
+        
+
+
+        self.bind(size=self.adjust_background, pos=self.adjust_background)
         self.bind(size=self._update_bg_and_label_pos, pos=self._update_bg_and_label_pos)
         
         Clock.schedule_interval(self.update, 1.0 / 33.0)
@@ -158,7 +161,6 @@ class PhotoLockGUI(FloatLayout):
         self.check_wifi_status(0)  # Immediately check the WiFi status upon start
         Clock.schedule_interval(self.check_gps_status, 10)
         self.check_gps_status(0)  # Immediately check the GPS status upon start
-
 
         Thread(target=update_gps_data_continuously, args=(gps_lock,), daemon=True).start()
         Thread(target=update_wifi_status_continuously, daemon=True).start()
@@ -169,12 +171,9 @@ class PhotoLockGUI(FloatLayout):
         self.countdown_label.pos = (self.width / 2 - 100, self.height / 2 - 50)
 
     
-    def adjust_indicators_background(self, *args):
-        # Adjust the background rectangle's position and size if needed
-        # This example positions it to cover both the WiFi and GPS status images
-        self.indicators_bg_rect.pos = (640, 340)
-        self.indicators_bg_rect.size = (200, 150)
-
+    def adjust_background(self, *args):
+        self.indicators_bg_rect.size = self.size  # Make the rectangle always fill the window
+        self.indicators_bg_rect.pos = self.pos
 
     def update(self, dt):
         ret, frame = self.capture.read()
