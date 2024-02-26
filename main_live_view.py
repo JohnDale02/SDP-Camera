@@ -109,7 +109,6 @@ class PhotoLockGUI(FloatLayout):
         self.capture = capture
 
         # Specify the size and position of the background rectangles
-        indicators_bg_size = (150, 130)  # Adjust the size as needed
         
         self.wifi_status_image = Image(source='nowifi.png', size_hint=(None, None), size=(100, 45))
     
@@ -118,9 +117,6 @@ class PhotoLockGUI(FloatLayout):
         # Create a layout for the status label with a background
         self.status_layout = BoxLayout(size_hint=(None, None), size=(100, 45),
                                        pos_hint={'center_x': 0.5, 'center_y': 0.05})
-        
-        self.indicators_bg_rect = Rectangle(size=indicators_bg_size, pos=(100,100))
-        self.indicators_bg_rect = Color(0, 0, 0, 0.4)  # Semi-transparent black background
 
         with self.status_layout.canvas.before:
             Color(0, 0, 0, 0.4)  # Semi-transparent black background
