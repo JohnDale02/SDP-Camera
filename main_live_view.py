@@ -167,11 +167,7 @@ class PhotoLockGUI(FloatLayout):
         self.bg_rect.pos = (self.width / 2 - 25, self.height / 2 - 25)
         self.bg_rect.size = (50, 50)
         self.countdown_label.pos = (self.width / 2 - 100, self.height / 2 - 50)
-
-    
-    def adjust_background(self, *args):
-        self.indicators_bg_rect.size = self.size  # Make the rectangle always fill the window
-        self.indicators_bg_rect.pos = self.pos
+        
 
     def update(self, dt):
         ret, frame = self.capture.read()
