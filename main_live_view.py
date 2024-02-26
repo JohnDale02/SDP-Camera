@@ -150,7 +150,6 @@ class PhotoLockGUI(FloatLayout):
             self.canvas.add(self.bg_color)
             self.canvas.add(self.bg_rect)
 
-        self.bind(size=self.adjust_background, pos=self.adjust_background)
         self.bind(size=self._update_bg_and_label_pos, pos=self._update_bg_and_label_pos)
         
         Clock.schedule_interval(self.update, 1.0 / 33.0)
@@ -167,7 +166,7 @@ class PhotoLockGUI(FloatLayout):
         self.bg_rect.pos = (self.width / 2 - 25, self.height / 2 - 25)
         self.bg_rect.size = (50, 50)
         self.countdown_label.pos = (self.width / 2 - 100, self.height / 2 - 50)
-        
+
 
     def update(self, dt):
         ret, frame = self.capture.read()
