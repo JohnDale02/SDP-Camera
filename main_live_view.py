@@ -152,6 +152,8 @@ class PhotoLockGUI(FloatLayout):
         with self.canvas.before:
             self.canvas.add(self.bg_color)
             self.canvas.add(self.bg_rect)
+            self.canvas.add(self.indicators_bg_rect)
+            
         
         self.add_widget(self.countdown_label)
         
@@ -235,8 +237,6 @@ class PhotoLockGUI(FloatLayout):
         # Center the video in the window
         self.img1.size = (video_width, video_height)
         self.img1.pos = ((window_width - video_width) / 2, 0)
-
-        self.indicators_bg_rect.pos=(100,100)
 
         
     def update_rect(self, instance, value):
