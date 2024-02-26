@@ -147,6 +147,13 @@ class PhotoLockGUI(FloatLayout):
         self.countdown_label = Label(text="", font_size='30sp', size_hint=(None, None),
                                      size=(100, 50), pos_hint={'center_x': 0.5, 'center_y': 0.5})
 
+        
+        with self.canvas.before:
+            Color(1, 0, 0, 1) 
+            self.indicators_bg_rect = Rectangle(size=(self.width/2, self.height/2), pos=(self.width/4, self.height/4))
+            
+        self.bind(size=self.adjust_indicators_background, pos=self.adjust_indicators_background)
+
         with self.canvas.before:
             self.canvas.add(self.bg_color)
             self.canvas.add(self.bg_rect)
@@ -169,7 +176,12 @@ class PhotoLockGUI(FloatLayout):
         self.bg_rect.size = (50, 50)
         self.countdown_label.pos = (self.width / 2 - 100, self.height / 2 - 50)
 
+    
+    def adjust_indicators_background(self, instance, value):
+        self.indicators_bg_rect.pos = (self.width/4, self.height/4)
+        self.indicators_bg_rect.size = (self.width/2, self.height/2)
 
+        
     def update(self, dt):
         ret, frame = self.capture.read()
         if ret:
