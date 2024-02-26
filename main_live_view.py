@@ -99,9 +99,6 @@ class PhotoLockGUI(FloatLayout):
     def __init__(self, capture, **kwargs):
         super(PhotoLockGUI, self).__init__(**kwargs)
 
-        Thread(target=update_gps_data_continuously, args=(gps_lock,), daemon=True).start()
-        Thread(target=update_wifi_status_continuously, daemon=True).start()
-
         self.capture = capture
 
         # Specify the size and position of the background rectangles
@@ -161,6 +158,9 @@ class PhotoLockGUI(FloatLayout):
         self.check_wifi_status(0)  # Immediately check the WiFi status upon start
         Clock.schedule_interval(self.check_gps_status, 10)
         self.check_gps_status(0)  # Immediately check the GPS status upon start
+
+        Thread(target=update_gps_data_continuously, args=(gps_lock,), daemon=True).start()
+        Thread(target=update_wifi_status_continuously, daemon=True).start()
 
     def _update_bg_and_label_pos(self, *args):
         self.bg_rect.pos = (self.width / 2 - 25, self.height / 2 - 25)
