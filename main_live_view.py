@@ -143,8 +143,6 @@ class PhotoLockGUI(FloatLayout):
                                      size=(100, 50), pos_hint={'center_x': 0.5, 'center_y': 0.5})
         
 
-        self.add_widget(self.gps_status_image)
-
         self.add_widget(self.countdown_label)
 
         with self.canvas.before:
