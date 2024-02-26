@@ -98,6 +98,10 @@ def update_wifi_status_continuously():
 class PhotoLockGUI(FloatLayout):
     def __init__(self, capture, **kwargs):
         super(PhotoLockGUI, self).__init__(**kwargs)
+
+        Thread(target=update_gps_data_continuously, args=(gps_lock,), daemon=True).start()
+        Thread(target=update_wifi_status_continuously, daemon=True).start()
+
         self.capture = capture
 
         # Specify the size and position of the background rectangles
@@ -483,14 +487,6 @@ def count_files(directory_path):
 # -------------------------------------------------------------------
 
 if __name__ == '__main__':
-    gps_update_thread = Thread(target=update_gps_data_continuously, args=(gps_lock,))
-    gps_update_thread.daemon = True  # Optional: makes the thread exit when the main thread does
-    wifi_update_thread = Thread(target=update_wifi_status_continuously)
-    wifi_update_thread.daemon = True  # Makes this thread a daemon thread, so it exits when the main program does
-
-    gps_update_thread.start()
-    wifi_update_thread.start()
-
     setup_gpio()
     gui_thread()  # This will start the Kivy application
     GPIO.cleanup()
