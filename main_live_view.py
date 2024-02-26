@@ -89,19 +89,11 @@ def update_gps_data_continuously(gps_lock):
 
 def update_wifi_status_continuously():
     global wifi_status
-    # Check for internet connectivity by pinging Google's DNS server
-    response = subprocess.run(['ping', '-c', '1', '8.8.8.8'], stdout=subprocess.DEVNULL)
     while True:
-        # Check for internet connectivity by pinging Google's DNS server
-        if response.returncode == 0:
-            wifi_status = True
-            # If there is connectivity, update the source to show the WiFi icon
-            
-        else:
-            # If there is no connectivity, update the source to show the no WiFi icon
-            wifi_status = False
-
+        response = subprocess.run(['ping', '-c', '1', '8.8.8.8'], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        wifi_status = response.returncode == 0
         time.sleep(5)
+
     
 class PhotoLockGUI(FloatLayout):
     def __init__(self, capture, **kwargs):
@@ -123,6 +115,8 @@ class PhotoLockGUI(FloatLayout):
             self.rect = Rectangle(size=self.status_layout.size, pos=self.status_layout.pos)
             self.recording_color = Color(1, 0, 0, 0)  # Start with transparent (invisible)
             self.recording_indicator = Ellipse(size=(50, 50), pos=(740, 410))
+            self.status_color = Color(0, 0, 0, 0.4)  # Semi-transparent black background
+            self.status_background = Rectangle(size=(200, 200), pos=(40, 400))
 
         self.status_layout.bind(pos=self.update_rect, size=self.update_rect)
         
