@@ -107,6 +107,9 @@ class PhotoLockGUI(FloatLayout):
     def __init__(self, capture, **kwargs):
         super(PhotoLockGUI, self).__init__(**kwargs)
         self.capture = capture
+
+        # Specify the size and position of the background rectangles
+        indicators_bg_size = (150, 130)  # Adjust the size as needed
         
         self.wifi_status_image = Image(source='nowifi.png', size_hint=(None, None), size=(100, 45))
     
@@ -121,7 +124,8 @@ class PhotoLockGUI(FloatLayout):
             self.rect = Rectangle(size=self.status_layout.size, pos=self.status_layout.pos)
             self.recording_color = Color(1, 0, 0, 0)  # Start with transparent (invisible)
             self.recording_indicator = Ellipse(size=(50, 50), pos=(740, 410))
-        
+            self.indicators_bg_rect = Rectangle(size=indicators_bg_size, pos=(self.width - indicators_bg_size[0] - 10, self.height - indicators_bg_size[1] - 10))
+
         self.status_layout.bind(pos=self.update_rect, size=self.update_rect)
         
         self.img1 = Image(keep_ratio=False, allow_stretch=True)
