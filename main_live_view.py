@@ -104,36 +104,38 @@ class PhotoLockGUI(FloatLayout):
 
         # Specify the size and position of the background rectangles
         
-        self.wifi_status_image = Image(source='nowifi.png', size_hint=(None, None), size=(100, 45))
-    
-        self.gps_status_image = Image(source='nogps.png', size_hint=(None, None), size=(120, 54))
 
-        # Create a layout for the status label with a background
+
+        # Create a layout for the status label with a background (Image or Video)
         self.status_layout = BoxLayout(size_hint=(None, None), size=(100, 45),
                                        pos_hint={'center_x': 0.5, 'center_y': 0.05})
 
         with self.status_layout.canvas.before:
             Color(0, 0, 0, 0.4)  # Semi-transparent black background
             self.rect = Rectangle(size=self.status_layout.size, pos=self.status_layout.pos)
+            self.rect2 = Rectangle(size=(800, 480), pos=(0, 0))
             self.recording_color = Color(1, 0, 0, 0)  # Start with transparent (invisible)
             self.recording_indicator = Ellipse(size=(50, 50), pos=(740, 410))
-            self.indicators_bg_rect = Rectangle(size=(800, 480), pos=(0, 0))
 
         self.status_layout.bind(pos=self.update_rect, size=self.update_rect)
         
         self.img1 = Image(keep_ratio=False, allow_stretch=True)
         self.add_widget(self.img1)
-
         self.bind(size=self.adjust_video_size)
 
         self.status_label = Label(text='Image', color=(1, 1, 1, 1), font_size='30sp')
+        self.wifi_status_image = Image(source='nowifi.png', size_hint=(None, None), size=(100, 45))
+        self.gps_status_image = Image(source='nogps.png', size_hint=(None, None), size=(120, 54))
+
         self.status_layout.add_widget(self.status_label)
+        self.status_layout.add_widget(self.wifi_status_image)
+        self.status_layout.add_widget(self.gps_status_image)
+
         self.add_widget(self.status_layout)
 
         # Countdown label and its background
         self.bg_color = Color(0, 0, 0, 0)  # Initially transparent
         self.bg_rect = Rectangle()
-
         
         self.countdown_label = Label(text="", font_size='30sp', size_hint=(None, None),
                                      size=(100, 50), pos_hint={'center_x': 0.5, 'center_y': 0.5})
@@ -145,11 +147,9 @@ class PhotoLockGUI(FloatLayout):
         self.add_widget(self.countdown_label)
 
         with self.canvas.before:
-            Color(1, 0, 0, 0.4)  # Red color with semi-transparency
+            Color(0, 0, 0, 0.4)  # Red color with semi-transparency
             self.canvas.add(self.bg_color)
             self.canvas.add(self.bg_rect)
-
-
 
         self.bind(size=self.adjust_background, pos=self.adjust_background)
         self.bind(size=self._update_bg_and_label_pos, pos=self._update_bg_and_label_pos)
