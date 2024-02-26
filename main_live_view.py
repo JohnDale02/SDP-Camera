@@ -103,9 +103,6 @@ class PhotoLockGUI(FloatLayout):
         self.capture = capture
 
         # Specify the size and position of the background rectangles
-        
-
-
         # Create a layout for the status label with a background (Image or Video)
         self.status_layout = BoxLayout(size_hint=(None, None), size=(100, 45),
                                        pos_hint={'center_x': 0.5, 'center_y': 0.05})
@@ -131,8 +128,8 @@ class PhotoLockGUI(FloatLayout):
         self.status_layout.add_widget(self.status_label)
         self.status_layout.add_widget(self.wifi_status_image)
         self.status_layout.add_widget(self.gps_status_image)
-        self.add_widget(self.wifi_status_image)
-        
+
+
         self.bind(size=self.adjust_gps_image_position)
         self.bind(size=self.adjust_wifi_image_position)
 
