@@ -119,6 +119,7 @@ class PhotoLockGUI(FloatLayout):
 
         self.status_layout.bind(pos=self.update_rect, size=self.update_rect)
         
+        
         self.img1 = Image(keep_ratio=False, allow_stretch=True)
         self.add_widget(self.img1)
         self.bind(size=self.adjust_video_size)
