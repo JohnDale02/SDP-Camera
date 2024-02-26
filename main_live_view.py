@@ -117,6 +117,7 @@ class PhotoLockGUI(FloatLayout):
             self.rect = Rectangle(size=self.status_layout.size, pos=self.status_layout.pos)
             self.recording_color = Color(1, 0, 0, 0)  # Start with transparent (invisible)
             self.recording_indicator = Ellipse(size=(50, 50), pos=(740, 410))
+            self.indicators_bg_rect = Rectangle(size=(800, 480), pos=(0, 0))
 
         self.status_layout.bind(pos=self.update_rect, size=self.update_rect)
         
@@ -145,11 +146,9 @@ class PhotoLockGUI(FloatLayout):
 
         with self.canvas.before:
             Color(1, 0, 0, 0.4)  # Red color with semi-transparency
-            #self.canvas.add(self.bg_color)
-            #self.canvas.add(self.bg_rect)
-            self.indicators_bg_rect = Rectangle(size=(800, 480), pos=(0, 0))
+            self.canvas.add(self.bg_color)
+            self.canvas.add(self.bg_rect)
 
-        
 
 
         self.bind(size=self.adjust_background, pos=self.adjust_background)
