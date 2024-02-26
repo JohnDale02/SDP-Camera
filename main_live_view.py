@@ -132,15 +132,16 @@ class PhotoLockGUI(FloatLayout):
         # Countdown label and its background
         self.bg_color = Color(0, 0, 0, 0)  # Initially transparent
         self.bg_rect = Rectangle()
-        self.indicators_bg_rect = Rectangle(size=(150, 130), pos=(650, 350))
+
         
         self.countdown_label = Label(text="", font_size='30sp', size_hint=(None, None),
                                      size=(100, 50), pos_hint={'center_x': 0.5, 'center_y': 0.5})
 
         with self.canvas.before:
-            self.canvas.add(self.bg_color)
-            self.canvas.add(self.bg_rect)
-            self.canvas.add(self.indicators_bg_rect)
+            Color(1, 0, 0, 0.4)  # Red color with semi-transparency
+            #self.canvas.add(self.bg_color)
+            #self.canvas.add(self.bg_rect)
+            self.indicators_bg_rect = Rectangle(size=(800, 480), pos=(650, 350))
 
         
         self.add_widget(self.wifi_status_image)
