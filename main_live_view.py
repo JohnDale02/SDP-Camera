@@ -89,17 +89,11 @@ def update_gps_data_continuously(gps_lock):
 
 def update_wifi_status_continuously():
     global wifi_status
-    # Check for internet connectivity by pinging Google's DNS server
-    response = subprocess.run(['ping', '-c', '1', '8.8.8.8'], stdout=subprocess.DEVNULL)
+
     while True:
         # Check for internet connectivity by pinging Google's DNS server
-        if response.returncode == 0:
-            wifi_status = True
-            # If there is connectivity, update the source to show the WiFi icon
-            
-        else:
-            # If there is no connectivity, update the source to show the no WiFi icon
-            wifi_status = False
+        response = subprocess.run(['ping', '-c', '1', '8.8.8.8'], stdout=subprocess.DEVNULL)
+        wifi_status = response.returncode == 0
 
         time.sleep(5)
     
@@ -135,33 +129,28 @@ class PhotoLockGUI(FloatLayout):
         self.status_layout.add_widget(self.status_label)
         self.add_widget(self.status_layout)
 
-        self.add_widget(self.wifi_status_image)
-        self.bind(size=self.adjust_wifi_image_position)
-        self.add_widget(self.gps_status_image)
-        self.bind(size=self.adjust_gps_image_position)
-
         # Countdown label and its background
         self.bg_color = Color(0, 0, 0, 0)  # Initially transparent
         self.bg_rect = Rectangle()
         
         self.countdown_label = Label(text="", font_size='30sp', size_hint=(None, None),
                                      size=(100, 50), pos_hint={'center_x': 0.5, 'center_y': 0.5})
-
-        
-        with self.canvas.before:
-            Color(1, 0, 0, 1) 
-            self.indicators_bg_rect = Rectangle(size=(self.width/2, self.height/2), pos=(self.width/4, self.height/4))
             
         self.bind(size=self.adjust_indicators_background, pos=self.adjust_indicators_background)
 
         with self.canvas.before:
             self.canvas.add(self.bg_color)
             self.canvas.add(self.bg_rect)
-            Color(0, 0, 0, 0.4)  # Semi-transparent black background
+            Color(1, 0, 0, 0.4)  # Semi-transparent black background
             self.indicators_bg_rect = Rectangle(size=(150, 130), pos=(650, 350))
         
-        self.add_widget(self.countdown_label)
         
+        self.add_widget(self.wifi_status_image)
+        self.bind(size=self.adjust_wifi_image_position)
+        self.add_widget(self.gps_status_image)
+        self.bind(size=self.adjust_gps_image_position)
+        self.add_widget(self.countdown_label)
+        self.bind(size=self.adjust_indicators_background, pos=self.adjust_indicators_background)
         self.bind(size=self._update_bg_and_label_pos, pos=self._update_bg_and_label_pos)
         
         Clock.schedule_interval(self.update, 1.0 / 33.0)
@@ -171,17 +160,23 @@ class PhotoLockGUI(FloatLayout):
         Clock.schedule_interval(self.check_gps_status, 10)
         self.check_gps_status(0)  # Immediately check the GPS status upon start
 
+
+        Thread(target=update_gps_data_continuously, args=(gps_lock,), daemon=True).start()
+        Thread(target=update_wifi_status_continuously, daemon=True).start()
+
     def _update_bg_and_label_pos(self, *args):
         self.bg_rect.pos = (self.width / 2 - 25, self.height / 2 - 25)
         self.bg_rect.size = (50, 50)
         self.countdown_label.pos = (self.width / 2 - 100, self.height / 2 - 50)
 
     
-    def adjust_indicators_background(self, instance, value):
-        self.indicators_bg_rect.pos = (self.width/4, self.height/4)
-        self.indicators_bg_rect.size = (self.width/2, self.height/2)
+    def adjust_indicators_background(self, *args):
+        # Adjust the background rectangle's position and size if needed
+        # This example positions it to cover both the WiFi and GPS status images
+        self.indicators_bg_rect.pos = (640, 340)
+        self.indicators_bg_rect.size = (200, 150)
 
-        
+
     def update(self, dt):
         ret, frame = self.capture.read()
         if ret:
@@ -501,14 +496,6 @@ def count_files(directory_path):
 # -------------------------------------------------------------------
 
 if __name__ == '__main__':
-    gps_update_thread = Thread(target=update_gps_data_continuously, args=(gps_lock,))
-    gps_update_thread.daemon = True  # Optional: makes the thread exit when the main thread does
-    wifi_update_thread = Thread(target=update_wifi_status_continuously)
-    wifi_update_thread.daemon = True  # Makes this thread a daemon thread, so it exits when the main program does
-
-    gps_update_thread.start()
-    wifi_update_thread.start()
-
     setup_gpio()
     gui_thread()  # This will start the Kivy application
     GPIO.cleanup()
