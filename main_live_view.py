@@ -236,7 +236,7 @@ class PhotoLockGUI(FloatLayout):
         self.img1.size = (video_width, video_height)
         self.img1.pos = ((window_width - video_width) / 2, 0)
 
-        self.indicators_bg_rect.pos=(0,0)
+        self.indicators_bg_rect.pos=(100,100)
 
         
     def update_rect(self, instance, value):
