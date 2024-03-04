@@ -32,7 +32,7 @@ from kivy.clock import Clock
 
 from kivy.core.window import Window
 Window.show_cursor = False
-Window.full_screen = False  # *********
+Window.fullscreen = False  # *********
 
 # -------------Global Variables ------------------------------
 image_mode = True
@@ -102,17 +102,14 @@ def update_wifi_status_continuously():
         time.sleep(5)
 
 
-def upload_saved_media_continuously(upload_lock):
-    print("starting upload_saved_media_continuously")
-    threading.Thread(target=upload_saved_media, args=(upload_lock,), daemon=True).start()  # try to upload all media  **** added if true check and thread
-
-
 class PhotoLockGUI(FloatLayout):
     def __init__(self, capture, **kwargs):
         super(PhotoLockGUI, self).__init__(**kwargs)
 
         Thread(target=update_gps_data_continuously, args=(gps_lock,), daemon=True).start()
-        Thread(target=update_wifi_status_continuously, args=(upload_lock), daemon=True).start()  # ***** added lock argument
+        Thread(target=update_wifi_status_continuously, daemon=True).start()  # ***** added lock argument
+        Thread(target=upload_saved_media_continuously, args=(upload_lock,), daemon=True).start()  # try to upload all media  **** added if true check and thread
+
 
         self.capture = capture
 
@@ -498,7 +495,7 @@ def count_files(directory_path):
 
 # -------------------------------------------------------------------
 
-def upload_saved_media(upload_lock):
+def upload_saved_media_continuously(upload_lock):
     '''thread function for uploading saved media in the background when Wifi is available and media is stored locally.'''
     global wifi_status
 
