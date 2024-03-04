@@ -10,6 +10,10 @@ from main import main
 from nothing import sleep
 from threading import Lock
 from GPS_uart import read_gps_data
+from upload_saved_media import upload_saved_media
+from upload_image import upload_image
+from upload_video import upload_video
+import json
 
 from kivy.config import Config
 Config.set('graphics', 'width', '800')
@@ -34,6 +38,7 @@ image_mode = True
 ffmpeg_process = None
 record_button = 40
 mode_button = 38
+# uploading_after_reconnect = False
 
 wifi_status = False
 gps_status = False
@@ -43,7 +48,8 @@ recording_indicator = False
 
 gps_lock = Lock()
 signature_lock = Lock()
-record_lock = Lock()
+record_lock = Lock()   
+upload_lock = Lock()   # **** upload lock
 mid_video = False
 
 camera_number_string = "1"
@@ -94,13 +100,18 @@ def update_wifi_status_continuously():
         wifi_status = response.returncode == 0
         time.sleep(5)
 
-    
+
+def upload_saved_media_continuously(upload_lock):
+    print("starting upload_saved_media_continuously")
+    threading.Thread(target=upload_saved_media, args=(upload_lock,), daemon=True).start()  # try to upload all media  **** added if true check and thread
+
+
 class PhotoLockGUI(FloatLayout):
     def __init__(self, capture, **kwargs):
         super(PhotoLockGUI, self).__init__(**kwargs)
 
         Thread(target=update_gps_data_continuously, args=(gps_lock,), daemon=True).start()
-        Thread(target=update_wifi_status_continuously, daemon=True).start()
+        Thread(target=update_wifi_status_continuously, args=(upload_lock), daemon=True).start()  # ***** added lock argument
 
         self.capture = capture
 
@@ -437,7 +448,7 @@ def stop_recording(ffmpeg_process, object_count):
     print("Stopped cutting recording")
     os.remove(video_filepath_raw)  # remove the video after uploading
 
-    hashSignUploadThread = threading.Thread(target=main, args=(video_filepath, camera_number_string, save_video_filepath, gps_lock, signature_lock,))
+    hashSignUploadThread = threading.Thread(target=main, args=(video_filepath, camera_number_string, save_video_filepath, gps_lock, signature_lock, upload_lock,))
     hashSignUploadThread.start()
 
     return None
@@ -460,7 +471,7 @@ def capture_image(camera):
     if ret:
         image = frame
         # Start automatic processing and upload process for images
-        hashSignUploadThread = threading.Thread(target=main, args=(image, camera_number_string, save_image_filepath, gps_lock, signature_lock,))
+        hashSignUploadThread = threading.Thread(target=main, args=(image, camera_number_string, save_image_filepath, gps_lock, signature_lock, upload_lock,))
         hashSignUploadThread.start()
 
     else:
@@ -484,6 +495,64 @@ def count_files(directory_path):
 
     return count
 
+# -------------------------------------------------------------------
+
+def upload_saved_media(upload_lock):
+    '''thread function for uploading saved media in the background when Wifi is available and media is stored locally.'''
+    global wifi_status
+
+    while True:
+        if wifi_status == True:
+            with upload_lock:        
+                if os.path.exists(os.path.join(os.getcwd(), "tmpImages")): # make a directory for tmpImages if it doesnt exist
+                        save_image_filepath = os.path.join(os.getcwd(), "tmpImages")
+                else:
+                    print("There is no tmpImages directory")         
+                if os.path.exists(os.path.join(os.getcwd(), "tmpVideos")): # make a directory for tmpImages if it doesnt exist
+                        save_video_filepath = os.path.join(os.getcwd(), "tmpVideos")
+                else:
+                    print("There is no tmpVideos directory")
+
+                for file_name in os.listdir(save_image_filepath):
+                    if file_name.lower().endswith('.png'):
+                        file_path = os.path.join(save_image_filepath, file_name) # get the full path
+                        image = cv2.imread(file_path)   # read the image
+                        _, encoded_image = cv2.imencode(".png", image)  # encode the image
+                        
+                        file_path_metadata = os.path.join(save_image_filepath, file_name[:-3]+'json') # get matching json file
+                        metadata = read_metadata(file_path_metadata)
+
+                        try:
+                            upload_image(encoded_image.tobytes(), metadata)   # cv2 png object, metadat
+                            os.remove(file_path)
+                            os.remove(file_path_metadata)
+                        except Exception as e:
+                            print(f"Error uploading saved image: {str(e)}")
+
+                for file_name in os.listdir(save_video_filepath):
+                    if file_name.lower().endswith('.avi'):
+                        file_path = os.path.join(save_video_filepath, file_name) # get the full path
+                        with open(file_path, 'rb') as video:
+                            video_bytes = video.read()
+                        
+                        file_path_metadata = os.path.join(save_video_filepath, file_name[:-3]+'json') # get matching json file
+                        metadata = read_metadata(file_path_metadata)
+
+                        try:
+                            upload_video(video_bytes, metadata)   # cv2 png object, metadat
+                            os.remove(file_path)
+                            os.remove(file_path_metadata)
+                        except Exception as e:
+                            print(f"Error uploading saved image: {str(e)}")
+        time.sleep(10)
+
+# -------------------------------------------------------------------
+                            
+def read_metadata(file_path_metadata):
+    with open(file_path_metadata, 'r') as file:
+        metadata = json.load(file)
+        return metadata
+    
 # -------------------------------------------------------------------
 
 if __name__ == '__main__':

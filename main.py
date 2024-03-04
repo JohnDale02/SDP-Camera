@@ -14,7 +14,7 @@ from save_metadata import save_metadata
 import os
 from upload_video import upload_video
 
-def main(media_input, camera_number_string, save_media_filepath, gps_lock, signature_lock):
+def main(media_input, camera_number_string, save_media_filepath, gps_lock, signature_lock, upload_lock):
 	'''main function for processing media for signing and uploading
 				media_input : for images = imread(image) ; for videos = video_filpath for reading bytes from
 				camera_number_string : number representing the actual device 
@@ -68,16 +68,15 @@ def main(media_input, camera_number_string, save_media_filepath, gps_lock, signa
 
 		if is_internet_available():
 			#print(f"Internet is available...Uploading")
-
-			upload_image(encoded_image.tobytes(), metadata)   # cv2 png object, metadat
-			#print(f"Uploaded Image")
+			with upload_lock:
+				upload_image(encoded_image.tobytes(), metadata)   # cv2 png object, metadat
+				#print(f"Uploaded Image")
 		
 		else: 
 			save_image(encoded_image.tobytes(), metadata, save_image_filepath)
 			#print("No wifi")
 
 	else: # if we are working with a video
-
 		save_video_filepath = save_media_filepath
 		#video_filepath = os.path.join(save_video_filepath, media_input)
 		video_filepath = media_input
@@ -136,9 +135,10 @@ def main(media_input, camera_number_string, save_media_filepath, gps_lock, signa
 
 		if is_internet_available():
 			try:
-				upload_video(video_bytes, metadata)  
-				os.remove(video_filepath)  # remove the video after uploading
-				os.remove(save_metadata_filepath)  # remove the metadata after uploading
+				with upload_lock:
+					upload_video(video_bytes, metadata)  
+					os.remove(video_filepath)  # remove the video after uploading
+					os.remove(save_metadata_filepath)  # remove the metadata after uploading
 
 			except Exception as e:
 				#print(str(e))
