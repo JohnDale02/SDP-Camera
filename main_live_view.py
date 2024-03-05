@@ -519,6 +519,7 @@ def upload_saved_media_continuously(upload_lock):
                 print("Video Directory: ", save_video_filepath)
 
                 for file_name in os.listdir(save_image_filepath):
+                    print("Image file name: ", file_name)
                     if file_name.lower().endswith('.png'):
                         file_path = os.path.join(save_image_filepath, file_name) # get the full path
                         image = cv2.imread(file_path)   # read the image
@@ -535,6 +536,7 @@ def upload_saved_media_continuously(upload_lock):
                             print(f"Error uploading saved image: {str(e)}")
 
                 for file_name in os.listdir(save_video_filepath):
+                    print("VIdeo file name: ", file_name)
                     if file_name.lower().endswith('.avi'):
                         file_path = os.path.join(save_video_filepath, file_name) # get the full path
                         with open(file_path, 'rb') as video:
