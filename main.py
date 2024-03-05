@@ -69,6 +69,7 @@ def main(media_input, camera_number_string, save_media_filepath, gps_lock, signa
 		if is_internet_available():
 			#print(f"Internet is available...Uploading")
 			with upload_lock:
+				print("Have lock trying to upload image from Main")
 				upload_image(encoded_image.tobytes(), metadata)   # cv2 png object, metadat
 				#print(f"Uploaded Image")
 		
@@ -136,6 +137,7 @@ def main(media_input, camera_number_string, save_media_filepath, gps_lock, signa
 		if is_internet_available():
 			try:
 				with upload_lock:
+					print("Have lock trying to upload video from Main")
 					upload_video(video_bytes, metadata)  
 					os.remove(video_filepath)  # remove the video after uploading
 					os.remove(save_metadata_filepath)  # remove the metadata after uploading

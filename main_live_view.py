@@ -99,6 +99,7 @@ def update_wifi_status_continuously():
     while True:
         response = subprocess.run(['ping', '-c', '1', '8.8.8.8'], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         wifi_status = response.returncode == 0
+        print(f"\Twifi status in wifi thread: {wifi_status}")
         time.sleep(5)
 
 
@@ -107,7 +108,7 @@ class PhotoLockGUI(FloatLayout):
         super(PhotoLockGUI, self).__init__(**kwargs)
 
         Thread(target=update_gps_data_continuously, args=(gps_lock,), daemon=True).start()
-        Thread(target=update_wifi_status_continuously, daemon=True).start()  # ***** added lock argument
+        Thread(target=update_wifi_status_continuously, daemon=True).start() 
         Thread(target=upload_saved_media_continuously, args=(upload_lock,), daemon=True).start()  # try to upload all media  **** added if true check and thread
 
 
@@ -500,7 +501,9 @@ def upload_saved_media_continuously(upload_lock):
     global wifi_status
 
     while True:
+        print(f"\Twifi status in upload thread: {wifi_status}")
         if wifi_status == True:
+            print("Have lock trying to upload ALL FILES from both folders")
             with upload_lock:        
                 if os.path.exists(os.path.join(os.getcwd(), "tmpImages")): # make a directory for tmpImages if it doesnt exist
                         save_image_filepath = os.path.join(os.getcwd(), "tmpImages")
