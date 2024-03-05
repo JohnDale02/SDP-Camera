@@ -514,6 +514,10 @@ def upload_saved_media_continuously(upload_lock):
                 else:
                     print("There is no tmpVideos directory")
 
+                print("Current Directory: ", os.getcwd())
+                print("Image Directory: ", save_image_filepath)
+                print("Video Directory: ", save_video_filepath)
+
                 for file_name in os.listdir(save_image_filepath):
                     if file_name.lower().endswith('.png'):
                         file_path = os.path.join(save_image_filepath, file_name) # get the full path
