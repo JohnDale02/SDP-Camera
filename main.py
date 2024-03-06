@@ -20,6 +20,7 @@ def main(media_input, camera_number_string, save_media_filepath, gps_lock, signa
 				camera_number_string : number representing the actual device 
 				save_media_filepath : folder for storing the media (tmpImages or tmpVideos)
 		'''
+	print("Main Called; upload 1 image or video")
 	
 	if save_media_filepath.endswith('Images'):
 
