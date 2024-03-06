@@ -51,6 +51,7 @@ gps_lock = Lock()
 signature_lock = Lock()
 record_lock = Lock()   
 upload_lock = Lock()   # **** upload lock
+capture_image_lock = Lock()
 mid_video = False
 
 camera_number_string = "1"
@@ -347,7 +348,7 @@ def toggle_recording(channel):
         elif image_mode == True and mid_video == False:                # image mode, not recording video
             # Image mode, we want to start capture, currently not capturing
             recording_indicator= True
-            capture_image(camera)
+            capture_image(camera, capture_image_lock)
             recording_indicator = False
             print("Released lock after capturing image in toggle_recording()")
 
@@ -421,7 +422,7 @@ def stop_recording(ffmpeg_process, object_count):
     return None
 
 
-def capture_image(camera):
+def capture_image(camera, capture_image_lock):
     ''' Initialized camera and takes picture'''
     global gui_instance
     # Initialize the camera (use the appropriate video device)
@@ -430,19 +431,20 @@ def capture_image(camera):
         print("\tError: Camera not found or could not be opened.")
         return None
 
-    # Capture a single frame from the camera
-    frame = None
-    for i in range(20):
-        ret, frame = camera.read()
-    
-    if ret:
-        image = frame
-        # Start automatic processing and upload process for images
-        hashSignUploadThread = threading.Thread(target=main, args=(image, camera_number_string, save_image_filepath, gps_lock, signature_lock, upload_lock,))
-        hashSignUploadThread.start()
+    with capture_image_lock:
+        # Capture a single frame from the camera
+        frame = None
+        for i in range(20):
+            ret, frame = camera.read()
+        
+        if ret:
+            image = frame
+            # Start automatic processing and upload process for images
+            hashSignUploadThread = threading.Thread(target=main, args=(image, camera_number_string, save_image_filepath, gps_lock, signature_lock, upload_lock,))
+            hashSignUploadThread.start()
 
-    else:
-        print("\tError: Failed to capture an image.")
+        else:
+            print("\tError: Failed to capture an image.")
 
 
 # --------------------------------------------------------------------
