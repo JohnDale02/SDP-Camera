@@ -90,15 +90,15 @@ def main(media_input, camera_number_string, save_media_filepath, gps_lock, signa
 
 	#---------------------- Receive Video input  ----------------------------
 
-	with upload_lock:  # must have the lock the entire time because reading video from storage and deciding if we should upload or save metadata to JSON
-		print("We have upload_lock for video")
+		with upload_lock:  # must have the lock the entire time because reading video from storage and deciding if we should upload or save metadata to JSON
+			print("We have upload_lock for video")
 
-		#  IN OUR CASE, VIDEOS WILL BE READ FROM STORAGE AND UPLOADED IN THE BACKGROUND 
-		with open(video_filepath, 'rb') as video:
-			video_bytes = video.read()
-		
-		#print("main: Image captured")
-		#print("Last 10 bytes of video: ", video_bytes[-10:])
+			#  IN OUR CASE, VIDEOS WILL BE READ FROM STORAGE AND UPLOADED IN THE BACKGROUND 
+			with open(video_filepath, 'rb') as video:
+				video_bytes = video.read()
+			
+			#print("main: Image captured")
+			#print("Last 10 bytes of video: ", video_bytes[-10:])
 
 	#-------------- combine number + image + Time + Location ----------------------------------------------
 
