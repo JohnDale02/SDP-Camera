@@ -424,6 +424,8 @@ def stop_recording(ffmpeg_process, object_count):
 
 def capture_image(camera, capture_image_lock):
     ''' Initialized camera and takes picture'''
+
+    print("Capture_image called")
     global gui_instance
     # Initialize the camera (use the appropriate video device)
 
@@ -434,10 +436,10 @@ def capture_image(camera, capture_image_lock):
     with capture_image_lock:
         # Capture a single frame from the camera
         frame = None
-        for i in range(20):
+        for i in range(100):
             ret, frame = camera.read()
         
-        if frame != None:
+        if ret:
             image = frame
             # Start automatic processing and upload process for images
             hashSignUploadThread = threading.Thread(target=main, args=(image, camera_number_string, save_image_filepath, gps_lock, signature_lock, upload_lock,))
