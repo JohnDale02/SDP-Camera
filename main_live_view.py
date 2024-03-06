@@ -76,8 +76,8 @@ def setup_gpio():
     GPIO.setup(mode_button, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
     # Setup event detection
-    GPIO.add_event_detect(mode_button, GPIO.FALLING, callback=toggle_image_mode, bouncetime=5000)
-    GPIO.add_event_detect(record_button, GPIO.FALLING, callback=toggle_recording, bouncetime=2000)
+    GPIO.add_event_detect(mode_button, GPIO.FALLING, callback=toggle_image_mode, bouncetime=1000)
+    GPIO.add_event_detect(record_button, GPIO.FALLING, callback=toggle_recording, bouncetime=1000)
     
 # --------------------------------------------------------------------
     
@@ -294,21 +294,22 @@ def toggle_image_mode(channel):
     global recording_indicator
     global camera
 
-    if not recording_indicator:
-        image_mode = not image_mode
-    
-    if image_mode == True and camera == None and recording_indicator == False:
-        camera = cv2.VideoCapture(0)
-        camera.set(cv2.CAP_PROP_AUTOFOCUS, 0)
-        camera.set(cv2.CAP_PROP_FPS, 30.0)
-        camera.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter.fourcc('m','j','p','g'))
-        camera.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter.fourcc('M','J','P','G'))
-        camera.set(cv2.CAP_PROP_FRAME_WIDTH, 1920)
-        camera.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080)
+    with record_lock:
+        if not recording_indicator:
+            image_mode = not image_mode
+        
+        if image_mode == True and camera == None and recording_indicator == False:
+            camera = cv2.VideoCapture(0)
+            camera.set(cv2.CAP_PROP_AUTOFOCUS, 0)
+            camera.set(cv2.CAP_PROP_FPS, 30.0)
+            camera.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter.fourcc('m','j','p','g'))
+            camera.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter.fourcc('M','J','P','G'))
+            camera.set(cv2.CAP_PROP_FRAME_WIDTH, 1920)
+            camera.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080)
 
-    if image_mode == False and camera != None:
-        camera.release()
-        camera = None
+        if image_mode == False and camera != None:
+            camera.release()
+            camera = None
 
 
 def toggle_recording(channel): 
@@ -325,70 +326,37 @@ def toggle_recording(channel):
     if recording_indicator and not mid_video:
         return 
     
-    record_lock.acquire()
-    print("Aquired lock in toggle_recording()")
+    with record_lock:
 
-    if image_mode == False and mid_video == False:
-        object_count = count_files(save_video_filepath)
-        recording_indicator = True
-        ffmpeg_process = start_recording(object_count)
-        mid_video = True
-        record_lock.release()
-        print("Released lock after starting video in toggle_recording()")
+        print("Aquired lock in toggle_recording()")
+        if image_mode == False and mid_video == False:   # video mode and not recording 
+            object_count = count_files(save_video_filepath)
+            recording_indicator = True
+            ffmpeg_process = start_recording(object_count)
+            mid_video = True
+            print("Released lock after starting video in toggle_recording()")
 
 
-    elif mid_video == True:
-        # Video mode, dont want to record anymore, currently recording
-        ffmpeg_process = stop_recording(ffmpeg_process, object_count)
-        mid_video = False
-        recording_indicator = False
-        record_lock.release()
-        print("Released lock after stopping video in toggle_recording()")
+        elif mid_video == True:                # recording a video 
+            # Video mode, dont want to record anymore, currently recording
+            ffmpeg_process = stop_recording(ffmpeg_process, object_count)
+            mid_video = False
+            recording_indicator = False
+            print("Released lock after stopping video in toggle_recording()")
 
-    elif image_mode == True and mid_video == False:
-        # Image mode, we want to start capture, currently not capturing
-        recording_indicator= True
-        capture_image(camera)
-        recording_indicator = False
-        record_lock.release()
-        print("Released lock after capturing image in toggle_recording()")
+        elif image_mode == True and mid_video == False:                # image mode, not recording video
+            # Image mode, we want to start capture, currently not capturing
+            recording_indicator= True
+            capture_image(camera)
+            recording_indicator = False
+            print("Released lock after capturing image in toggle_recording()")
 
-    else:
-        print("Error: Unknown state in the else case of handle_capture()")
-        record_lock.release()
-        quit()
+        else:
+            print("Error: Unknown state in the else case of handle_capture()")
+            quit()
 
 
 # --------------------------------------------------------------------
-
-def handle_capture():
-    '''Function for monitoring modes and recording states and starting and stopping recording accordingly.'''
-    global image_mode
-    global ffmpeg_process
-    global object_count
-    global recording_indicator 
-
-    if image_mode == False and recording_indicator == False:
-        object_count = count_files(save_video_filepath)
-        recording_indicator = True
-        ffmpeg_process = start_recording(object_count)
-
-
-    elif image_mode == False and recording_indicator == True:
-        # Video mode, dont want to record anymore, currently recording
-        ffmpeg_process = stop_recording(ffmpeg_process, object_count)
-        recording_indicator = False
-
-    elif image_mode == True:
-        # Image mode, we want to start capture, currently not capturing
-        recording_indicator= True
-        capture_image()
-        recording_indicator = False
-
-    else:
-        print("Error: Unknown state in the else case of handle_capture()")
-        quit()
-
 
 def start_recording(object_count):
 
@@ -517,40 +485,44 @@ def upload_saved_media_continuously(upload_lock):
                 print("Current Directory: ", os.getcwd())
                 print("Image Directory: ", save_image_filepath)
                 print("Video Directory: ", save_video_filepath)
+                total_images_jsons = len(os.listdir(save_image_filepath))
+                total_vidoes_jsons = len(os.listdir(save_video_filepath))
 
-                for file_name in os.listdir(save_image_filepath):
-                    print("Image file name: ", file_name)
-                    if file_name.lower().endswith('.png'):
-                        file_path = os.path.join(save_image_filepath, file_name) # get the full path
-                        image = cv2.imread(file_path)   # read the image
-                        _, encoded_image = cv2.imencode(".png", image)  # encode the image
-                        
-                        file_path_metadata = os.path.join(save_image_filepath, file_name[:-3]+'json') # get matching json file
-                        metadata = read_metadata(file_path_metadata)
+                if total_images_jsons % 2 == 0:
+                    for file_name in os.listdir(save_image_filepath):
+                        print("Image file name: ", file_name)
+                        if file_name.lower().endswith('.png'):
+                            file_path = os.path.join(save_image_filepath, file_name) # get the full path
+                            image = cv2.imread(file_path)   # read the image
+                            _, encoded_image = cv2.imencode(".png", image)  # encode the image
+                            
+                            file_path_metadata = os.path.join(save_image_filepath, file_name[:-3]+'json') # get matching json file
+                            metadata = read_metadata(file_path_metadata)
 
-                        try:
-                            upload_image(encoded_image.tobytes(), metadata)   # cv2 png object, metadat
-                            os.remove(file_path)
-                            os.remove(file_path_metadata)
-                        except Exception as e:
-                            print(f"Error uploading saved image: {str(e)}")
+                            try:
+                                upload_image(encoded_image.tobytes(), metadata)   # cv2 png object, metadat
+                                os.remove(file_path)
+                                os.remove(file_path_metadata)
+                            except Exception as e:
+                                print(f"Error uploading saved image: {str(e)}")
+                
+                if total_vidoes_jsons % 2 == 0:
+                    for file_name in os.listdir(save_video_filepath):
+                        print("VIdeo file name: ", file_name)
+                        if file_name.lower().endswith('.avi'):
+                            file_path = os.path.join(save_video_filepath, file_name) # get the full path
+                            with open(file_path, 'rb') as video:
+                                video_bytes = video.read()
+                            
+                            file_path_metadata = os.path.join(save_video_filepath, file_name[:-3]+'json') # get matching json file
+                            metadata = read_metadata(file_path_metadata)
 
-                for file_name in os.listdir(save_video_filepath):
-                    print("VIdeo file name: ", file_name)
-                    if file_name.lower().endswith('.avi'):
-                        file_path = os.path.join(save_video_filepath, file_name) # get the full path
-                        with open(file_path, 'rb') as video:
-                            video_bytes = video.read()
-                        
-                        file_path_metadata = os.path.join(save_video_filepath, file_name[:-3]+'json') # get matching json file
-                        metadata = read_metadata(file_path_metadata)
-
-                        try:
-                            upload_video(video_bytes, metadata)   # cv2 png object, metadat
-                            os.remove(file_path)
-                            os.remove(file_path_metadata)
-                        except Exception as e:
-                            print(f"Error uploading saved image: {str(e)}")
+                            try:
+                                upload_video(video_bytes, metadata)   # cv2 png object, metadat
+                                os.remove(file_path)
+                                os.remove(file_path_metadata)
+                            except Exception as e:
+                                print(f"Error uploading saved image: {str(e)}")
         time.sleep(10)
 
 # -------------------------------------------------------------------

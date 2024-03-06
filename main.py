@@ -66,30 +66,22 @@ def main(media_input, camera_number_string, save_media_filepath, gps_lock, signa
 
 	#------------------ Check if we have Wi-FI -----------------------------
 
-		if is_internet_available():
-			#print(f"Internet is available...Uploading")
-			with upload_lock:
-				print("Have lock trying to upload image from Main")
-				upload_image(encoded_image.tobytes(), metadata)   # cv2 png object, metadat
-				#print(f"Uploaded Image")
-		
-		else: 
-			save_image(encoded_image.tobytes(), metadata, save_image_filepath)
-			#print("No wifi")
+		with upload_lock:
+			if is_internet_available():
+				#print(f"Internet is available...Uploading")
+				with upload_lock:
+					print("Have lock trying to upload image from Main")
+					upload_image(encoded_image.tobytes(), metadata)   # cv2 png object, metadat
+					#print(f"Uploaded Image")
+			
+			else: 
+				save_image(encoded_image.tobytes(), metadata, save_image_filepath)
+				#print("No wifi")
 
 	else: # if we are working with a video
 		save_video_filepath = save_media_filepath
 		#video_filepath = os.path.join(save_video_filepath, media_input)
 		video_filepath = media_input
-
-	#---------------------- Receive Video input  ----------------------------
-
-		#  IN OUR CASE, VIDEOS WILL BE READ FROM STORAGE AND UPLOADED IN THE BACKGROUND 
-		with open(video_filepath, 'rb') as video:
-			video_bytes = video.read()
-		
-		#print("main: Image captured")
-		#print("Last 10 bytes of video: ", video_bytes[-10:])
 
 	#---------- Capture GNSS Data (Time and Location) ------------------------
 
@@ -97,6 +89,17 @@ def main(media_input, camera_number_string, save_media_filepath, gps_lock, signa
 		location = (f"{lat_value}, {long_value}")
 		time = (f"{time_value}")
 		#print(f"Recieved Time and GNSS Data: {time}{location}")
+
+	#---------------------- Receive Video input  ----------------------------
+
+	with upload_lock:  # must have the lock the entire time because reading video from storage and deciding if we should upload or save metadata to JSON
+
+		#  IN OUR CASE, VIDEOS WILL BE READ FROM STORAGE AND UPLOADED IN THE BACKGROUND 
+		with open(video_filepath, 'rb') as video:
+			video_bytes = video.read()
+		
+		#print("main: Image captured")
+		#print("Last 10 bytes of video: ", video_bytes[-10:])
 
 	#-------------- combine number + image + Time + Location ----------------------------------------------
 
@@ -136,11 +139,10 @@ def main(media_input, camera_number_string, save_media_filepath, gps_lock, signa
 
 		if is_internet_available():
 			try:
-				with upload_lock:
-					print("Have lock trying to upload video from Main")
-					upload_video(video_bytes, metadata)  
-					os.remove(video_filepath)  # remove the video after uploading
-					os.remove(save_metadata_filepath)  # remove the metadata after uploading
+				print("Have lock trying to upload video from Main")
+				upload_video(video_bytes, metadata)  
+				os.remove(video_filepath)  # remove the video after uploading
+				os.remove(save_metadata_filepath)  # remove the metadata after uploading
 
 			except Exception as e:
 				#print(str(e))
