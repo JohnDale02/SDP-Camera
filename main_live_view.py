@@ -416,8 +416,7 @@ def stop_recording(ffmpeg_process, object_count):
     print("Stopped cutting recording")
     os.remove(video_filepath_raw)  # remove the video after uploading
 
-    hashSignUploadThread = threading.Thread(target=main, args=(video_filepath, camera_number_string, save_video_filepath, gps_lock, signature_lock, upload_lock,))
-    hashSignUploadThread.start()
+    Thread(target=main, args=(video_filepath, camera_number_string, save_video_filepath, gps_lock, signature_lock, upload_lock,)).start()
 
     return None
 
@@ -442,8 +441,7 @@ def capture_image(camera, capture_image_lock):
         if ret:
             image = frame
             # Start automatic processing and upload process for images
-            hashSignUploadThread = threading.Thread(target=main, args=(image, camera_number_string, save_image_filepath, gps_lock, signature_lock, upload_lock,))
-            hashSignUploadThread.start()
+            Thread(target=main, args=(image, camera_number_string, save_image_filepath, gps_lock, signature_lock, upload_lock,)).start()
 
         else:
             print("\tError: Failed to capture an image.")
