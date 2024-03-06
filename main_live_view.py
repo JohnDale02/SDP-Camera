@@ -436,7 +436,7 @@ def capture_image(camera, capture_image_lock):
     with capture_image_lock:
         # Capture a single frame from the camera
         frame = None
-        for i in range(10):
+        for i in range(35):
             ret, frame = camera.read()
         
         if ret:
@@ -447,6 +447,7 @@ def capture_image(camera, capture_image_lock):
 
         else:
             print("\tError: Failed to capture an image.")
+        
 
 
 # --------------------------------------------------------------------
