@@ -25,7 +25,6 @@ def main(media_input, camera_number_string, save_media_filepath, gps_lock, signa
 
 		#print("We are dealing with an image here folks")
 		save_image_filepath = save_media_filepath
-
 #---------------------- Receive Image input  ----------------------------
 		image = media_input
 		# image = create_image()  # take the image
@@ -67,12 +66,11 @@ def main(media_input, camera_number_string, save_media_filepath, gps_lock, signa
 	#------------------ Check if we have Wi-FI -----------------------------
 
 		with upload_lock:
+			print("We have upload_lock for image")
 			if is_internet_available():
-				#print(f"Internet is available...Uploading")
-				with upload_lock:
-					print("Have lock trying to upload image from Main")
-					upload_image(encoded_image.tobytes(), metadata)   # cv2 png object, metadat
-					#print(f"Uploaded Image")
+				print("Have lock trying to upload image from Main")
+				upload_image(encoded_image.tobytes(), metadata)   # cv2 png object, metadat
+				#print(f"Uploaded Image")
 			
 			else: 
 				save_image(encoded_image.tobytes(), metadata, save_image_filepath)
@@ -93,6 +91,7 @@ def main(media_input, camera_number_string, save_media_filepath, gps_lock, signa
 	#---------------------- Receive Video input  ----------------------------
 
 	with upload_lock:  # must have the lock the entire time because reading video from storage and deciding if we should upload or save metadata to JSON
+		print("We have upload_lock for video")
 
 		#  IN OUR CASE, VIDEOS WILL BE READ FROM STORAGE AND UPLOADED IN THE BACKGROUND 
 		with open(video_filepath, 'rb') as video:
