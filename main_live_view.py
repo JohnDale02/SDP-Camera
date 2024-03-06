@@ -437,7 +437,7 @@ def capture_image(camera, capture_image_lock):
         for i in range(20):
             ret, frame = camera.read()
         
-        if ret:
+        if frame != None:
             image = frame
             # Start automatic processing and upload process for images
             hashSignUploadThread = threading.Thread(target=main, args=(image, camera_number_string, save_image_filepath, gps_lock, signature_lock, upload_lock,))
