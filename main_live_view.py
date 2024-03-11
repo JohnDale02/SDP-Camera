@@ -32,7 +32,7 @@ from kivy.clock import Clock
 
 from kivy.core.window import Window
 Window.show_cursor = False
-Window.fullscreen = False  # *********
+#Window.fullscreen = False  # *********
 
 # -------------Global Variables ------------------------------
 image_mode = True
@@ -364,7 +364,7 @@ import os
 import subprocess
 
 def start_recording(object_count):
-    
+
     save_video_filepath = "/home/sdp/SDP-Camera/tmpVideos"  # Ensure this is defined or passed correctly
 
     # Ensure the directory exists
@@ -393,7 +393,7 @@ def start_recording(object_count):
     ffmpeg_process = subprocess.Popen(command, stdin=subprocess.PIPE)
 
     # Assuming you have defined Clock and gui_instance elsewhere
-    # Clock.schedule_once(lambda dt: gui_instance.start_countdown(duration=3), 0)
+    Clock.schedule_once(lambda dt: gui_instance.start_countdown(duration=3), 0)
     
     return ffmpeg_process
 
