@@ -475,16 +475,7 @@ def upload_saved_media_continuously(upload_lock):
         print(f"\Twifi status in upload thread: {wifi_status}")
         if wifi_status == True:
             print("Have lock trying to upload ALL FILES from both folders")
-            with upload_lock:        
-                if os.path.exists(os.path.join(os.getcwd(), "tmpImages")): # make a directory for tmpImages if it doesnt exist
-                        save_image_filepath = os.path.join(os.getcwd(), "tmpImages")
-                else:
-                    print("There is no tmpImages directory")         
-                if os.path.exists(os.path.join(os.getcwd(), "tmpVideos")): # make a directory for tmpImages if it doesnt exist
-                        save_video_filepath = os.path.join(os.getcwd(), "tmpVideos")
-                else:
-                    print("There is no tmpVideos directory")
-
+            with upload_lock:   
                 print("Current Directory: ", os.getcwd())
                 print("Image Directory: ", save_image_filepath)
                 print("Video Directory: ", save_video_filepath)
