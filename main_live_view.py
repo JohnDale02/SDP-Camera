@@ -32,7 +32,7 @@ from kivy.clock import Clock
 
 from kivy.core.window import Window
 Window.show_cursor = False
-#Window.fullscreen = False  # *********
+Window.fullscreen = False  # *********
 
 # -------------Global Variables ------------------------------
 image_mode = True
@@ -339,6 +339,7 @@ def toggle_recording(channel):
 
 
         elif mid_video == True:                # recording a video 
+            print("In the elif for mid_video == True")
             # Video mode, dont want to record anymore, currently recording
             ffmpeg_process = stop_recording(ffmpeg_process, object_count)
             mid_video = False
