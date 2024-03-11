@@ -360,11 +360,20 @@ def toggle_recording(channel):
 
 # --------------------------------------------------------------------
 
+import os
+import subprocess
+
 def start_recording(object_count):
+    
+    save_video_filepath = "/home/sdp/SDP-Camera/tmpVideos"  # Ensure this is defined or passed correctly
+
+    # Ensure the directory exists
+    if not os.path.exists(save_video_filepath):
+        os.makedirs(save_video_filepath)  # Create the directory and any necessary parents
 
     video_filepath_raw = os.path.join(save_video_filepath, f'{object_count}raw.avi')
 
-    command = [ 
+    command = [
         'ffmpeg',
         '-framerate', '30',
         '-video_size', '1920x1080',
@@ -383,9 +392,11 @@ def start_recording(object_count):
     # Start FFmpeg process
     ffmpeg_process = subprocess.Popen(command, stdin=subprocess.PIPE)
 
-    Clock.schedule_once(lambda dt: gui_instance.start_countdown(duration=3), 0)
+    # Assuming you have defined Clock and gui_instance elsewhere
+    # Clock.schedule_once(lambda dt: gui_instance.start_countdown(duration=3), 0)
     
     return ffmpeg_process
+
 
 def stop_recording(ffmpeg_process, object_count):
     '''Function for stopping the video and saving it. Key note is that we are not directly uploading after recording videos'''
