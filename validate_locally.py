@@ -14,6 +14,7 @@ import os
 def verify_image_and_metadata(image_path, json_path):
 
     # Read the image
+  
     image = cv2.imread(image_path)
 
     # Read metadata from JSON file
@@ -107,12 +108,51 @@ def verify_signature(combined_data, signature, public_key):
 
 # Usage
 
-
+'''
 image_path = f"52.png"
 json_path = f"52.json"
 valid = verify_image_and_metadata(image_path, json_path)
 print(f"Verification result: {valid}")
+'''
 
+
+def verify_all_images(directory_path):
+    # List all files in the directory
+    all_files = os.listdir(directory_path)
+    # Filter out .png files
+    png_files = [file for file in all_files if file.endswith('.png')]
+    
+    results = {}
+    
+    for image_name in png_files:
+        # Construct the corresponding JSON filename
+        base_name = os.path.splitext(image_name)[0]
+        json_name = f"{base_name}.json"
+        
+        # Construct full paths
+        image_path = os.path.join(directory_path, image_name)
+        json_path = os.path.join(directory_path, json_name)
+        
+        if os.path.exists(json_path):
+            # Verify the image and its metadata
+            valid = verify_image_and_metadata(image_path, json_path)
+            results[image_name] = valid
+        else:
+            print(f"No JSON file found for {image_name}")
+            results[image_name] = False
+    
+    return results
+
+# Directory where your PNG and JSON files are stored
+directory_path = "C:\\S3BackupModified"
+
+# Verify all images in the directory
+verification_results = verify_all_images(directory_path)
+for image, result in verification_results.items():
+    print(f"Verification result for {image}: {result}")
+
+print("-------------------------------------------------------------")
+print(f"{len(verification_results)} images checked with 0% validated")
 
 '''
 for i in range(50):

@@ -11,11 +11,12 @@ from cryptography.exceptions import InvalidSignature
 from cryptography.hazmat.backends import default_backend
 import os
 
-def verify_image_and_metadata(image_path, json_path):
+def verify_image_and_metadata(video_path, json_path):
 
     # Read the image
   
-    image = cv2.imread(image_path)
+    with open(video_path, 'rb') as video:
+        video_bytes = video.read()
 
     # Read metadata from JSON file
     with open(json_path, 'r') as file:
@@ -28,7 +29,7 @@ def verify_image_and_metadata(image_path, json_path):
     signature = base64.b64decode(signature_base64)
 
     # Recreate combined data
-    combined_data = create_combined(camera_number, image, time_data, location_data)
+    combined_data = create_combined(camera_number, video_bytes, time_data, location_data)
 
     public_key_base64 = get_public_key(int(camera_number))
     public_key = base64.b64decode(public_key_base64)
@@ -75,16 +76,14 @@ def get_public_key(camera_number):
         return 'Public key not found'
     
 
-def create_combined(camera_number: str, image: bytes, time: str, location: str) -> bytes:
-    # Similar to your provided function
-    _, encoded_image = cv2.imencode(".png", image)
-    encoded_image = encoded_image.tobytes()
+def create_combined(camera_number: str, media: bytes, time: str, location: str) -> bytes:
+    '''Takes in camera number, image, time, location and encodes then combines to form one byte object'''
 
     encoded_number = camera_number.encode('utf-8')
     encoded_time = time.encode('utf-8')
     encoded_location = location.encode('utf-8')
 
-    combined_data = encoded_number + encoded_image + encoded_time + encoded_location
+    combined_data = encoded_number + media + encoded_time + encoded_location
 
     return combined_data
 
@@ -108,12 +107,51 @@ def verify_signature(combined_data, signature, public_key):
 
 # Usage
 
-
+'''
 image_path = f"52.png"
 json_path = f"52.json"
 valid = verify_image_and_metadata(image_path, json_path)
 print(f"Verification result: {valid}")
+'''
 
+
+def verify_all_videos(directory_path):
+    # List all files in the directory
+    all_files = os.listdir(directory_path)
+    # Filter out .png files
+    avi_files = [file for file in all_files if file.endswith('.avi')]
+    
+    results = {}
+    
+    for video_name in avi_files:
+        # Construct the corresponding JSON filename
+        base_name = os.path.splitext(video_name)[0]
+        json_name = f"{base_name}.json"
+        
+        # Construct full paths
+        image_path = os.path.join(directory_path, video_name)
+        json_path = os.path.join(directory_path, json_name)
+        
+        if os.path.exists(json_path):
+            # Verify the image and its metadata
+            valid = verify_image_and_metadata(image_path, json_path)
+            results[video_name] = valid
+        else:
+            print(f"No JSON file found for {video_name}")
+            results[video_name] = False
+    
+    return results
+
+# Directory where your PNG and JSON files are stored
+directory_path = "C:\\S3Backup"
+
+# Verify all images in the directory
+verification_results = verify_all_videos(directory_path)
+for image, result in verification_results.items():
+    print(f"Verification result for {image}: {result}")
+
+print("-------------------------------------------------------------")
+print(f"{len(verification_results)} videos checked with 0% verified")
 
 '''
 for i in range(50):
