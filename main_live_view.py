@@ -339,6 +339,7 @@ def toggle_recording(channel):
 
 
         elif mid_video == True:                # recording a video 
+            print("In the elif for mid_video == True")
             # Video mode, dont want to record anymore, currently recording
             ffmpeg_process = stop_recording(ffmpeg_process, object_count)
             mid_video = False
@@ -359,11 +360,20 @@ def toggle_recording(channel):
 
 # --------------------------------------------------------------------
 
+import os
+import subprocess
+
 def start_recording(object_count):
+
+    save_video_filepath = "/home/sdp/SDP-Camera/tmpVideos"  # Ensure this is defined or passed correctly
+
+    # Ensure the directory exists
+    if not os.path.exists(save_video_filepath):
+        os.makedirs(save_video_filepath)  # Create the directory and any necessary parents
 
     video_filepath_raw = os.path.join(save_video_filepath, f'{object_count}raw.avi')
 
-    command = [ 
+    command = [
         'ffmpeg',
         '-framerate', '30',
         '-video_size', '1920x1080',
@@ -382,9 +392,11 @@ def start_recording(object_count):
     # Start FFmpeg process
     ffmpeg_process = subprocess.Popen(command, stdin=subprocess.PIPE)
 
+    # Assuming you have defined Clock and gui_instance elsewhere
     Clock.schedule_once(lambda dt: gui_instance.start_countdown(duration=3), 0)
     
     return ffmpeg_process
+
 
 def stop_recording(ffmpeg_process, object_count):
     '''Function for stopping the video and saving it. Key note is that we are not directly uploading after recording videos'''
@@ -475,16 +487,7 @@ def upload_saved_media_continuously(upload_lock):
         print(f"\Twifi status in upload thread: {wifi_status}")
         if wifi_status == True:
             print("Have lock trying to upload ALL FILES from both folders")
-            with upload_lock:        
-                if os.path.exists(os.path.join(os.getcwd(), "tmpImages")): # make a directory for tmpImages if it doesnt exist
-                        save_image_filepath = os.path.join(os.getcwd(), "tmpImages")
-                else:
-                    print("There is no tmpImages directory")         
-                if os.path.exists(os.path.join(os.getcwd(), "tmpVideos")): # make a directory for tmpImages if it doesnt exist
-                        save_video_filepath = os.path.join(os.getcwd(), "tmpVideos")
-                else:
-                    print("There is no tmpVideos directory")
-
+            with upload_lock:   
                 print("Current Directory: ", os.getcwd())
                 print("Image Directory: ", save_image_filepath)
                 print("Video Directory: ", save_video_filepath)
