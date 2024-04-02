@@ -14,6 +14,7 @@ from upload_saved_media import upload_saved_media
 from upload_image import upload_image
 from upload_video import upload_video
 import json
+from r503 import R503
 
 from kivy.config import Config
 Config.set('graphics', 'width', '800')
@@ -47,6 +48,7 @@ gps_status = False
 ignore_button_presses = False  # This flag indicates whether to ignore button events
 recording_indicator = False
 
+
 gps_lock = Lock()
 signature_lock = Lock()
 record_lock = Lock()   
@@ -54,7 +56,15 @@ upload_lock = Lock()   # **** upload lock
 capture_image_lock = Lock()
 mid_video = False
 
+media_taken = 0
 camera_number_string = "1"
+fingerprint = None    # string representing name of user's fingerprint that opened camera
+fingerprint_reader = R503(port=5)
+fingerprint_mappings = {1, 'John Dale',
+                        2, 'Dani Kasti',
+                        3, 'Darius Paradie',
+                        4, 'Jace Christakis'}
+
 save_video_filepath = "/home/sdp/SDP-Camera/tmpVideos"
 save_image_filepath = "/home/sdp/SDP-Camera/tmpImages"
 object_count = None
@@ -79,8 +89,24 @@ def setup_gpio():
     # Setup event detection
     GPIO.add_event_detect(mode_button, GPIO.FALLING, callback=toggle_image_mode, bouncetime=1000)
     GPIO.add_event_detect(record_button, GPIO.FALLING, callback=toggle_recording, bouncetime=3000)
+    fingerprint = "John Dale"
     
 # --------------------------------------------------------------------
+'''
+def fingerprint_monitor():
+    while True:
+        result = fingerprint_reader.search()   # find matching fingerprint 
+        print("Result: ", result)   
+        if result[0] == '0':  # if we successfully read a fingerprint
+            fingerprint = fingerprint_mappings[result[1]]
+            while (media_taken < 5):
+                time.sleep(1)
+                # wait(media_taken_lock, media_taken_with_fingerprint)
+            media_taken = 0
+            fingerprint = None
+        time.sleep(1)  # Short sleep to prevent hogging CPU resources
+'''
+
     
 def update_gps_data_continuously(gps_lock):
     global gps_status
@@ -111,6 +137,8 @@ class PhotoLockGUI(FloatLayout):
         Thread(target=update_gps_data_continuously, args=(gps_lock,), daemon=True).start()
         Thread(target=update_wifi_status_continuously, daemon=True).start() 
         Thread(target=upload_saved_media_continuously, args=(upload_lock,), daemon=True).start()  # try to upload all media  **** added if true check and thread
+        # Start the fingerprint monitor in a separate thread
+        # Thread(target=fingerprint_monitor, daemon=True).start()       ############################### 
 
 
         self.capture = capture
@@ -428,7 +456,7 @@ def stop_recording(ffmpeg_process, object_count):
     print("Stopped cutting recording")
     os.remove(video_filepath_raw)  # remove the video after uploading
 
-    Thread(target=main, args=(video_filepath, camera_number_string, save_video_filepath, gps_lock, signature_lock, upload_lock,)).start()
+    Thread(target=main, args=(fingerprint, video_filepath, camera_number_string, save_video_filepath, gps_lock, signature_lock, upload_lock,)).start()
 
     return None
 
@@ -453,7 +481,7 @@ def capture_image(camera, capture_image_lock):
         if ret:
             image = frame
             # Start automatic processing and upload process for images
-            Thread(target=main, args=(image, camera_number_string, save_image_filepath, gps_lock, signature_lock, upload_lock,)).start()
+            Thread(target=main, args=(fingerprint, image, camera_number_string, save_image_filepath, gps_lock, signature_lock, upload_lock,)).start()
 
         else:
             print("\tError: Failed to capture an image.")
