@@ -14,7 +14,6 @@ from upload_saved_media import upload_saved_media
 from upload_image import upload_image
 from upload_video import upload_video
 import json
-from r503 import R503
 
 from kivy.config import Config
 Config.set('graphics', 'width', '800')
@@ -59,7 +58,6 @@ mid_video = False
 media_taken = 0
 camera_number_string = "1"
 fingerprint = None    # string representing name of user's fingerprint that opened camera
-fingerprint_reader = R503(port=5)
 fingerprint_mappings = {1, 'John Dale',
                         2, 'Dani Kasti',
                         3, 'Darius Paradie',
