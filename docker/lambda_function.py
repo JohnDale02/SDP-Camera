@@ -90,7 +90,7 @@ def handler(event, context):
             errors = errors + "Error:" + f"Public key error: {str(e)}"
 
         try:
-            combined_data = create_combined(camera_number, encoded_media, time_data, location_data)
+            combined_data = create_combined(fingerprint, camera_number, encoded_media, time_data, location_data)
 
         except Exception as e:
             errors = errors + "Error:" + f"Couldnt combine Data: {str(e)}"
