@@ -57,7 +57,7 @@ mid_video = False
 
 media_taken = 0
 camera_number_string = "1"
-fingerprint = None    # string representing name of user's fingerprint that opened camera
+fingerprint = "John Dale"  # string representing name of user's fingerprint that opened camera
 fingerprint_mappings = {1, 'John Dale',
                         2, 'Dani Kasti',
                         3, 'Darius Paradie',
@@ -87,7 +87,6 @@ def setup_gpio():
     # Setup event detection
     GPIO.add_event_detect(mode_button, GPIO.FALLING, callback=toggle_image_mode, bouncetime=1000)
     GPIO.add_event_detect(record_button, GPIO.FALLING, callback=toggle_recording, bouncetime=3000)
-    fingerprint = "John Dale"
     
 # --------------------------------------------------------------------
 '''
