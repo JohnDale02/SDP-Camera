@@ -109,7 +109,7 @@ def handler(event, context):
 
             try: 
                 convert_to_mp4(temp_media_path, temp_mp4_path)
-                upload_verified_mp4(s3_client, camera_number, temp_mp4_path, media_number)  # create and save a mp4 file
+                upload_verified_mp4(s3_client, fingerprint, temp_mp4_path, media_number)  # create and save a mp4 file
 
             except Exception as e:
                 errors = errors + "Issue uploading to verified bucket" + str(e)
