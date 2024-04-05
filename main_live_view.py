@@ -312,7 +312,7 @@ class PhotoLockGUI(FloatLayout):
             
     def animate_last_frame(self):
         if self.last_frame_texture:
-            animated_image = Image(texture=self.last_frame_texture, size_hint=(None, None), size=(800, 480))
+            animated_image = Image(texture=self.last_frame_texture, size_hint=(None, None), size=(800, 480),keep_ratio=False, allow_stretch=True)
             self.animation_overlay.add_widget(animated_image)
 
             animation = Animation(pos=(10, 10), size=(150, 90), duration=.3) + Animation(opacity=0, duration=1)
