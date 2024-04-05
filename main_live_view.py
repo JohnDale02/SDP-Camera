@@ -138,6 +138,9 @@ class PhotoLockGUI(FloatLayout):
         # Start the fingerprint monitor in a separate thread
         # Thread(target=fingerprint_monitor, daemon=True).start()       ############################### 
 
+        video_width = None
+        video_height = None
+
         Window.bind(on_key_down=self.on_key_down)
 
         self.capture = capture
@@ -268,6 +271,7 @@ class PhotoLockGUI(FloatLayout):
                                     self.height - self.gps_status_image.height - top_offset)
 
     def adjust_video_size(self, *args):
+        global video_width, video_height
         # Aspect ratio of the video feed
         video_aspect_ratio = 15.0 / 9.0
 
@@ -312,7 +316,7 @@ class PhotoLockGUI(FloatLayout):
             
     def animate_last_frame(self):
         if self.last_frame_texture:
-            animated_image = Image(texture=self.last_frame_texture, size_hint=(None, None), size=(self.width, self.height))
+            animated_image = Image(texture=self.last_frame_texture, size_hint=(None, None), size=(video_width, video_height))
             self.animation_overlay.add_widget(animated_image)
 
             animation = Animation(pos=(10, 10), size=(100, 50), duration=.3) + Animation(opacity=0, duration=1)
