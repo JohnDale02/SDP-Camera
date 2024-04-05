@@ -138,10 +138,10 @@ class PhotoLockGUI(FloatLayout):
         # Start the fingerprint monitor in a separate thread
         # Thread(target=fingerprint_monitor, daemon=True).start()       ############################### 
 
-
+        Window.bind(on_key_down=self.on_key_down)
+        
         self.capture = capture
         
-        Window.bind(on_key_down=self.on_key_down)  # Bind keyboard input ################## REMOVE 
         self.last_frame_texture = None  # To hold the texture of the last frame
 
         # Specify the size and position of the background rectangles
@@ -305,8 +305,9 @@ class PhotoLockGUI(FloatLayout):
         self.bg_color.rgba = (0, 0, 0, 0)  # Make the background transparent again
         Clock.unschedule(self.update_countdown)
 
-    def on_key_down(self, instance, keyboard, keycode, text, modifiers):
-        if text == '\r':  # If Enter key is pressed
+    def on_key_down(self, window, key, *args):
+        # Check if the pressed key is Enter (keycode == 13)
+        if key == 13:
             self.animate_last_frame()
             
     def animate_last_frame(self):
@@ -321,6 +322,7 @@ class PhotoLockGUI(FloatLayout):
 class PhotoLockApp(App):
     def build(self):
         global gui_instance
+
         self.capture = cv2.VideoCapture(2)
         self.capture.set(cv2.CAP_PROP_AUTOFOCUS, 0)
         self.capture.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
