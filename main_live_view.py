@@ -139,7 +139,7 @@ class PhotoLockGUI(FloatLayout):
         # Thread(target=fingerprint_monitor, daemon=True).start()       ############################### 
 
         Window.bind(on_key_down=self.on_key_down)
-        
+
         self.capture = capture
         
         self.last_frame_texture = None  # To hold the texture of the last frame
@@ -315,7 +315,7 @@ class PhotoLockGUI(FloatLayout):
             animated_image = Image(texture=self.last_frame_texture, size_hint=(None, None), size=(self.width, self.height))
             self.animation_overlay.add_widget(animated_image)
 
-            animation = Animation(pos=(10, 10), size=(100, 50), duration=1) + Animation(opacity=0, duration=1)
+            animation = Animation(pos=(10, 10), size=(100, 50), duration=.3) + Animation(opacity=0, duration=1)
             animation.bind(on_complete=lambda *x: self.animation_overlay.remove_widget(animated_image))
             animation.start(animated_image)
 
