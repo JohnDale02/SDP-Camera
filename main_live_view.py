@@ -374,6 +374,7 @@ def toggle_recording(channel):
     global record_lock
     global mid_video
     global camera
+    global gui_instance
 
     if recording_indicator and not mid_video:
         return 
@@ -393,12 +394,15 @@ def toggle_recording(channel):
             print("In the elif for mid_video == True")
             # Video mode, dont want to record anymore, currently recording
             ffmpeg_process = stop_recording(ffmpeg_process, object_count)
+            Clock.schedule_once(lambda dt: gui_instance.animate_last_frame())
             mid_video = False
             recording_indicator = False
+
             print("Released lock after stopping video in toggle_recording()")
 
         elif image_mode == True and mid_video == False:                # image mode, not recording video
             # Image mode, we want to start capture, currently not capturing
+            recording_indicator= True
             capture_image(camera, capture_image_lock)
             recording_indicator = False
             print("Released lock after capturing image in toggle_recording()")
@@ -487,7 +491,7 @@ def capture_image(camera, capture_image_lock):
     ''' Initialized camera and takes picture'''
 
     print("Capture_image called")
-    global gui_instance, recording_indicator
+    global gui_instance
     # Initialize the camera (use the appropriate video device)
 
     if not camera.isOpened():
@@ -498,8 +502,6 @@ def capture_image(camera, capture_image_lock):
         # Capture a single frame from the camera
         frame = None
         for i in range(35):
-            if i == 25: # give the indicator a slight buffer
-                recording_indicator= True
             ret, frame = camera.read()
         
         # Animate frame (capture image thing)
