@@ -167,6 +167,10 @@ class PhotoLockGUI(FloatLayout):
         self.img1 = Image(keep_ratio=False, allow_stretch=True)
         self.add_widget(self.img1)
 
+        self.animation_overlay = FloatLayout(size_hint=(1, 1))
+        self.add_widget(self.animation_overlay)
+
+
         self.bind(size=self.adjust_video_size)
 
         self.status_label = Label(text='Image', color=(1, 1, 1, 1), font_size='30sp')
@@ -308,10 +312,10 @@ class PhotoLockGUI(FloatLayout):
     def animate_last_frame(self):
         if self.last_frame_texture:
             animated_image = Image(texture=self.last_frame_texture, size_hint=(None, None), size=(self.width, self.height))
-            self.add_widget(animated_image)
+            self.animation_overlay.add_widget(animated_image)
 
             animation = Animation(pos=(10, 10), size=(100, 50), duration=1) + Animation(opacity=0, duration=1)
-            animation.bind(on_complete=lambda *x: self.remove_widget(animated_image))
+            animation.bind(on_complete=lambda *x: self.animation_overlay.remove_widget(animated_image))
             animation.start(animated_image)
 
 class PhotoLockApp(App):
