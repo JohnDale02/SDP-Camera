@@ -28,6 +28,7 @@ from kivy.uix.image import Image  # Use AsyncImage for potentially better handli
 from kivy.graphics.texture import Texture
 from kivy.graphics import Color, Rectangle, Ellipse
 from kivy.uix.boxlayout import BoxLayout
+from kivy.animation import Animation
 from kivy.clock import Clock
 
 from kivy.core.window import Window
@@ -139,6 +140,9 @@ class PhotoLockGUI(FloatLayout):
 
 
         self.capture = capture
+        
+        Window.bind(on_key_down=self.on_key_down)  # Bind keyboard input ################## REMOVE 
+        self.last_frame_texture = None  # To hold the texture of the last frame
 
         # Specify the size and position of the background rectangles
         
@@ -206,12 +210,15 @@ class PhotoLockGUI(FloatLayout):
 
     def update(self, dt):
         ret, frame = self.capture.read()
+
         if ret:
+            self.last_frame = frame  # Store the last frame
             buf1 = cv2.flip(frame, 0)
             buf = buf1.tobytes()
             texture = Texture.create(size=(frame.shape[1], frame.shape[0]), colorfmt='bgr')
             texture.blit_buffer(buf, colorfmt='bgr', bufferfmt='ubyte')
             self.img1.texture = texture
+            self.last_frame_texture = texture  # Update the last frame's texture
             
             mode_text = "Image" if image_mode else "Video"
             self.status_label.text = f"{mode_text}"
@@ -293,7 +300,20 @@ class PhotoLockGUI(FloatLayout):
         self.countdown_label.text = ""
         self.bg_color.rgba = (0, 0, 0, 0)  # Make the background transparent again
         Clock.unschedule(self.update_countdown)
+
+    def on_key_down(self, instance, keyboard, keycode, text, modifiers):
+        if text == '\r':  # If Enter key is pressed
+            self.animate_last_frame()
             
+    def animate_last_frame(self):
+        if self.last_frame_texture:
+            animated_image = Image(texture=self.last_frame_texture, size_hint=(None, None), size=(self.width, self.height))
+            self.add_widget(animated_image)
+
+            animation = Animation(pos=(10, 10), size=(100, 50), duration=1) + Animation(opacity=0, duration=1)
+            animation.bind(on_complete=lambda *x: self.remove_widget(animated_image))
+            animation.start(animated_image)
+
 class PhotoLockApp(App):
     def build(self):
         global gui_instance
