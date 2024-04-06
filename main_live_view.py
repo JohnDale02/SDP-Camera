@@ -91,23 +91,27 @@ def setup_gpio():
     # Setup event detection
     GPIO.add_event_detect(mode_button, GPIO.FALLING, callback=toggle_image_mode, bouncetime=1000)
     GPIO.add_event_detect(record_button, GPIO.FALLING, callback=toggle_recording, bouncetime=3000)
+
+    fingerprint_monitor()   # check if we should request fingerprint again...
     
 # --------------------------------------------------------------------
 
 def fingerprint_monitor():
     global media_taken, fingerprint
-    if media_taken >= 2:
+    if media_taken >= 2 or fingerprint == None:
         media_taken = 0
-        fingerprint = "John Dale"
-        '''
-        while fingerprint == None:
-            result = fingerprint_reader.search()   # find matching fingerprint 
-            print("Result: ", result)   
-            if result[0] == '0':  # if we successfully read a fingerprint
-                fingerprint = fingerprint_mappings[result[1]]
-            time.sleep(1)  # Short sleep to prevent hogging CPU resources
+        fingerprint = None
 
-    # we will loop infinitely until we find a valid fingerprint
+    fingerprint = "John Dale"
+    '''
+    while fingerprint == None:
+        result = fingerprint_reader.search()   # find matching fingerprint 
+        print("Result: ", result)   
+        if result[0] == '0':  # if we successfully read a fingerprint
+            fingerprint = fingerprint_mappings[result[1]]
+        time.sleep(1)  # Short sleep to prevent hogging CPU resources
+
+# we will loop infinitely until we find a valid fingerprint
 
 
             
@@ -143,8 +147,6 @@ class PhotoLockGUI(FloatLayout):
         Thread(target=update_gps_data_continuously, args=(gps_lock,), daemon=True).start()
         Thread(target=update_wifi_status_continuously, daemon=True).start() 
         Thread(target=upload_saved_media_continuously, args=(upload_lock,), daemon=True).start()  # try to upload all media  **** added if true check and thread
-        # Start the fingerprint monitor in a separate thread
-        # Thread(target=fingerprint_monitor, daemon=True).start()       ############################### 
 
         Window.bind(on_key_down=self.on_key_down)
 
