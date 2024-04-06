@@ -174,7 +174,7 @@ class PhotoLockGUI(FloatLayout):
             self.status_background = Rectangle(size=(70, 120), pos=(25, 354))
 
             self.fingerprint_color = Color(1, 1, 0, .4)  ########################################
-            self.fingerprint_background = Rectangle(size=(100, 160), pos_hint={'center_x': 0.5, 'center_y': 0.5}) ###############################
+            self.fingerprint_background = Rectangle(size=(100, 160), pos=(250, 450)) ###############################
 
         self.status_layout.bind(pos=self.update_rect, size=self.update_rect)
         
@@ -190,7 +190,7 @@ class PhotoLockGUI(FloatLayout):
         self.status_label = Label(text='Image', color=(1, 1, 1, 1), font_size='30sp')
         self.status_layout.add_widget(self.status_label)
 
-        self.fingerprint_label = Label(text='Scan Fingerprint', color=(1, 1, 1, 1), font_size='60sp', pos_hint={'center_x': 0.5, 'center_y': 0.5})  ###################### 
+        self.fingerprint_label = Label(text='Scan Fingerprint', color=(1, 1, 1, 1), font_size='60sp')  ###################### 
         self.status_layout.add_widget(self.fingerprint_label)  ########################### 
 
         self.add_widget(self.status_layout)
@@ -247,7 +247,7 @@ class PhotoLockGUI(FloatLayout):
             self.status_label.text = f"{mode_text}"
 
             self.recording_color.a = 1 if recording_indicator else 0
-            self.fingerprint_color.a = 1 if fingerprint else 0  #############################
+            self.fingerprint_color.a = 0 if fingerprint else 1  #############################
             self.fingerprint_label.text = "" if fingerprint else "Scan Fingerprint"  #############################
 
  
@@ -417,6 +417,7 @@ def toggle_recording(channel):
     global mid_video
     global camera
     global gui_instance
+    global media_taken
 
     if recording_indicator and not mid_video:
         return 
@@ -439,9 +440,8 @@ def toggle_recording(channel):
             Clock.schedule_once(lambda dt: gui_instance.animate_last_frame())
             ffmpeg_process = stop_recording(ffmpeg_process, object_count)
             mid_video = False
+            media_taken += 1
             fingerprint_monitor()   # check if we should request fingerprint again...
-
-
 
             print("Released lock after stopping video in toggle_recording()")
 
@@ -450,6 +450,7 @@ def toggle_recording(channel):
             recording_indicator= True
             capture_image(camera, capture_image_lock)
             recording_indicator = False
+            media_taken += 1
             fingerprint_monitor()   # check if we should request fingerprint again...
             print("Released lock after capturing image in toggle_recording()")
 
