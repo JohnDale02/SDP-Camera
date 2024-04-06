@@ -317,7 +317,7 @@ class PhotoLockGUI(FloatLayout):
             animated_image = Image(texture=self.last_frame_texture, size_hint=(None, None), size=(800, 480),keep_ratio=False, allow_stretch=True)
             self.animation_overlay.add_widget(animated_image)
 
-            animation = Animation(pos=(10, 10), size=(150, 90), duration=.3) + Animation(opacity=0, duration=1)
+            animation = Animation(pos=(10, 10), size=(150, 90), duration=.3) + Animation(opacity=1, duration=6) + Animation(opacity=0, duration=.3)
             animation.bind(on_complete=lambda *x: self.animation_overlay.remove_widget(animated_image))
             animation.start(animated_image)
 
@@ -396,10 +396,11 @@ def toggle_recording(channel):
             print("In the elif for mid_video == True")
             # Video mode, dont want to record anymore, currently recording
             recording_indicator = False
+            Clock.schedule_once(lambda dt: gui_instance.animate_last_frame())
             ffmpeg_process = stop_recording(ffmpeg_process, object_count)
             mid_video = False
 
-            Clock.schedule_once(lambda dt: gui_instance.animate_last_frame())
+
 
             print("Released lock after stopping video in toggle_recording()")
 
