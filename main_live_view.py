@@ -174,7 +174,7 @@ class PhotoLockGUI(FloatLayout):
             self.status_background = Rectangle(size=(70, 120), pos=(25, 354))
 
             self.fingerprint_color = Color(1, 1, 0, .4)  ########################################
-            self.fingerprint_background = Rectangle(size=(100, 160), pos_hint={'center_x': 0.5, 'center_y': 0.5})) ###############################
+            self.fingerprint_background = Rectangle(size=(100, 160), pos_hint={'center_x': 0.5, 'center_y': 0.5}) ###############################
 
         self.status_layout.bind(pos=self.update_rect, size=self.update_rect)
         
