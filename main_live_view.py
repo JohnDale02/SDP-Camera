@@ -181,15 +181,18 @@ class PhotoLockGUI(FloatLayout):
         self.animation_overlay = FloatLayout(size_hint=(1, 1))
         self.add_widget(self.animation_overlay)
 
+        self.fingerprint_background = Rectangle(size=(100, 160), color=(0, 0, 0, .4), pos_hint={'center_x': 0.5, 'center_y': 0.5}) ###############################
+        self.add_widget(self.fingerprint_background)
+
+
 
         self.bind(size=self.adjust_video_size)
 
         self.status_label = Label(text='Image', color=(1, 1, 1, 1), font_size='30sp')
         self.status_layout.add_widget(self.status_label)
 
-        self.fingerprint_background = Rectangle(size=(100, 160), color=(0, 0, 0, .4), pos_hint={'center_x': 0.5, 'center_y': 0.5}) ###############################
+        
         self.fingerprint_label = Label(text='Scan Fingerprint', color=(1, 1, 1, 1), font_size='60sp', pos_hint={'center_x': 0.5, 'center_y': 0.5})  ###################### 
-        self.animation_overlay.add_widget(self.fingerprint_background)  ###############################
         self.animation_overlay.add_widget(self.fingerprint_label)  ########################### 
 
         self.add_widget(self.status_layout)
@@ -246,7 +249,7 @@ class PhotoLockGUI(FloatLayout):
             self.status_label.text = f"{mode_text}"
 
             self.recording_color.a = 1 if recording_indicator else 0
-            self.fingerprint_color.a = 1 if fingerprint else 0  #############################
+            self.fingerprint_background.a = 0 if fingerprint else .4  #############################
             self.fingerprint_label.text = "" if fingerprint else "Scan Fingerprint"  #############################
 
  
