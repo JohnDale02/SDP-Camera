@@ -1,6 +1,6 @@
 
 import threading 
-from threading import Lock, Thread
+from threading import Lock, Thread, Condition
 import RPi.GPIO as GPIO
 import time
 import subprocess
@@ -53,6 +53,7 @@ signature_lock = Lock()
 record_lock = Lock()   
 upload_lock = Lock()   # **** upload lock
 capture_image_lock = Lock()
+fingerprint_condition = Condition()
 mid_video = False
 
 
@@ -90,20 +91,34 @@ def setup_gpio():
     GPIO.add_event_detect(record_button, GPIO.FALLING, callback=toggle_recording, bouncetime=3000)
     
 # --------------------------------------------------------------------
-'''
+
 def fingerprint_monitor():
-    while True:
-        result = fingerprint_reader.search()   # find matching fingerprint 
-        print("Result: ", result)   
-        if result[0] == '0':  # if we successfully read a fingerprint
-            fingerprint = fingerprint_mappings[result[1]]
-            while (media_taken < 5):
-                time.sleep(1)
-                # wait(media_taken_lock, media_taken_with_fingerprint)
-            media_taken = 0
-            fingerprint = None
-        time.sleep(1)  # Short sleep to prevent hogging CPU resources
-'''
+    global fingerprint
+
+    while True:  # Use a loop to keep the thread running
+        with fingerprint_condition:
+            while fingerprint is not None:
+                fingerprint_condition.wait()
+            # Simulate fingerprint re-sign in
+            print("Awaiting fingerprint...")
+            time.sleep(10)  # Simulate waiting time for user to re-sign in
+            fingerprint = "John Dale"  # Simulate user re-signing in
+            print("Fingerprint verified.")
+
+
+    '''
+    result = fingerprint_reader.search()   # find matching fingerprint 
+    print("Result: ", result)   
+    if result[0] == '0':  # if we successfully read a fingerprint
+        fingerprint = fingerprint_mappings[result[1]]
+        while (media_taken < 5):
+            time.sleep(1)
+            # wait(media_taken_lock, media_taken_with_fingerprint)
+        media_taken = 0
+        fingerprint = None
+    time.sleep(1)  # Short sleep to prevent hogging CPU resources
+    '''
+
 
     
 def update_gps_data_continuously(gps_lock):
@@ -135,8 +150,7 @@ class PhotoLockGUI(FloatLayout):
         Thread(target=update_gps_data_continuously, args=(gps_lock,), daemon=True).start()
         Thread(target=update_wifi_status_continuously, daemon=True).start() 
         Thread(target=upload_saved_media_continuously, args=(upload_lock,), daemon=True).start()  # try to upload all media  **** added if true check and thread
-        # Start the fingerprint monitor in a separate thread
-        # Thread(target=fingerprint_monitor, daemon=True).start()       ############################### 
+        Thread(target=fingerprint_monitor, daemon=True).start()
 
         Window.bind(on_key_down=self.on_key_down)
 
@@ -168,6 +182,8 @@ class PhotoLockGUI(FloatLayout):
         self.add_widget(self.img1)
 
         self.animation_overlay = FloatLayout(size_hint=(1, 1))
+        self.fingerprint_label = Label(text='Image', color=(1, 1, 1, 1), font_size='30sp', pos_hint={'center_x': 0.5, 'center_y': 0.5})
+        self.animation_overlay.add_widget(self.fingerprint_label)
         self.add_widget(self.animation_overlay)
 
 
@@ -176,6 +192,8 @@ class PhotoLockGUI(FloatLayout):
         self.status_label = Label(text='Image', color=(1, 1, 1, 1), font_size='30sp')
         self.status_layout.add_widget(self.status_label)
         self.add_widget(self.status_layout)
+
+
 
         self.add_widget(self.wifi_status_image)
         self.bind(size=self.adjust_wifi_image_position)
@@ -226,6 +244,9 @@ class PhotoLockGUI(FloatLayout):
             
             mode_text = "Image" if image_mode else "Video"
             self.status_label.text = f"{mode_text}"
+
+            fingerprint_text = "" if fingerprint else "Scan Fingerprint"
+            self.fingerprint_label.text = f"{mode_text}"
 
             self.recording_color.a = 1 if recording_indicator else 0
 
@@ -395,6 +416,8 @@ def toggle_recording(channel):
     global mid_video
     global camera
     global gui_instance
+    global media_taken
+    global fingerprint
 
     if recording_indicator and not mid_video:
         return 
@@ -416,9 +439,8 @@ def toggle_recording(channel):
             recording_indicator = False
             Clock.schedule_once(lambda dt: gui_instance.animate_last_frame())
             ffmpeg_process = stop_recording(ffmpeg_process, object_count)
+            media_taken += 1
             mid_video = False
-
-
 
             print("Released lock after stopping video in toggle_recording()")
 
@@ -426,6 +448,7 @@ def toggle_recording(channel):
             # Image mode, we want to start capture, currently not capturing
             recording_indicator= True
             capture_image(camera, capture_image_lock)
+            media_taken += 1
             recording_indicator = False
             print("Released lock after capturing image in toggle_recording()")
 
@@ -433,7 +456,11 @@ def toggle_recording(channel):
             print("Error: Unknown state in the else case of handle_capture()")
             quit()
 
-
+        if media_taken > 3:
+            with fingerprint_condition:
+                fingerprint = None
+                media_taken = 0
+                fingerprint_condition.notify_all()
 # --------------------------------------------------------------------
 
 import os
