@@ -246,7 +246,7 @@ class PhotoLockGUI(FloatLayout):
             self.status_label.text = f"{mode_text}"
 
             fingerprint_text = "" if fingerprint else "Scan Fingerprint"
-            self.fingerprint_label.text = f"{mode_text}"
+            self.fingerprint_label.text = f"{fingerprint_text}"
 
             self.recording_color.a = 1 if recording_indicator else 0
 
