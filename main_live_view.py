@@ -191,7 +191,7 @@ class PhotoLockGUI(FloatLayout):
         self.status_layout.add_widget(self.status_label)
 
         self.fingerprint_label = Label(text='Scan Fingerprint', color=(1, 1, 1, 1), font_size='60sp')  ###################### 
-        self.status_layout.add_widget(self.fingerprint_label)  ########################### 
+        self.animation_overlay.add_widget(self.fingerprint_label, pos_hint={'center_x': 0.5, 'center_y': 0.5})  ########################### 
 
         self.add_widget(self.status_layout)
 
@@ -247,7 +247,7 @@ class PhotoLockGUI(FloatLayout):
             self.status_label.text = f"{mode_text}"
 
             self.recording_color.a = 1 if recording_indicator else 0
-            self.fingerprint_color.a = 0 if fingerprint else 1  #############################
+            self.fingerprint_color.a = 1 if fingerprint else 0  #############################
             self.fingerprint_label.text = "" if fingerprint else "Scan Fingerprint"  #############################
 
  
@@ -374,7 +374,6 @@ class PhotoLockApp(App):
         
         gui_instance = PhotoLockGUI(self.capture)  # Assign the instance to the global variable
 
-        fingerprint_monitor()   # check if we should request fingerprint again...
         return gui_instance
 
     def on_stop(self):
