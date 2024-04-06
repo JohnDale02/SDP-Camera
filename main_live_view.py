@@ -96,9 +96,9 @@ def setup_gpio():
 
 def fingerprint_monitor():
     global media_taken, fingerprint
-    if media_taken >= 5:
+    if media_taken >= 2:
         media_taken = 0
-        fingerprint = None
+        fingerprint = "John Dale"
         '''
         while fingerprint == None:
             result = fingerprint_reader.search()   # find matching fingerprint 
@@ -435,6 +435,7 @@ def toggle_recording(channel):
             Clock.schedule_once(lambda dt: gui_instance.animate_last_frame())
             ffmpeg_process = stop_recording(ffmpeg_process, object_count)
             mid_video = False
+            fingerprint_monitor()   # check if we should request fingerprint again...
 
 
 
@@ -445,6 +446,7 @@ def toggle_recording(channel):
             recording_indicator= True
             capture_image(camera, capture_image_lock)
             recording_indicator = False
+            fingerprint_monitor()   # check if we should request fingerprint again...
             print("Released lock after capturing image in toggle_recording()")
 
         else:
