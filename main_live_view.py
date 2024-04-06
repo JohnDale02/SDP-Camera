@@ -91,8 +91,6 @@ def setup_gpio():
     # Setup event detection
     GPIO.add_event_detect(mode_button, GPIO.FALLING, callback=toggle_image_mode, bouncetime=1000)
     GPIO.add_event_detect(record_button, GPIO.FALLING, callback=toggle_recording, bouncetime=3000)
-    GPIO.remove_event_detect(mode_button)
-
     fingerprint_monitor()   # check if we should request fingerprint again...
     
 # --------------------------------------------------------------------
