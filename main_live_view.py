@@ -420,6 +420,7 @@ def toggle_recording(channel):
     global gui_instance
     global media_taken
     global fingerprint
+    global user_number
 
     if recording_indicator and not mid_video:
         return 
