@@ -99,13 +99,12 @@ def fingerprint_monitor():
         with fingerprint_condition:
             while fingerprint is not None:
                 fingerprint_condition.wait()
-
-            with record_lock:
-                # Simulate fingerprint re-sign in
-                print("Awaiting fingerprint...")
-                time.sleep(10)  # Simulate waiting time for user to re-sign in
-                fingerprint = fingerprint_mappings[user_number]
-                print("Fingerprint verified.")
+                
+            # Simulate fingerprint re-sign in
+            print("Awaiting fingerprint...")
+            time.sleep(10)  # Simulate waiting time for user to re-sign in
+            fingerprint = fingerprint_mappings[user_number]
+            print("Fingerprint verified.")
 
 
     '''
