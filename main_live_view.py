@@ -189,7 +189,7 @@ class PhotoLockGUI(FloatLayout):
 
         # Fingerprint label and its background
         self.fingerprint_bg_color = Color(0, 0, 0, 0)  # Initially transparent
-        self.fingerprint_bg_rect = Rectangle(size=(400, 50), pos=(200, 200))
+        self.fingerprint_bg_rect = Rectangle(size=(500, 150), pos=(150, 150))
 
         with self.canvas.before:
             self.canvas.add(self.fingerprint_bg_color)
