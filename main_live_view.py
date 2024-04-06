@@ -91,12 +91,13 @@ def setup_gpio():
     # Setup event detection
     GPIO.add_event_detect(mode_button, GPIO.FALLING, callback=toggle_image_mode, bouncetime=1000)
     GPIO.add_event_detect(record_button, GPIO.FALLING, callback=toggle_recording, bouncetime=3000)
-    fingerprint_monitor()   # check if we should request fingerprint again...
+
     
 # --------------------------------------------------------------------
 
 def fingerprint_monitor():
     global media_taken, fingerprint
+
     if media_taken >= 2 or fingerprint == None:
         media_taken = 0
         fingerprint = None
@@ -372,6 +373,8 @@ class PhotoLockApp(App):
         self.capture.set(cv2.CAP_PROP_FPS, 30.0)
         
         gui_instance = PhotoLockGUI(self.capture)  # Assign the instance to the global variable
+
+        fingerprint_monitor()   # check if we should request fingerprint again...
         return gui_instance
 
     def on_stop(self):
@@ -380,15 +383,13 @@ class PhotoLockApp(App):
 def gui_thread():
     PhotoLockApp().run()
 
+
 # --------------------------------------------------------------------
 
 def toggle_image_mode(channel):
     global image_mode
     global recording_indicator
     global camera
-
-    if not fingerprint:
-        return 
 
     with record_lock:
         if not recording_indicator:
@@ -423,9 +424,6 @@ def toggle_recording(channel):
     global fingerprint
 
     if recording_indicator and not mid_video:
-        return 
-    
-    if not fingerprint:
         return 
     
     with record_lock:
