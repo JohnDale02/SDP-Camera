@@ -54,6 +54,7 @@ record_lock = Lock()
 upload_lock = Lock()   # **** upload lock
 capture_image_lock = Lock()
 fingerprint_condition = Condition()
+fingerprint_lock = Lock()
 mid_video = False
 
 
@@ -94,16 +95,16 @@ def setup_gpio():
 
 def fingerprint_monitor():
     global fingerprint
-
-    while True:  # Use a loop to keep the thread running
-        with fingerprint_condition:
-            while fingerprint is not None:
-                fingerprint_condition.wait()
-            # Simulate fingerprint re-sign in
-            print("Awaiting fingerprint...")
-            time.sleep(10)  # Simulate waiting time for user to re-sign in
-            fingerprint = "John Dale"  # Simulate user re-signing in
-            print("Fingerprint verified.")
+    with record_lock:
+        while True:  # Use a loop to keep the thread running
+            with fingerprint_condition:
+                while fingerprint is not None:
+                    fingerprint_condition.wait()
+                # Simulate fingerprint re-sign in
+                print("Awaiting fingerprint...")
+                time.sleep(10)  # Simulate waiting time for user to re-sign in
+                fingerprint = "John Dale"  # Simulate user re-signing in
+                print("Fingerprint verified.")
 
 
     '''
