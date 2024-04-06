@@ -54,7 +54,6 @@ record_lock = Lock()
 upload_lock = Lock()   # **** upload lock
 capture_image_lock = Lock()
 fingerprint_condition = Condition()
-fingerprint_lock = Lock()
 mid_video = False
 
 
@@ -99,12 +98,12 @@ def fingerprint_monitor():
         with fingerprint_condition:
             while fingerprint is not None:
                 fingerprint_condition.wait()
-            with record_lock:
-                # Simulate fingerprint re-sign in
-                print("Awaiting fingerprint...")
-                time.sleep(10)  # Simulate waiting time for user to re-sign in
-                fingerprint = "John Dale"  # Simulate user re-signing in
-                print("Fingerprint verified.")
+
+            # Simulate fingerprint re-sign in
+            print("Awaiting fingerprint...")
+            time.sleep(10)  # Simulate waiting time for user to re-sign in
+            fingerprint = "John Dale"  # Simulate user re-signing in
+            print("Fingerprint verified.")
 
 
     '''
@@ -422,6 +421,9 @@ def toggle_recording(channel):
 
     if recording_indicator and not mid_video:
         return 
+    
+    if not fingerprint:
+        return
     
     with record_lock:
 
