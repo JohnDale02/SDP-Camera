@@ -194,7 +194,7 @@ class PhotoLockGUI(FloatLayout):
         with self.canvas.before:
             self.canvas.add(self.fingerprint_bg_color)
             self.canvas.add(self.fingerprint_bg_rect)
-            Color(0, 0, 0, 0.4)  # Semi-transparent black background
+            Color(0, 0, 0, 0.8)  # Semi-transparent black background
 
 
         self.add_widget(self.animation_overlay)
@@ -260,7 +260,7 @@ class PhotoLockGUI(FloatLayout):
             self.status_label.text = f"{mode_text}"
 
             fingerprint_text = "" if fingerprint else "Scan Fingerprint"
-            self.fingerprint_bg_color.rgba = (0, 0, 0, .4) if not fingerprint else (0, 0, 0, 0)
+            self.fingerprint_bg_color.rgba = (0, 0, 0, .8) if not fingerprint else (0, 0, 0, 0)
             self.fingerprint_label.text = f"{fingerprint_text}"
 
             self.recording_color.a = 1 if recording_indicator else 0
