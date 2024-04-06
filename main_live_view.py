@@ -1,6 +1,6 @@
 
 import threading 
-from threading import Lock, Thread, Condition
+from threading import Lock, Thread
 import RPi.GPIO as GPIO
 import time
 import subprocess
@@ -34,8 +34,6 @@ from kivy.core.window import Window
 Window.show_cursor = False
 #Window.fullscreen = False  # *********
 
-
-
 # -------------Global Variables ------------------------------
 image_mode = True
 ffmpeg_process = None
@@ -46,22 +44,21 @@ mode_button = 38
 wifi_status = False
 gps_status = False
 
+ignore_button_presses = False  # This flag indicates whether to ignore button events
 recording_indicator = False
-mid_video = False
+
 
 gps_lock = Lock()
 signature_lock = Lock()
 record_lock = Lock()   
 upload_lock = Lock()   # **** upload lock
 capture_image_lock = Lock()
+mid_video = False
 
-fingerprint_condition = Condition()
-timeout_condition = Condition()
 
 media_taken = 0
 camera_number_string = "1"
-fingerprint = None  # initialized to None
-#fingerprint = "John Dale"  # string representing name of user's fingerprint that opened camera
+fingerprint = "John Dale"  # string representing name of user's fingerprint that opened camera
 fingerprint_mappings = {1, 'John Dale',
                         2, 'Dani Kasti',
                         3, 'Darius Paradie',
@@ -91,32 +88,22 @@ def setup_gpio():
     # Setup event detection
     GPIO.add_event_detect(mode_button, GPIO.FALLING, callback=toggle_image_mode, bouncetime=1000)
     GPIO.add_event_detect(record_button, GPIO.FALLING, callback=toggle_recording, bouncetime=3000)
-
     
 # --------------------------------------------------------------------
-
+'''
 def fingerprint_monitor():
-    global media_taken, fingerprint
-
-    if media_taken >= 2 or fingerprint == None:
-        media_taken = 0
-        fingerprint = None
-
-        time.sleep(10)
-        fingerprint = "John Dale"
-    '''
-    while fingerprint == None:
+    while True:
         result = fingerprint_reader.search()   # find matching fingerprint 
         print("Result: ", result)   
         if result[0] == '0':  # if we successfully read a fingerprint
             fingerprint = fingerprint_mappings[result[1]]
+            while (media_taken < 5):
+                time.sleep(1)
+                # wait(media_taken_lock, media_taken_with_fingerprint)
+            media_taken = 0
+            fingerprint = None
         time.sleep(1)  # Short sleep to prevent hogging CPU resources
-
-# we will loop infinitely until we find a valid fingerprint
-
-
-            
-    '''
+'''
 
     
 def update_gps_data_continuously(gps_lock):
@@ -148,6 +135,8 @@ class PhotoLockGUI(FloatLayout):
         Thread(target=update_gps_data_continuously, args=(gps_lock,), daemon=True).start()
         Thread(target=update_wifi_status_continuously, daemon=True).start() 
         Thread(target=upload_saved_media_continuously, args=(upload_lock,), daemon=True).start()  # try to upload all media  **** added if true check and thread
+        # Start the fingerprint monitor in a separate thread
+        # Thread(target=fingerprint_monitor, daemon=True).start()       ############################### 
 
         Window.bind(on_key_down=self.on_key_down)
 
@@ -174,15 +163,6 @@ class PhotoLockGUI(FloatLayout):
             self.status_background = Rectangle(size=(70, 120), pos=(25, 354))
 
         self.status_layout.bind(pos=self.update_rect, size=self.update_rect)
-
-                # Create a layout for the status label with a background
-        self.fingerprint_layout = BoxLayout(size_hint=(None, None), size=(300, 300),
-                                       pos_hint={'center_x': 0.5, 'center_y': 0.5})
-
-        with self.fingerprint_layout.canvas.before:
-            self.fingerprint_background = Rectangle(size=(100, 160), color=(0, 0, 0, .4), pos_hint={'center_x': 0.5, 'center_y': 0.5}) ###############################
-
-        self.fingerprint_layout.bind(pos=self.update_rect, size=self.update_rect)
         
         self.img1 = Image(keep_ratio=False, allow_stretch=True)
         self.add_widget(self.img1)
@@ -190,18 +170,12 @@ class PhotoLockGUI(FloatLayout):
         self.animation_overlay = FloatLayout(size_hint=(1, 1))
         self.add_widget(self.animation_overlay)
 
+
         self.bind(size=self.adjust_video_size)
 
         self.status_label = Label(text='Image', color=(1, 1, 1, 1), font_size='30sp')
         self.status_layout.add_widget(self.status_label)
-
-        
-        self.fingerprint_label = Label(text='Scan Fingerprint', color=(1, 1, 1, 1), font_size='60sp', pos_hint={'center_x': 0.5, 'center_y': 0.5})  ###################### 
-        self.animation_overlay.add_widget(self.fingerprint_label)  ########################### 
-
         self.add_widget(self.status_layout)
-        self.add_widget(self.fingerprint_layout)
-
 
         self.add_widget(self.wifi_status_image)
         self.bind(size=self.adjust_wifi_image_position)
@@ -254,10 +228,7 @@ class PhotoLockGUI(FloatLayout):
             self.status_label.text = f"{mode_text}"
 
             self.recording_color.a = 1 if recording_indicator else 0
-            #self.fingerprint_background.color = 0 if fingerprint else .4  #############################
-            self.fingerprint_label.text = "" if fingerprint else "Scan Fingerprint"  #############################
 
- 
     def check_wifi_status(self, dt):
         global wifi_status
 
@@ -380,7 +351,6 @@ class PhotoLockApp(App):
         self.capture.set(cv2.CAP_PROP_FPS, 30.0)
         
         gui_instance = PhotoLockGUI(self.capture)  # Assign the instance to the global variable
-
         return gui_instance
 
     def on_stop(self):
@@ -388,7 +358,6 @@ class PhotoLockApp(App):
 
 def gui_thread():
     PhotoLockApp().run()
-
 
 # --------------------------------------------------------------------
 
@@ -426,8 +395,6 @@ def toggle_recording(channel):
     global mid_video
     global camera
     global gui_instance
-    global media_taken
-    global fingerprint
 
     if recording_indicator and not mid_video:
         return 
@@ -450,8 +417,8 @@ def toggle_recording(channel):
             Clock.schedule_once(lambda dt: gui_instance.animate_last_frame())
             ffmpeg_process = stop_recording(ffmpeg_process, object_count)
             mid_video = False
-            media_taken += 1
-            fingerprint_monitor()   # check if we should request fingerprint again...
+
+
 
             print("Released lock after stopping video in toggle_recording()")
 
@@ -460,8 +427,6 @@ def toggle_recording(channel):
             recording_indicator= True
             capture_image(camera, capture_image_lock)
             recording_indicator = False
-            media_taken += 1
-            fingerprint_monitor()   # check if we should request fingerprint again...
             print("Released lock after capturing image in toggle_recording()")
 
         else:
