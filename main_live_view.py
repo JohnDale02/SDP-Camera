@@ -1,6 +1,6 @@
 
 import threading 
-from threading import Lock, Thread
+from threading import Lock, Thread, Condition
 import RPi.GPIO as GPIO
 import time
 import subprocess
@@ -10,7 +10,6 @@ from main import main
 from nothing import sleep
 from threading import Lock
 from GPS_uart import read_gps_data
-from upload_saved_media import upload_saved_media
 from upload_image import upload_image
 from upload_video import upload_video
 import json
@@ -28,6 +27,7 @@ from kivy.uix.image import Image  # Use AsyncImage for potentially better handli
 from kivy.graphics.texture import Texture
 from kivy.graphics import Color, Rectangle, Ellipse
 from kivy.uix.boxlayout import BoxLayout
+from kivy.animation import Animation
 from kivy.clock import Clock
 
 from kivy.core.window import Window
@@ -47,14 +47,25 @@ gps_status = False
 ignore_button_presses = False  # This flag indicates whether to ignore button events
 recording_indicator = False
 
+
 gps_lock = Lock()
 signature_lock = Lock()
 record_lock = Lock()   
 upload_lock = Lock()   # **** upload lock
 capture_image_lock = Lock()
+fingerprint_condition = Condition()
 mid_video = False
 
+
+media_taken = 0
+user_number = 0
 camera_number_string = "1"
+fingerprint = "John Dale"  # string representing name of user's fingerprint that opened camera
+fingerprint_mappings = {0: 'John Dale',
+                        1: 'Dani Kasti',
+                        2: 'Darius Paradie',
+                        3: 'Jace Christakis'}
+
 save_video_filepath = "/home/sdp/SDP-Camera/tmpVideos"
 save_image_filepath = "/home/sdp/SDP-Camera/tmpImages"
 object_count = None
@@ -81,6 +92,36 @@ def setup_gpio():
     GPIO.add_event_detect(record_button, GPIO.FALLING, callback=toggle_recording, bouncetime=3000)
     
 # --------------------------------------------------------------------
+
+def fingerprint_monitor():
+    global fingerprint, user_number
+    while True:  # Use a loop to keep the thread running
+        with fingerprint_condition:
+            while fingerprint is not None:
+                fingerprint_condition.wait()
+
+            with record_lock:
+                # Simulate fingerprint re-sign in
+                print("Awaiting fingerprint...")
+                time.sleep(10)  # Simulate waiting time for user to re-sign in
+                fingerprint = fingerprint_mappings[user_number]
+                print("Fingerprint verified.")
+
+
+    '''
+    result = fingerprint_reader.search()   # find matching fingerprint 
+    print("Result: ", result)   
+    if result[0] == '0':  # if we successfully read a fingerprint
+        fingerprint = fingerprint_mappings[result[1]]
+        while (media_taken < 5):
+            time.sleep(1)
+            # wait(media_taken_lock, media_taken_with_fingerprint)
+        media_taken = 0
+        fingerprint = None
+    time.sleep(1)  # Short sleep to prevent hogging CPU resources
+    '''
+
+
     
 def update_gps_data_continuously(gps_lock):
     global gps_status
@@ -111,9 +152,13 @@ class PhotoLockGUI(FloatLayout):
         Thread(target=update_gps_data_continuously, args=(gps_lock,), daemon=True).start()
         Thread(target=update_wifi_status_continuously, daemon=True).start() 
         Thread(target=upload_saved_media_continuously, args=(upload_lock,), daemon=True).start()  # try to upload all media  **** added if true check and thread
+        Thread(target=fingerprint_monitor, daemon=True).start()
 
+        Window.bind(on_key_down=self.on_key_down)
 
         self.capture = capture
+        
+        self.last_frame_texture = None  # To hold the texture of the last frame
 
         # Specify the size and position of the background rectangles
         
@@ -138,11 +183,29 @@ class PhotoLockGUI(FloatLayout):
         self.img1 = Image(keep_ratio=False, allow_stretch=True)
         self.add_widget(self.img1)
 
+        self.animation_overlay = FloatLayout(size_hint=(1, 1))
+        self.fingerprint_label = Label(text='Scan Fingerprint', color=(1, 1, 1, 1), font_size='60sp', pos_hint={'center_x': 0.5, 'center_y': 0.5})
+        self.animation_overlay.add_widget(self.fingerprint_label)
+
+        # Fingerprint label and its background
+        self.fingerprint_bg_color = Color(0, 0, 0, 0)  # Initially transparent
+        self.fingerprint_bg_rect = Rectangle(size=(500, 100), pos=(150, 190))
+
+        with self.canvas.before:
+            self.canvas.add(self.fingerprint_bg_color)
+            self.canvas.add(self.fingerprint_bg_rect)
+            Color(0, 0, 0, 0.8)  # Semi-transparent black background
+
+
+        self.add_widget(self.animation_overlay)
+
+
         self.bind(size=self.adjust_video_size)
 
         self.status_label = Label(text='Image', color=(1, 1, 1, 1), font_size='30sp')
         self.status_layout.add_widget(self.status_label)
         self.add_widget(self.status_layout)
+
 
         self.add_widget(self.wifi_status_image)
         self.bind(size=self.adjust_wifi_image_position)
@@ -163,6 +226,8 @@ class PhotoLockGUI(FloatLayout):
             self.indicators_bg_rect = Rectangle(size=(150, 130), pos=(650, 350))
         
         self.add_widget(self.countdown_label)
+
+    #-----------------------------------------------------------------------------------
         
         self.bind(size=self._update_bg_and_label_pos, pos=self._update_bg_and_label_pos)
         
@@ -181,15 +246,22 @@ class PhotoLockGUI(FloatLayout):
 
     def update(self, dt):
         ret, frame = self.capture.read()
+
         if ret:
+            self.last_frame = frame  # Store the last frame
             buf1 = cv2.flip(frame, 0)
             buf = buf1.tobytes()
             texture = Texture.create(size=(frame.shape[1], frame.shape[0]), colorfmt='bgr')
             texture.blit_buffer(buf, colorfmt='bgr', bufferfmt='ubyte')
             self.img1.texture = texture
+            self.last_frame_texture = texture  # Update the last frame's texture
             
             mode_text = "Image" if image_mode else "Video"
             self.status_label.text = f"{mode_text}"
+
+            fingerprint_text = "" if fingerprint else "Scan Fingerprint"
+            self.fingerprint_bg_color.rgba = (0, 0, 0, .8) if not fingerprint else (0, 0, 0, 0)
+            self.fingerprint_label.text = f"{fingerprint_text}"
 
             self.recording_color.a = 1 if recording_indicator else 0
 
@@ -268,10 +340,45 @@ class PhotoLockGUI(FloatLayout):
         self.countdown_label.text = ""
         self.bg_color.rgba = (0, 0, 0, 0)  # Make the background transparent again
         Clock.unschedule(self.update_countdown)
+
+    def on_key_down(self, window, key, *args):
+        # Check if the pressed key is Enter (keycode == 13)
+        if key == 13:
+            self.animate_last_frame()
             
+    def animate_last_frame(self):
+        if self.last_frame_texture:
+            animated_image = Image(texture=self.last_frame_texture, size_hint=(None, None), size=(800, 480),keep_ratio=False, allow_stretch=True)
+            self.animation_overlay.add_widget(animated_image)
+
+            animation = Animation(pos=(10, 10), size=(150, 90), duration=.3) + Animation(opacity=1, duration=6) + Animation(opacity=0, duration=.3)
+            animation.bind(on_complete=lambda *x: self.animation_overlay.remove_widget(animated_image))
+            animation.start(animated_image)
+
+    def animate_upload(self):
+        # Create a label for the upload animation
+        upload_label = Label(text="Uploading...", size_hint=(None, None), size=(200, 50),
+                             pos=(self.width / 2 - 100, self.height - 60))  # Position it at the top
+
+        # Add this label to the animation overlay
+        self.animation_overlay.add_widget(upload_label)
+
+        # Define the animation sequence: fade in, stay, fade out
+        animation = Animation(opacity=1, duration=0.5) + \
+                    Animation(opacity=1, duration=2) + \
+                    Animation(opacity=0, duration=0.5)
+
+        # Remove the label from the overlay once the animation is complete
+        animation.bind(on_complete=lambda *x: self.animation_overlay.remove_widget(upload_label))
+
+        # Start the animation
+        animation.start(upload_label)
+
+
 class PhotoLockApp(App):
     def build(self):
         global gui_instance
+
         self.capture = cv2.VideoCapture(2)
         self.capture.set(cv2.CAP_PROP_AUTOFOCUS, 0)
         self.capture.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
@@ -323,9 +430,16 @@ def toggle_recording(channel):
     global record_lock
     global mid_video
     global camera
+    global gui_instance
+    global media_taken
+    global fingerprint
+    global user_number
 
     if recording_indicator and not mid_video:
         return 
+    
+    if not fingerprint:
+        return
     
     with record_lock:
 
@@ -341,15 +455,19 @@ def toggle_recording(channel):
         elif mid_video == True:                # recording a video 
             print("In the elif for mid_video == True")
             # Video mode, dont want to record anymore, currently recording
-            ffmpeg_process = stop_recording(ffmpeg_process, object_count)
-            mid_video = False
             recording_indicator = False
+            Clock.schedule_once(lambda dt: gui_instance.animate_last_frame())
+            ffmpeg_process = stop_recording(ffmpeg_process, object_count)
+            media_taken += 1
+            mid_video = False
+
             print("Released lock after stopping video in toggle_recording()")
 
         elif image_mode == True and mid_video == False:                # image mode, not recording video
             # Image mode, we want to start capture, currently not capturing
             recording_indicator= True
             capture_image(camera, capture_image_lock)
+            media_taken += 1
             recording_indicator = False
             print("Released lock after capturing image in toggle_recording()")
 
@@ -357,7 +475,14 @@ def toggle_recording(channel):
             print("Error: Unknown state in the else case of handle_capture()")
             quit()
 
-
+        if media_taken > 3:
+            user_number += 1
+            if user_number > 3:
+                user_number = 0
+            with fingerprint_condition:
+                fingerprint = None
+                media_taken = 0
+                fingerprint_condition.notify_all()
 # --------------------------------------------------------------------
 
 import os
@@ -415,7 +540,7 @@ def stop_recording(ffmpeg_process, object_count):
     ffmpeg_cut_command = [
     'ffmpeg',
     '-i', video_filepath_raw,  # Input file path
-    '-ss', '5',  # Start trimming 5 seconds into the video
+    '-ss', '3',  # Start trimming 5 seconds into the video
     '-c:v', 'copy',  # Copy the video stream without re-encoding
     '-c:a', 'copy',  # Copy the audio stream without re-encoding
     '-threads', '4',
@@ -428,7 +553,7 @@ def stop_recording(ffmpeg_process, object_count):
     print("Stopped cutting recording")
     os.remove(video_filepath_raw)  # remove the video after uploading
 
-    Thread(target=main, args=(video_filepath, camera_number_string, save_video_filepath, gps_lock, signature_lock, upload_lock,)).start()
+    Thread(target=main, args=(fingerprint, video_filepath, camera_number_string, save_video_filepath, gps_lock, signature_lock, upload_lock,)).start()
 
     return None
 
@@ -450,10 +575,13 @@ def capture_image(camera, capture_image_lock):
         for i in range(35):
             ret, frame = camera.read()
         
+        # Animate frame (capture image thing)
+        Clock.schedule_once(lambda dt: gui_instance.animate_last_frame())
+        
         if ret:
             image = frame
             # Start automatic processing and upload process for images
-            Thread(target=main, args=(image, camera_number_string, save_image_filepath, gps_lock, signature_lock, upload_lock,)).start()
+            Thread(target=main, args=(fingerprint, image, camera_number_string, save_image_filepath, gps_lock, signature_lock, upload_lock,)).start()
 
         else:
             print("\tError: Failed to capture an image.")
@@ -480,56 +608,60 @@ def count_files(directory_path):
 # -------------------------------------------------------------------
 
 def upload_saved_media_continuously(upload_lock):
-    '''thread function for uploading saved media in the background when Wifi is available and media is stored locally.'''
-    global wifi_status
-
+    global gui_instance
     while True:
-        print(f"\Twifi status in upload thread: {wifi_status}")
-        if wifi_status == True:
-            print("Have lock trying to upload ALL FILES from both folders")
-            with upload_lock:   
-                print("Current Directory: ", os.getcwd())
-                print("Image Directory: ", save_image_filepath)
-                print("Video Directory: ", save_video_filepath)
-                total_images_jsons = len(os.listdir(save_image_filepath))
-                total_vidoes_jsons = len(os.listdir(save_video_filepath))
+        if wifi_status:  # Assuming wifi_status is a global variable indicating WiFi availability
+            with upload_lock:  # Ensure exclusive access to the file system
+                try:
+                    for save_path in [save_image_filepath, save_video_filepath]:
 
-                if total_images_jsons % 2 == 0:
-                    for file_name in os.listdir(save_image_filepath):
-                        print("Image file name: ", file_name)
-                        if file_name.lower().endswith('.png'):
-                            file_path = os.path.join(save_image_filepath, file_name) # get the full path
-                            image = cv2.imread(file_path)   # read the image
-                            _, encoded_image = cv2.imencode(".png", image)  # encode the image
-                            
-                            file_path_metadata = os.path.join(save_image_filepath, file_name[:-3]+'json') # get matching json file
-                            metadata = read_metadata(file_path_metadata)
+                        files = os.listdir(save_path)
+                        paired_files = find_paired_files(files)
 
+                        for base_name in paired_files:
+                            image_path = os.path.join(save_path, base_name + '.png')
+                            video_path = os.path.join(save_path, base_name + '.avi')
+                            metadata_path = os.path.join(save_path, base_name + '.json')
+
+                            # Attempt to upload paired files
                             try:
-                                upload_image(encoded_image.tobytes(), metadata)   # cv2 png object, metadat
-                                os.remove(file_path)
-                                os.remove(file_path_metadata)
+                                if os.path.exists(image_path):
+                                    Clock.schedule_once(lambda dt: gui_instance.animate_upload())
+                                    upload_image_file(image_path, metadata_path)
+                                elif os.path.exists(video_path):
+                                    Clock.schedule_once(lambda dt: gui_instance.animate_upload())
+                                    upload_video_file(video_path, metadata_path)
                             except Exception as e:
-                                print(f"Error uploading saved image: {str(e)}")
-                
-                if total_vidoes_jsons % 2 == 0:
-                    for file_name in os.listdir(save_video_filepath):
-                        print("VIdeo file name: ", file_name)
-                        if file_name.lower().endswith('.avi'):
-                            file_path = os.path.join(save_video_filepath, file_name) # get the full path
-                            with open(file_path, 'rb') as video:
-                                video_bytes = video.read()
-                            
-                            file_path_metadata = os.path.join(save_video_filepath, file_name[:-3]+'json') # get matching json file
-                            metadata = read_metadata(file_path_metadata)
+                                print(f"Error uploading file {base_name}: {e}")
+                except Exception as e:
+                    print(f"Unexpected error: {e}")
+        
+        time.sleep(10)  # Wait before trying again
 
-                            try:
-                                upload_video(video_bytes, metadata)   # cv2 png object, metadat
-                                os.remove(file_path)
-                                os.remove(file_path_metadata)
-                            except Exception as e:
-                                print(f"Error uploading saved image: {str(e)}")
-        time.sleep(10)
+def find_paired_files(files):
+    """Extract base filenames that have both an image/video and a metadata file."""
+    base_names = set()
+    for file in files:
+        if file.lower().endswith(('.png', '.avi', '.json')):
+            base_names.add(file.rsplit('.', 1)[0])
+    # Return only those base names for which both a media file and a metadata file exist
+    return {base for base in base_names if any(f"{base}.json" in files for f in ['png', 'avi'])}
+
+def upload_image_file(image_path, metadata_path):
+    image = cv2.imread(image_path)
+    _, encoded_image = cv2.imencode(".png", image)
+    metadata = read_metadata(metadata_path)
+    upload_image(encoded_image.tobytes(), metadata)
+    os.remove(image_path)
+    os.remove(metadata_path)
+
+def upload_video_file(video_path, metadata_path):
+    with open(video_path, 'rb') as video:
+        video_bytes = video.read()
+    metadata = read_metadata(metadata_path)
+    upload_video(video_bytes, metadata)
+    os.remove(video_path)
+    os.remove(metadata_path)
 
 # -------------------------------------------------------------------
                             

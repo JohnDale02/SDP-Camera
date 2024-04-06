@@ -8,6 +8,7 @@ from cryptography.hazmat.primitives import hashes, serialization
 from cryptography.hazmat.primitives.asymmetric import padding
 from cryptography.exceptions import InvalidSignature
 
+'''Lambda function for verifying the signature of an image or video being uploaded to our Twitter Clone : Team4SeniorDesignProject-Twitter.com'''
 
 def handler(event, context):
     errors = ""
@@ -38,17 +39,18 @@ def handler(event, context):
             details = get_json_details(binary_image)
 
             if details  != False:
-                camera_number = details[0]
-                time_data = details[1]
-                location_data = details[2]
-                signature_string = details[3]
+                fingerprint = details[0]
+                camera_number = details[1]
+                time_data = details[2]
+                location_data = details[3]
+                signature_string = details[4]
                 signature = signature = base64.b64decode(signature_string)
 
         except Exception as e:
             errors = errors + "Error:" + f"Error getting JSON details: {str(e)}"
 
         try:
-            combined_data = create_combined(camera_number, encoded_media, time_data, location_data)
+            combined_data = create_combined(fingerprint, camera_number, encoded_media, time_data, location_data)
         
         except Exception as e:
             errors = errors + "Error:" + f"Error combining data: {str(e)}"
@@ -79,6 +81,7 @@ def handler(event, context):
                     'body': json.dumps({
                         "result": "True",
                         "metadata": {
+                            "fingerprint": fingerprint,
                             "camera_number": camera_number,
                             "time_data": time_data,
                             "location_data": location_data,
@@ -115,17 +118,18 @@ def handler(event, context):
             details = get_json_details(binary_video)
 
             if details  != False:
-                camera_number = details[0]
-                time_data = details[1]
-                location_data = details[2]
-                signature_string = details[3]
+                fingerprint = details[0]
+                camera_number = details[1]
+                time_data = details[2]
+                location_data = details[3]
+                signature_string = details[4]
                 signature = signature = base64.b64decode(signature_string)
 
         except Exception as e:
             errors = errors + "Error:" + f"Error getting JSON details for video: {str(e)}"
 
         try:
-            combined_data = create_combined(camera_number, binary_video, time_data, location_data)
+            combined_data = create_combined(fingerprint, camera_number, binary_video, time_data, location_data)
         
         except Exception as e:
             errors = errors + "Error:" + f"Error combining data: {str(e)}"
@@ -156,6 +160,7 @@ def handler(event, context):
                     'body': json.dumps({
                         "result": "True",
                         "metadata": {
+                            "fingerprint": fingerprint,
                             "camera_number": camera_number,
                             "time_data": time_data,
                             "location_data": location_data,
@@ -242,30 +247,30 @@ def get_json_details(binary_image):
 
     if result:      # if the image_hash is found in the database
         data = json.loads(result[0])
+        fingerprint = data.get("Fingerprint")
         camera_number = data.get("Camera Number")
         time_data = data.get("Time")
         location_data = data.get("Location")
         signature = data.get("Signature_Base64")
-        print([camera_number, time_data, location_data, signature])
+        print([fingerprint, camera_number, time_data, location_data, signature])
 
-        return [camera_number, time_data, location_data, signature]
+        return [fingerprint, camera_number, time_data, location_data, signature]
     else:
         return False   # if the image_hash is not found in the database
 
 
 
+def create_combined(fingerprint: str, camera_number: str, media: bytes, time: str, location: str) -> bytes:
+    '''Takes in fingerprint, camera number, image, time, location and encodes then combines to form one byte object'''
 
-def create_combined(camera_number: str, media: bytes, time: str, location: str) -> bytes:
-    '''Takes in camera number, image, time, location and encodes then combines to form one byte object'''
-
+    encoded_fingerprint = fingerprint.encode('utf-8')
     encoded_number = camera_number.encode('utf-8')
     encoded_time = time.encode('utf-8')
     encoded_location = location.encode('utf-8')
 
-    combined_data = encoded_number + media + encoded_time + encoded_location
+    combined_data = encoded_fingerprint + encoded_number + media + encoded_time + encoded_location
 
     return combined_data
-
 
 
 

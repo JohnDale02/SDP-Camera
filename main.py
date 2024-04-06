@@ -14,7 +14,7 @@ from save_metadata import save_metadata
 import os
 from upload_video import upload_video
 
-def main(media_input, camera_number_string, save_media_filepath, gps_lock, signature_lock, upload_lock):
+def main(fingerprint, media_input, camera_number_string, save_media_filepath, gps_lock, signature_lock, upload_lock):
 	'''main function for processing media for signing and uploading
 				media_input : for images = imread(image) ; for videos = video_filpath for reading bytes from
 				camera_number_string : number representing the actual device 
@@ -42,7 +42,7 @@ def main(media_input, camera_number_string, save_media_filepath, gps_lock, signa
 
 	#-------------- combine number + image + Time + Location ----------------------------------------------
 
-		combined_data = create_combined(camera_number_string, encoded_image.tobytes(), time, location)   # returns combined data as a 
+		combined_data = create_combined(fingerprint, camera_number_string, encoded_image.tobytes(), time, location)   # returns combined data as a 
 
 	# ---------------- Create digest for signing --------------------------
 		try:
@@ -62,7 +62,7 @@ def main(media_input, camera_number_string, save_media_filepath, gps_lock, signa
 
 	#---------------- Create Metadata ------------------------------------
 
-		metadata = create_metadata(camera_number_string, time, location, signature_string)   # creates a dictionary for the strings [string, string, string, byte64]
+		metadata = create_metadata(fingerprint, camera_number_string, time, location, signature_string)   # creates a dictionary for the strings [string, string, string, byte64]
 
 	#------------------ Check if we have Wi-FI -----------------------------
 
@@ -103,7 +103,7 @@ def main(media_input, camera_number_string, save_media_filepath, gps_lock, signa
 
 	#-------------- combine number + image + Time + Location ----------------------------------------------
 
-		combined_data = create_combined(camera_number_string, video_bytes, time, location)   # returns combined data as a 
+		combined_data = create_combined(fingerprint, camera_number_string, video_bytes, time, location)   # returns combined data as a 
 
 	# ---------------- Create digest for signing --------------------------
 		try:
@@ -122,7 +122,7 @@ def main(media_input, camera_number_string, save_media_filepath, gps_lock, signa
 	#---------------- Create Metadata ------------------------------------
 
 		try:
-			metadata = create_metadata(camera_number_string, time, location, signature_string)   # creates a dictionary for the strings [string, string, string, byte64]
+			metadata = create_metadata(fingerprint, camera_number_string, time, location, signature_string)   # creates a dictionary for the strings [string, string, string, byte64]
 		
 		except Exception as e:
 			#print(f"Could not create metadata for video: {str(e)}")
