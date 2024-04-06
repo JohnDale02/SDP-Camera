@@ -102,8 +102,8 @@ def fingerprint_monitor():
         media_taken = 0
         fingerprint = None
 
-    time.sleep(10)
-    fingerprint = "John Dale"
+        time.sleep(10)
+        fingerprint = "John Dale"
     '''
     while fingerprint == None:
         result = fingerprint_reader.search()   # find matching fingerprint 
