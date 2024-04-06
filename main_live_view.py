@@ -173,9 +173,6 @@ class PhotoLockGUI(FloatLayout):
             self.status_color = Color(0, 0, 0, 0.4)  # Semi-transparent black background
             self.status_background = Rectangle(size=(70, 120), pos=(25, 354))
 
-            self.fingerprint_color = Color(1, 1, 0, .4)  ########################################
-            self.fingerprint_background = Rectangle(size=(100, 160), pos=(250, 450)) ###############################
-
         self.status_layout.bind(pos=self.update_rect, size=self.update_rect)
         
         self.img1 = Image(keep_ratio=False, allow_stretch=True)
@@ -190,7 +187,9 @@ class PhotoLockGUI(FloatLayout):
         self.status_label = Label(text='Image', color=(1, 1, 1, 1), font_size='30sp')
         self.status_layout.add_widget(self.status_label)
 
+        self.fingerprint_background = Rectangle(size=(100, 160), color=(0, 0, 0, .4), pos_hint={'center_x': 0.5, 'center_y': 0.5}) ###############################
         self.fingerprint_label = Label(text='Scan Fingerprint', color=(1, 1, 1, 1), font_size='60sp', pos_hint={'center_x': 0.5, 'center_y': 0.5})  ###################### 
+        self.animation_overlay.add_widget(self.fingerprint_background)  ###############################
         self.animation_overlay.add_widget(self.fingerprint_label)  ########################### 
 
         self.add_widget(self.status_layout)
