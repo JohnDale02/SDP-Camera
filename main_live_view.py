@@ -190,8 +190,8 @@ class PhotoLockGUI(FloatLayout):
         self.status_label = Label(text='Image', color=(1, 1, 1, 1), font_size='30sp')
         self.status_layout.add_widget(self.status_label)
 
-        self.fingerprint_label = Label(text='Scan Fingerprint', color=(1, 1, 1, 1), font_size='60sp')  ###################### 
-        self.animation_overlay.add_widget(self.fingerprint_label, pos_hint={'center_x': 0.5, 'center_y': 0.5})  ########################### 
+        self.fingerprint_label = Label(text='Scan Fingerprint', color=(1, 1, 1, 1), font_size='60sp', pos_hint={'center_x': 0.5, 'center_y': 0.5})  ###################### 
+        self.animation_overlay.add_widget(self.fingerprint_label)  ########################### 
 
         self.add_widget(self.status_layout)
 
