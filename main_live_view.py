@@ -566,7 +566,6 @@ def upload_saved_media_continuously(upload_lock):
                 try:
                     for save_path in [save_image_filepath, save_video_filepath]:
 
-                        Clock.schedule_once(lambda dt: gui_instance.animate_upload())
                         files = os.listdir(save_path)
                         paired_files = find_paired_files(files)
 
@@ -578,8 +577,10 @@ def upload_saved_media_continuously(upload_lock):
                             # Attempt to upload paired files
                             try:
                                 if os.path.exists(image_path):
+                                    Clock.schedule_once(lambda dt: gui_instance.animate_upload())
                                     upload_image_file(image_path, metadata_path)
                                 elif os.path.exists(video_path):
+                                    Clock.schedule_once(lambda dt: gui_instance.animate_upload())
                                     upload_video_file(video_path, metadata_path)
                             except Exception as e:
                                 print(f"Error uploading file {base_name}: {e}")
