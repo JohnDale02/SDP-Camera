@@ -61,10 +61,10 @@ media_taken = 0
 user_number = 0
 camera_number_string = "1"
 fingerprint = "John Dale"  # string representing name of user's fingerprint that opened camera
-fingerprint_mappings = {0, 'John Dale',
-                        1, 'Dani Kasti',
-                        2, 'Darius Paradie',
-                        3, 'Jace Christakis'}
+fingerprint_mappings = {0: 'John Dale',
+                        1: 'Dani Kasti',
+                        2: 'Darius Paradie',
+                        3: 'Jace Christakis'}
 
 save_video_filepath = "/home/sdp/SDP-Camera/tmpVideos"
 save_image_filepath = "/home/sdp/SDP-Camera/tmpImages"
@@ -99,12 +99,13 @@ def fingerprint_monitor():
         with fingerprint_condition:
             while fingerprint is not None:
                 fingerprint_condition.wait()
-                
-            # Simulate fingerprint re-sign in
-            print("Awaiting fingerprint...")
-            time.sleep(10)  # Simulate waiting time for user to re-sign in
-            fingerprint = fingerprint_mappings[user_number]
-            print("Fingerprint verified.")
+
+            with record_lock:
+                # Simulate fingerprint re-sign in
+                print("Awaiting fingerprint...")
+                time.sleep(10)  # Simulate waiting time for user to re-sign in
+                fingerprint = fingerprint_mappings[user_number]
+                print("Fingerprint verified.")
 
 
     '''
