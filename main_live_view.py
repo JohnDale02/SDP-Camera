@@ -91,6 +91,7 @@ def setup_gpio():
     # Setup event detection
     GPIO.add_event_detect(mode_button, GPIO.FALLING, callback=toggle_image_mode, bouncetime=1000)
     GPIO.add_event_detect(record_button, GPIO.FALLING, callback=toggle_recording, bouncetime=3000)
+    GPIO.remove_event_detect(mode_button)
 
     fingerprint_monitor()   # check if we should request fingerprint again...
     
@@ -99,11 +100,15 @@ def setup_gpio():
 def fingerprint_monitor():
     global media_taken, fingerprint
     if media_taken >= 2 or fingerprint == None:
+        GPIO.remove_event_detect(mode_button)
+        GPIO.remove_event_detect(record_button)
         media_taken = 0
         fingerprint = None
 
         time.sleep(10)
         fingerprint = "John Dale"
+        GPIO.add_event_detect(mode_button, GPIO.FALLING, callback=toggle_image_mode, bouncetime=1000)
+        GPIO.add_event_detect(record_button, GPIO.FALLING, callback=toggle_recording, bouncetime=3000)
     '''
     while fingerprint == None:
         result = fingerprint_reader.search()   # find matching fingerprint 
