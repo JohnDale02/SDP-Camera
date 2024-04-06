@@ -10,7 +10,6 @@ from main import main
 from nothing import sleep
 from threading import Lock
 from GPS_uart import read_gps_data
-from upload_saved_media import upload_saved_media
 from upload_image import upload_image
 from upload_video import upload_video
 import json
@@ -56,7 +55,6 @@ upload_lock = Lock()   # **** upload lock
 capture_image_lock = Lock()
 mid_video = False
 
-upload_threads = []
 
 media_taken = 0
 camera_number_string = "1"
@@ -541,56 +539,57 @@ def count_files(directory_path):
 # -------------------------------------------------------------------
 
 def upload_saved_media_continuously(upload_lock):
-    '''thread function for uploading saved media in the background when Wifi is available and media is stored locally.'''
-    global wifi_status
-
     while True:
-        print(f"\Twifi status in upload thread: {wifi_status}")
-        if wifi_status == True:
-            print("Have lock trying to upload ALL FILES from both folders")
-            with upload_lock:   
-                print("Current Directory: ", os.getcwd())
-                print("Image Directory: ", save_image_filepath)
-                print("Video Directory: ", save_video_filepath)
-                total_images_jsons = len(os.listdir(save_image_filepath))
-                total_vidoes_jsons = len(os.listdir(save_video_filepath))
+        if wifi_status:  # Assuming wifi_status is a global variable indicating WiFi availability
+            with upload_lock:  # Ensure exclusive access to the file system
+                try:
+                    # Combine the logic for both images and videos into a single block for efficiency
+                    for save_path in [save_image_filepath, save_video_filepath]:
+                        files = os.listdir(save_path)
+                        paired_files = find_paired_files(files)
 
-                if total_images_jsons % 2 == 0:
-                    for file_name in os.listdir(save_image_filepath):
-                        print("Image file name: ", file_name)
-                        if file_name.lower().endswith('.png'):
-                            file_path = os.path.join(save_image_filepath, file_name) # get the full path
-                            image = cv2.imread(file_path)   # read the image
-                            _, encoded_image = cv2.imencode(".png", image)  # encode the image
-                            
-                            file_path_metadata = os.path.join(save_image_filepath, file_name[:-3]+'json') # get matching json file
-                            metadata = read_metadata(file_path_metadata)
+                        for base_name in paired_files:
+                            image_path = os.path.join(save_path, base_name + '.png')
+                            video_path = os.path.join(save_path, base_name + '.avi')
+                            metadata_path = os.path.join(save_path, base_name + '.json')
 
+                            # Attempt to upload paired files
                             try:
-                                upload_image(encoded_image.tobytes(), metadata)   # cv2 png object, metadat
-                                os.remove(file_path)
-                                os.remove(file_path_metadata)
+                                if os.path.exists(image_path):
+                                    upload_image_file(image_path, metadata_path)
+                                elif os.path.exists(video_path):
+                                    upload_video_file(video_path, metadata_path)
                             except Exception as e:
-                                print(f"Error uploading saved image: {str(e)}")
-                
-                if total_vidoes_jsons % 2 == 0:
-                    for file_name in os.listdir(save_video_filepath):
-                        print("VIdeo file name: ", file_name)
-                        if file_name.lower().endswith('.avi'):
-                            file_path = os.path.join(save_video_filepath, file_name) # get the full path
-                            with open(file_path, 'rb') as video:
-                                video_bytes = video.read()
-                            
-                            file_path_metadata = os.path.join(save_video_filepath, file_name[:-3]+'json') # get matching json file
-                            metadata = read_metadata(file_path_metadata)
+                                print(f"Error uploading file {base_name}: {e}")
+                except Exception as e:
+                    print(f"Unexpected error: {e}")
+                    
+        time.sleep(10)  # Wait before trying again
 
-                            try:
-                                upload_video(video_bytes, metadata)   # cv2 png object, metadat
-                                os.remove(file_path)
-                                os.remove(file_path_metadata)
-                            except Exception as e:
-                                print(f"Error uploading saved image: {str(e)}")
-        time.sleep(10)
+def find_paired_files(files):
+    """Extract base filenames that have both an image/video and a metadata file."""
+    base_names = set()
+    for file in files:
+        if file.lower().endswith(('.png', '.avi', '.json')):
+            base_names.add(file.rsplit('.', 1)[0])
+    # Return only those base names for which both a media file and a metadata file exist
+    return {base for base in base_names if any(f"{base}.json" in files for f in ['png', 'avi'])}
+
+def upload_image_file(image_path, metadata_path):
+    image = cv2.imread(image_path)
+    _, encoded_image = cv2.imencode(".png", image)
+    metadata = read_metadata(metadata_path)
+    upload_image(encoded_image.tobytes(), metadata)
+    os.remove(image_path)
+    os.remove(metadata_path)
+
+def upload_video_file(video_path, metadata_path):
+    with open(video_path, 'rb') as video:
+        video_bytes = video.read()
+    metadata = read_metadata(metadata_path)
+    upload_video(video_bytes, metadata)
+    os.remove(video_path)
+    os.remove(metadata_path)
 
 # -------------------------------------------------------------------
                             
