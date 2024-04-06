@@ -95,11 +95,11 @@ def setup_gpio():
 
 def fingerprint_monitor():
     global fingerprint
-    with record_lock:
-        while True:  # Use a loop to keep the thread running
-            with fingerprint_condition:
-                while fingerprint is not None:
-                    fingerprint_condition.wait()
+    while True:  # Use a loop to keep the thread running
+        with fingerprint_condition:
+            while fingerprint is not None:
+                fingerprint_condition.wait()
+            with record_lock:
                 # Simulate fingerprint re-sign in
                 print("Awaiting fingerprint...")
                 time.sleep(10)  # Simulate waiting time for user to re-sign in
