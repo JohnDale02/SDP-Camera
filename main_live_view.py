@@ -192,8 +192,8 @@ class PhotoLockGUI(FloatLayout):
         self.fingerprint_bg_rect = Rectangle()
 
         with self.canvas.before:
-            self.canvas.add(self.bg_color)
-            self.canvas.add(self.bg_rect)
+            self.canvas.add(self.fingerprint_bg_color)
+            self.canvas.add(self.fingerprint_bg_rect)
             Color(0, 0, 0, 0.4)  # Semi-transparent black background
 
 
