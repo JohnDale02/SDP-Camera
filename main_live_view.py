@@ -58,12 +58,13 @@ mid_video = False
 
 
 media_taken = 0
+user_number = 0
 camera_number_string = "1"
 fingerprint = "John Dale"  # string representing name of user's fingerprint that opened camera
-fingerprint_mappings = {1, 'John Dale',
-                        2, 'Dani Kasti',
-                        3, 'Darius Paradie',
-                        4, 'Jace Christakis'}
+fingerprint_mappings = {0, 'John Dale',
+                        1, 'Dani Kasti',
+                        2, 'Darius Paradie',
+                        3, 'Jace Christakis'}
 
 save_video_filepath = "/home/sdp/SDP-Camera/tmpVideos"
 save_image_filepath = "/home/sdp/SDP-Camera/tmpImages"
@@ -93,7 +94,7 @@ def setup_gpio():
 # --------------------------------------------------------------------
 
 def fingerprint_monitor():
-    global fingerprint
+    global fingerprint, user_number
     while True:  # Use a loop to keep the thread running
         with fingerprint_condition:
             while fingerprint is not None:
@@ -103,7 +104,7 @@ def fingerprint_monitor():
                 # Simulate fingerprint re-sign in
                 print("Awaiting fingerprint...")
                 time.sleep(10)  # Simulate waiting time for user to re-sign in
-                fingerprint = "John Dale"  # Simulate user re-signing in
+                fingerprint = fingerprint_mappings[user_number]
                 print("Fingerprint verified.")
 
 
@@ -461,6 +462,9 @@ def toggle_recording(channel):
             quit()
 
         if media_taken > 3:
+            user_number += 1
+            if user_number > 3:
+                user_number = 0
             with fingerprint_condition:
                 fingerprint = None
                 media_taken = 0
