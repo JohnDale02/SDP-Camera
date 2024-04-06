@@ -184,12 +184,12 @@ class PhotoLockGUI(FloatLayout):
         self.add_widget(self.img1)
 
         self.animation_overlay = FloatLayout(size_hint=(1, 1))
-        self.fingerprint_label = Label(text='Image', color=(1, 1, 1, 1), font_size='30sp', pos_hint={'center_x': 0.5, 'center_y': 0.5})
+        self.fingerprint_label = Label(text='Scan Fingerprint', color=(1, 1, 1, 1), font_size='60sp', pos_hint={'center_x': 0.5, 'center_y': 0.5})
         self.animation_overlay.add_widget(self.fingerprint_label)
 
         # Fingerprint label and its background
         self.fingerprint_bg_color = Color(0, 0, 0, 0)  # Initially transparent
-        self.fingerprint_bg_rect = Rectangle(size=(200, 50), pos=(300, 200))
+        self.fingerprint_bg_rect = Rectangle(size=(400, 120), pos=(300, 220))
 
         with self.canvas.before:
             self.canvas.add(self.fingerprint_bg_color)
