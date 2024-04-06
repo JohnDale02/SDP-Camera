@@ -186,6 +186,17 @@ class PhotoLockGUI(FloatLayout):
         self.animation_overlay = FloatLayout(size_hint=(1, 1))
         self.fingerprint_label = Label(text='Image', color=(1, 1, 1, 1), font_size='30sp', pos_hint={'center_x': 0.5, 'center_y': 0.5})
         self.animation_overlay.add_widget(self.fingerprint_label)
+
+        # Fingerprint label and its background
+        self.fingerprint_bg_color = Color(0, 0, 0, 0)  # Initially transparent
+        self.fingerprint_bg_rect = Rectangle()
+
+        with self.canvas.before:
+            self.canvas.add(self.bg_color)
+            self.canvas.add(self.bg_rect)
+            Color(0, 0, 0, 0.4)  # Semi-transparent black background
+
+
         self.add_widget(self.animation_overlay)
 
 
@@ -194,7 +205,6 @@ class PhotoLockGUI(FloatLayout):
         self.status_label = Label(text='Image', color=(1, 1, 1, 1), font_size='30sp')
         self.status_layout.add_widget(self.status_label)
         self.add_widget(self.status_layout)
-
 
 
         self.add_widget(self.wifi_status_image)
@@ -216,6 +226,8 @@ class PhotoLockGUI(FloatLayout):
             self.indicators_bg_rect = Rectangle(size=(150, 130), pos=(650, 350))
         
         self.add_widget(self.countdown_label)
+
+    #-----------------------------------------------------------------------------------
         
         self.bind(size=self._update_bg_and_label_pos, pos=self._update_bg_and_label_pos)
         
@@ -248,6 +260,7 @@ class PhotoLockGUI(FloatLayout):
             self.status_label.text = f"{mode_text}"
 
             fingerprint_text = "" if fingerprint else "Scan Fingerprint"
+            self.fingerprint_bg_color.rgba = (0, 0, 0, .4) if not fingerprint else (0, 0, 0, 0)
             self.fingerprint_label.text = f"{fingerprint_text}"
 
             self.recording_color.a = 1 if recording_indicator else 0
