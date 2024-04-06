@@ -56,6 +56,8 @@ upload_lock = Lock()   # **** upload lock
 capture_image_lock = Lock()
 mid_video = False
 
+upload_threads = []
+
 media_taken = 0
 camera_number_string = "1"
 fingerprint = "John Dale"  # string representing name of user's fingerprint that opened camera
@@ -469,7 +471,7 @@ def stop_recording(ffmpeg_process, object_count):
     ffmpeg_cut_command = [
     'ffmpeg',
     '-i', video_filepath_raw,  # Input file path
-    '-ss', '5',  # Start trimming 5 seconds into the video
+    '-ss', '3',  # Start trimming 5 seconds into the video
     '-c:v', 'copy',  # Copy the video stream without re-encoding
     '-c:a', 'copy',  # Copy the audio stream without re-encoding
     '-threads', '4',
