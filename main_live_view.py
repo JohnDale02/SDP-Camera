@@ -102,6 +102,7 @@ def fingerprint_monitor():
         media_taken = 0
         fingerprint = None
 
+    time.sleep(10)
     fingerprint = "John Dale"
     '''
     while fingerprint == None:
@@ -172,8 +173,8 @@ class PhotoLockGUI(FloatLayout):
             self.status_color = Color(0, 0, 0, 0.4)  # Semi-transparent black background
             self.status_background = Rectangle(size=(70, 120), pos=(25, 354))
 
-            self.fingerprint_color = Color(1, 1, 1, 1)  ########################################
-            self.fingerprint_background = Rectangle(size=(100, 160), pos=(25, 354)) ###############################
+            self.fingerprint_color = Color(1, 1, 0, .4)  ########################################
+            self.fingerprint_background = Rectangle(size=(100, 160), pos_hint={'center_x': 0.5, 'center_y': 0.5})) ###############################
 
         self.status_layout.bind(pos=self.update_rect, size=self.update_rect)
         
@@ -189,7 +190,7 @@ class PhotoLockGUI(FloatLayout):
         self.status_label = Label(text='Image', color=(1, 1, 1, 1), font_size='30sp')
         self.status_layout.add_widget(self.status_label)
 
-        self.fingerprint_label = Label(text='Scan Fingerprint', color=(1, 1, 1, 1), font_size='60sp')  ###################### 
+        self.fingerprint_label = Label(text='Scan Fingerprint', color=(1, 1, 1, 1), font_size='60sp', pos_hint={'center_x': 0.5, 'center_y': 0.5}))  ###################### 
         self.status_layout.add_widget(self.fingerprint_label)  ########################### 
 
         self.add_widget(self.status_layout)
@@ -247,6 +248,7 @@ class PhotoLockGUI(FloatLayout):
 
             self.recording_color.a = 1 if recording_indicator else 0
             self.fingerprint_color.a = 1 if fingerprint else 0  #############################
+            self.fingerprint_label.text = "" if fingerprint else "Scan Fingerprint"  #############################
 
  
     def check_wifi_status(self, dt):
