@@ -395,9 +395,10 @@ def toggle_recording(channel):
         elif mid_video == True:                # recording a video 
             print("In the elif for mid_video == True")
             # Video mode, dont want to record anymore, currently recording
+            recording_indicator = False
             ffmpeg_process = stop_recording(ffmpeg_process, object_count)
             mid_video = False
-            recording_indicator = False
+
             Clock.schedule_once(lambda dt: gui_instance.animate_last_frame())
 
             print("Released lock after stopping video in toggle_recording()")
