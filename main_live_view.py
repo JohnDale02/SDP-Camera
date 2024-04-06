@@ -319,6 +319,26 @@ class PhotoLockGUI(FloatLayout):
             animation.bind(on_complete=lambda *x: self.animation_overlay.remove_widget(animated_image))
             animation.start(animated_image)
 
+    def animate_upload(self):
+        # Create a label for the upload animation
+        upload_label = Label(text="Uploading...", size_hint=(None, None), size=(200, 50),
+                             pos=(self.width / 2 - 100, self.height - 60))  # Position it at the top
+
+        # Add this label to the animation overlay
+        self.animation_overlay.add_widget(upload_label)
+
+        # Define the animation sequence: fade in, stay, fade out
+        animation = Animation(opacity=1, duration=0.5) + \
+                    Animation(opacity=1, duration=2) + \
+                    Animation(opacity=0, duration=0.5)
+
+        # Remove the label from the overlay once the animation is complete
+        animation.bind(on_complete=lambda *x: self.animation_overlay.remove_widget(upload_label))
+
+        # Start the animation
+        animation.start(upload_label)
+
+
 class PhotoLockApp(App):
     def build(self):
         global gui_instance
@@ -539,12 +559,14 @@ def count_files(directory_path):
 # -------------------------------------------------------------------
 
 def upload_saved_media_continuously(upload_lock):
+    global gui_instance
     while True:
         if wifi_status:  # Assuming wifi_status is a global variable indicating WiFi availability
             with upload_lock:  # Ensure exclusive access to the file system
                 try:
-                    # Combine the logic for both images and videos into a single block for efficiency
                     for save_path in [save_image_filepath, save_video_filepath]:
+
+                        Clock.schedule_once(lambda dt: gui_instance.animate_upload())
                         files = os.listdir(save_path)
                         paired_files = find_paired_files(files)
 
@@ -563,7 +585,7 @@ def upload_saved_media_continuously(upload_lock):
                                 print(f"Error uploading file {base_name}: {e}")
                 except Exception as e:
                     print(f"Unexpected error: {e}")
-                    
+        
         time.sleep(10)  # Wait before trying again
 
 def find_paired_files(files):
