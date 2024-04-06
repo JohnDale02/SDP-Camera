@@ -1,6 +1,6 @@
 
 import threading 
-from threading import Lock, Thread
+from threading import Lock, Thread, Condition
 import RPi.GPIO as GPIO
 import time
 import subprocess
@@ -34,6 +34,8 @@ from kivy.core.window import Window
 Window.show_cursor = False
 #Window.fullscreen = False  # *********
 
+
+
 # -------------Global Variables ------------------------------
 image_mode = True
 ffmpeg_process = None
@@ -44,21 +46,22 @@ mode_button = 38
 wifi_status = False
 gps_status = False
 
-ignore_button_presses = False  # This flag indicates whether to ignore button events
 recording_indicator = False
-
+mid_video = False
 
 gps_lock = Lock()
 signature_lock = Lock()
 record_lock = Lock()   
 upload_lock = Lock()   # **** upload lock
 capture_image_lock = Lock()
-mid_video = False
 
+fingerprint_condition = Condition()
+timeout_condition = Condition()
 
 media_taken = 0
 camera_number_string = "1"
-fingerprint = "John Dale"  # string representing name of user's fingerprint that opened camera
+fingerprint = None  # initialized to None
+#fingerprint = "John Dale"  # string representing name of user's fingerprint that opened camera
 fingerprint_mappings = {1, 'John Dale',
                         2, 'Dani Kasti',
                         3, 'Darius Paradie',
@@ -90,20 +93,25 @@ def setup_gpio():
     GPIO.add_event_detect(record_button, GPIO.FALLING, callback=toggle_recording, bouncetime=3000)
     
 # --------------------------------------------------------------------
-'''
+
 def fingerprint_monitor():
-    while True:
-        result = fingerprint_reader.search()   # find matching fingerprint 
-        print("Result: ", result)   
-        if result[0] == '0':  # if we successfully read a fingerprint
-            fingerprint = fingerprint_mappings[result[1]]
-            while (media_taken < 5):
-                time.sleep(1)
-                # wait(media_taken_lock, media_taken_with_fingerprint)
-            media_taken = 0
-            fingerprint = None
-        time.sleep(1)  # Short sleep to prevent hogging CPU resources
-'''
+    global media_taken, fingerprint
+    if media_taken >= 5:
+        media_taken = 0
+        fingerprint = None
+        '''
+        while fingerprint == None:
+            result = fingerprint_reader.search()   # find matching fingerprint 
+            print("Result: ", result)   
+            if result[0] == '0':  # if we successfully read a fingerprint
+                fingerprint = fingerprint_mappings[result[1]]
+            time.sleep(1)  # Short sleep to prevent hogging CPU resources
+
+    # we will loop infinitely until we find a valid fingerprint
+
+
+            
+    '''
 
     
 def update_gps_data_continuously(gps_lock):
@@ -162,6 +170,9 @@ class PhotoLockGUI(FloatLayout):
             self.status_color = Color(0, 0, 0, 0.4)  # Semi-transparent black background
             self.status_background = Rectangle(size=(70, 120), pos=(25, 354))
 
+            self.fingerprint_color = Color(0, 0, 0, 0.4)  ########################################
+            self.fingerprint_background = Rectangle(size=(100, 160), pos=(25, 354)) ###############################
+
         self.status_layout.bind(pos=self.update_rect, size=self.update_rect)
         
         self.img1 = Image(keep_ratio=False, allow_stretch=True)
@@ -175,7 +186,12 @@ class PhotoLockGUI(FloatLayout):
 
         self.status_label = Label(text='Image', color=(1, 1, 1, 1), font_size='30sp')
         self.status_layout.add_widget(self.status_label)
+
+        self.fingerprint_label = Label(text='Image', color=(1, 1, 1, 1), font_size='60sp')  ###################### 
+        self.status_layout.add_widget(self.fingerprint_label)  ########################### 
+
         self.add_widget(self.status_layout)
+
 
         self.add_widget(self.wifi_status_image)
         self.bind(size=self.adjust_wifi_image_position)
@@ -228,7 +244,9 @@ class PhotoLockGUI(FloatLayout):
             self.status_label.text = f"{mode_text}"
 
             self.recording_color.a = 1 if recording_indicator else 0
+            self.fingerprint_color.a = 1 if fingerprint else 0  #############################
 
+ 
     def check_wifi_status(self, dt):
         global wifi_status
 
