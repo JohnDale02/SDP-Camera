@@ -27,3 +27,11 @@ docker push 359793706805.dkr.ecr.us-east-2.amazonaws.com/final:latest
 # Testing Local Deployment
 terminal: docker run -p 9000:8080 <any_image_name_you_want>:test  
 Windows Powershell:  Invoke-WebRequest -Uri "http://localhost:9000/2015-03-31/functions/function/invocations" -Method Post -Body '{}' -ContentType "application/json"
+
+
+
+
+MYSQL PASSWORD:
+
+username: sdp
+password sdpsdpsdp

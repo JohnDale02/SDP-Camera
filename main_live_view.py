@@ -109,16 +109,7 @@ def fingerprint_monitor():
 
 
     '''
-    result = fingerprint_reader.search()   # find matching fingerprint 
-    print("Result: ", result)   
-    if result[0] == '0':  # if we successfully read a fingerprint
-        fingerprint = fingerprint_mappings[result[1]]
-        while (media_taken < 5):
-            time.sleep(1)
-            # wait(media_taken_lock, media_taken_with_fingerprint)
-        media_taken = 0
-        fingerprint = None
-    time.sleep(1)  # Short sleep to prevent hogging CPU resources
+    result = get_fingerprint()
     '''
 
 
