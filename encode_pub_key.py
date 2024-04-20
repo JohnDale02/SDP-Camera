@@ -1,23 +1,13 @@
 import base64
 
-def encode_key_to_base64(file_path):
-    # Open and read the public key file
-    with open(file_path, 'rb') as file:
-        public_key = file.read()
-    
-    # The public key file typically starts with '-----BEGIN PUBLIC KEY-----'
-    # and ends with '-----END PUBLIC KEY-----'. We need to remove these headers
-    # and any newlines or extra spaces.
-    start_marker = "-----BEGIN PUBLIC KEY-----"
-    end_marker = "-----END PUBLIC KEY-----"
-    
-    base64_encoded_public_key = base64.b64encode(public_key.encode())
-    
-    print("Encoded Public Key:", base64_encoded_public_key)
+# Specify the file path of your PEM file
+file_path = 'public.pem'
 
-# Specify the path to your public key file
-file_path = '/home/sdp/rsa.pub'
+# Read the file in binary mode
+with open(file_path, 'rb') as file:
+    binary_content = file.read()
 
-# Get the encoded key
-base64_encoded_public_key = encode_key_to_base64(file_path)
-print("Base64 Encoded Public Key:", base64_encoded_public_key)
+# Encode the binary data to a Base64 string for easy handling and display
+encoded_content = base64.b64encode(binary_content).decode('utf-8')
+
+print(encoded_content)
