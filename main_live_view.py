@@ -12,6 +12,7 @@ from threading import Lock
 from GPS_uart import read_gps_data
 from upload_image import upload_image
 from upload_video import upload_video
+from get_fingerprint import get_fingerprint
 import json
 
 from kivy.config import Config
@@ -61,8 +62,8 @@ media_taken = 0
 user_number = 0
 camera_number_string = "2"
 fingerprint = "John Dale"  # string representing name of user's fingerprint that opened camera
-fingerprint_mappings = {0: 'John Dale',
-                        1: 'Dani Kasti',
+fingerprint_mappings = {0: 'Dani Kasti',
+                        1: 'John Dale',
                         2: 'Darius Paradie',
                         3: 'Jace Christakis'}
 
@@ -103,15 +104,9 @@ def fingerprint_monitor():
             with record_lock:
                 # Simulate fingerprint re-sign in
                 print("Awaiting fingerprint...")
-                time.sleep(10)  # Simulate waiting time for user to re-sign in
+                user_number = get_fingerprint()
                 fingerprint = fingerprint_mappings[user_number]
                 print("Fingerprint verified.")
-
-
-    '''
-    result = get_fingerprint()
-    '''
-
 
     
 def update_gps_data_continuously(gps_lock):

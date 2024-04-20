@@ -37,6 +37,3 @@ def get_fingerprint():
         print('Operation failed!')
         print('Exception message: ' + str(e))
         exit(1)
-
-
-print(get_fingerprint())
