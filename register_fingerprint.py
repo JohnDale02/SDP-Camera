@@ -3,7 +3,7 @@ import time
 
 try:
     ## Change here: Update the port to '/dev/ttyAMA1' or the correct one for UART4
-    f = PyFingerprint('/dev/ttyAMA4', 57600, 0xFFFFFFFF, 0x00000000)
+    f = PyFingerprint('/dev/ttyAMA5', 57600, 0xFFFFFFFF, 0x00000000)
 
     if (f.verifyPassword() == False):
         raise ValueError('The given fingerprint sensor password is wrong!')
