@@ -58,7 +58,7 @@ fingerprint_condition = Condition()
 mid_video = False
 
 
-media_taken = 10000
+media_taken = 0
 user_number = -1
 camera_number_string = "2"
 fingerprint = None # string representing name of user's fingerprint that opened camera
