@@ -104,7 +104,7 @@ def fingerprint_monitor():
             with record_lock:
                 # Simulate fingerprint re-sign in
                 print("Awaiting fingerprint...")
-                while user_number < -1:
+                while user_number < 0:  # in the invalid range
                     user_number = get_fingerprint(user_number)
 
                 fingerprint = fingerprint_mappings[user_number]
