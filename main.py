@@ -29,7 +29,7 @@ def main(fingerprint, media_input, camera_number_string, save_media_filepath, gp
 #---------------------- Receive Image input  ----------------------------
 		image = media_input
 		# image = create_image()  # take the image
-
+		
 		_, encoded_image = cv2.imencode('.png', image)  # we send the encoded image to the cloud 
 		#print("main: Image captured")
 
