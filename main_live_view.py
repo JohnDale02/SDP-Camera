@@ -59,7 +59,7 @@ mid_video = False
 
 media_taken = 0
 user_number = 0
-camera_number_string = "1"
+camera_number_string = "2"
 fingerprint = "John Dale"  # string representing name of user's fingerprint that opened camera
 fingerprint_mappings = {0: 'John Dale',
                         1: 'Dani Kasti',
