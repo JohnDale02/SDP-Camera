@@ -104,8 +104,9 @@ def fingerprint_monitor():
             with record_lock:
                 # Simulate fingerprint re-sign in
                 print("Awaiting fingerprint...")
-                while user_number == -1:
-                    user_number = get_fingerprint()
+                while user_number < -1:
+                    user_number = get_fingerprint(user_number)
+
                 fingerprint = fingerprint_mappings[user_number]
                 print("Fingerprint verified.")
 
@@ -246,7 +247,13 @@ class PhotoLockGUI(FloatLayout):
             mode_text = "Image" if image_mode else "Video"
             self.status_label.text = f"{mode_text}"
 
-            fingerprint_text = "" if fingerprint else "Scan Fingerprint"
+            if user_number > -1:
+                fingerprint_text = ""
+            elif user_number == -1:
+                fingerprint_text = "Scan Fingerprint"
+            else:  # This will handle cases where user_number < -1
+                fingerprint_text = "Invalid Scan"
+
             self.fingerprint_bg_color.rgba = (0, 0, 0, .8) if not fingerprint else (0, 0, 0, 0)
             self.fingerprint_label.text = f"{fingerprint_text}"
 

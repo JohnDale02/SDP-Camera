@@ -1,6 +1,6 @@
 from pyfingerprint.pyfingerprint import PyFingerprint
 
-def get_fingerprint():
+def get_fingerprint(user_number):
     try:
         ## Change here: Update the port to '/dev/ttyAMA4'
         f = PyFingerprint('/dev/ttyAMA5', 57600, 0xFFFFFFFF, 0x00000000)
@@ -27,7 +27,7 @@ def get_fingerprint():
 
         if (positionNumber == -1):
             print('No match found!')
-            return -1
+            return user_number-1
         else:
             print('Found template at position #' + str(positionNumber))
             print('The accuracy score is: ' + str(accuracyScore))
