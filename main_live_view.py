@@ -59,7 +59,7 @@ mid_video = False
 
 
 media_taken = 0
-user_number = 0
+user_number = None
 camera_number_string = "2"
 fingerprint = None # string representing name of user's fingerprint that opened camera
 fingerprint_mappings = {0: 'Dani Kasti',
@@ -419,7 +419,6 @@ def toggle_recording(channel):
     global gui_instance
     global media_taken
     global fingerprint
-    global user_number
 
     if recording_indicator and not mid_video:
         return 
@@ -462,9 +461,6 @@ def toggle_recording(channel):
             quit()
 
         if media_taken > 3:
-            user_number += 1
-            if user_number > 3:
-                user_number = 0
             with fingerprint_condition:
                 fingerprint = None
                 media_taken = 0
