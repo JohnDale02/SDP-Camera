@@ -11,10 +11,9 @@ def encode_key_to_base64(file_path):
     start_marker = "-----BEGIN PUBLIC KEY-----"
     end_marker = "-----END PUBLIC KEY-----"
     
-    # Strip headers/footers and replace newlines
-    encoded_key = public_key.replace(start_marker, '').replace(end_marker, '').strip()
+    base64_encoded_public_key = base64.b64encode(public_key.encode()).decode()
     
-    print("Encoded Public Key:", encoded_key)
+    print("Encoded Public Key:", base64_encoded_public_key)
 
 # Specify the path to your public key file
 file_path = '/home/sdp/rsa.pub'
