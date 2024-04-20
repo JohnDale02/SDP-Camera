@@ -59,7 +59,7 @@ mid_video = False
 
 
 media_taken = 10000
-user_number = None
+user_number = -1
 camera_number_string = "2"
 fingerprint = None # string representing name of user's fingerprint that opened camera
 fingerprint_mappings = {0: 'Dani Kasti',
@@ -104,7 +104,8 @@ def fingerprint_monitor():
             with record_lock:
                 # Simulate fingerprint re-sign in
                 print("Awaiting fingerprint...")
-                user_number = get_fingerprint()
+                while user_number == -1:
+                    user_number = get_fingerprint()
                 fingerprint = fingerprint_mappings[user_number]
                 print("Fingerprint verified.")
 
@@ -419,6 +420,7 @@ def toggle_recording(channel):
     global gui_instance
     global media_taken
     global fingerprint
+    global user_number
 
     if recording_indicator and not mid_video:
         return 
@@ -462,6 +464,7 @@ def toggle_recording(channel):
 
         if media_taken > 3:
             with fingerprint_condition:
+                user_number = -1
                 fingerprint = None
                 media_taken = 0
                 fingerprint_condition.notify_all()
