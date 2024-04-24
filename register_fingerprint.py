@@ -19,12 +19,12 @@ try:
         pass
 
     f.convertImage(0x01)
-    result = f.searchTemplate()
-    positionNumber = result[0]
+    #result = f.searchTemplate()
+    #positionNumber = result[0]
 
-    if (positionNumber >= 0):
-        print('Template already exists at position #' + str(positionNumber))
-        exit(0)
+    #if (positionNumber >= 0):
+     #   print('Template already exists at position #' + str(positionNumber))
+    #   exit(0)
 
     print('Remove finger...')
     time.sleep(2)
