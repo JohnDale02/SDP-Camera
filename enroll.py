@@ -5,13 +5,10 @@
 PyFingerprint
 Copyright (C) 2015 Bastian Raschke <bastian.raschke@posteo.de>
 All rights reserved.
-
 """
 
 import time
 from pyfingerprint.pyfingerprint import PyFingerprint
-from pyfingerprint.pyfingerprint import FINGERPRINT_CHARBUFFER1
-from pyfingerprint.pyfingerprint import FINGERPRINT_CHARBUFFER2
 
 
 ## Enrolls new finger
@@ -19,7 +16,7 @@ from pyfingerprint.pyfingerprint import FINGERPRINT_CHARBUFFER2
 
 ## Tries to initialize the sensor
 try:
-    f = PyFingerprint('/dev/ttyAMA5', 57600, 0xFFFFFFFF, 0x00000000)
+    f = PyFingerprint('/dev/ttyUSB0', 57600, 0xFFFFFFFF, 0x00000000)
 
     if ( f.verifyPassword() == False ):
         raise ValueError('The given fingerprint sensor password is wrong!')
@@ -41,7 +38,8 @@ try:
         pass
 
     ## Converts read image to characteristics and stores it in charbuffer 1
-    f.convertImage(FINGERPRINT_CHARBUFFER1)
+    f.convertImage(0x01)
+    f.createTemplate()  # Line added for fix
 
     ## Checks if finger is already enrolled
     result = f.searchTemplate()
@@ -61,7 +59,8 @@ try:
         pass
 
     ## Converts read image to characteristics and stores it in charbuffer 2
-    f.convertImage(FINGERPRINT_CHARBUFFER2)
+    f.convertImage(0x02)
+    f.createTemplate()  # Line added for fix
 
     ## Compares the charbuffers
     if ( f.compareCharacteristics() == 0 ):
