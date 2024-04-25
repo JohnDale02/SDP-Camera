@@ -64,8 +64,8 @@ camera_number_string = "2"
 fingerprint = None # string representing name of user's fingerprint that opened camera
 fingerprint_mappings = {0: 'Dani Kasti',
                         1: 'John Dale',
-                        2: 'Darius Paradie',
-                        3: 'Jace Christakis'}
+                        2: 'Jace Christakis',
+                        3: 'Darius Paradie'}
 
 save_video_filepath = "/home/sdp/SDP-Camera/tmpVideos"
 save_image_filepath = "/home/sdp/SDP-Camera/tmpImages"
