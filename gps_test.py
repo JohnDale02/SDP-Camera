@@ -42,6 +42,9 @@ def parse_nmea_sentence(sentence):
             formatted_date = date_object.strftime("%Y-%m-%d")
 
             return latitude, longitude, formatted_time, formatted_date
+    else:
+        return parts[0], None, None, None
+
 
     return None, None, None, None
 
