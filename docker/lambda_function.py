@@ -1,60 +1,87 @@
-import mysql.connector
+import boto3
 import json
-import cv2
-import hashlib
+import base64
+import mysql.connector
 import os
 import base64
-from cryptography.hazmat.primitives import hashes, serialization
+import cv2
+import numpy as np
+import os
+from twilio.rest import Client
+from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.asymmetric import padding
+from cryptography.hazmat.primitives import serialization
 from cryptography.exceptions import InvalidSignature
+from cryptography.hazmat.backends import default_backend
+import hashlib
+import subprocess
 
-'''Lambda function for verifying the signature of an image or video being uploaded to our Twitter Clone : Team4SeniorDesignProject-Twitter.com'''
+# Possible updates
+# - Done hardcode bucket name and object key
+# - want cameras to have differnt object keys so not overwriting eachother 
+#   - Ex. object_key = "NewImage_1.png" for camera 1 and "NewImage_2.png" so both devices are overwriting eachothers if picture at same time
 
 def handler(event, context):
-    errors = ""
-    print("THIS IS THE VERIFICATION API CALL")
-    try:
-        # Parse the JSON string in the body
-        body = json.loads(event['body'])
+    # Create an S3 client
+    s3_client = boto3.client('s3')
 
-        content_type = body['type']
-        # Access the 'image' key directly
-        binary_media  = base64.b64decode(body['image'])
+    # Extract bucket name and object key from the event
+    object_key = str(event['Records'][0]['s3']['object']['key'])
+    print("Object key: should be NewImage.png or NewVideo.avi", object_key)
+    bucket_name = 'unverifiedimages'
 
-    except Exception as e:
-        errors = "Error decoding media from event: " + str(e)
+    image = False   # video default
+    if object_key.endswith(".png"):
+        image = True  # we have an image now 
     
-    if content_type == "image/png":
-        binary_image = binary_media
+    print(f"Is this an image: {image}")
 
+    errors = ""
+
+    try:
+        # Get the object from S3
         try:
-            image = binary_image_to_numpy(binary_image)
-            _, encoded_image = cv2.imencode('.png', image)  # we send the encoded image to the cloud
+            #bucket_name = 'unverifiedimages'
+            #object_key = 'NewImage.png'
+            response = s3_client.get_object(Bucket=bucket_name, Key=object_key)
+
+        except Exception as e:
+            errors = errors + "Error:" + f"Get object error : {str(e)}"
+
+
+        if image: 
+            temp_media_path = '/tmp/TempNewImage.png'   # recreate the png using the cv2 png object bytes recieved
+            s3_client.download_file(bucket_name, object_key, temp_media_path)
+            media = cv2.imread(temp_media_path)
+            _, encoded_image = cv2.imencode('.png', media)  # we send the encoded image to the cloud
             encoded_media = encoded_image.tobytes()
 
-        except Exception as e:
-            errors = errors + "Error:" + f"Error converting binary image to numpy: {str(e)}"
+        else:
+            temp_media_path = '/tmp/TempNewVideo.avi'
+            s3_client.download_file(bucket_name, object_key, temp_media_path)
+            print("Downloading video Done")
+            temp_mp4_path = '/tmp/TempNewMp4.mp4'
+
+            with open(temp_media_path, 'rb') as video:
+                encoded_media = video.read()
+                print(encoded_media[-10:])
+                
+        # Access the object's metadata
+        metadata = response['Metadata']
 
         try:
-            details = get_json_details(binary_image)
-
-            if details  != False:
-                fingerprint = details[0]
-                camera_number = details[1]
-                time_data = details[2]
-                location_data = details[3]
-                signature_string = details[4]
-                signature = signature = base64.b64decode(signature_string)
+            fingerprint, camera_number, date_data, time_data, location_data, signature, signature_string = recreate_data(metadata)
 
         except Exception as e:
-            errors = errors + "Error:" + f"Error getting JSON details: {str(e)}"
+            errors = errors + "Error:" + f"Cannot recreate time and metadata {str(e)}"
 
-        try:
-            combined_data = create_combined(fingerprint, camera_number, encoded_media, time_data, location_data)
+        try: 
+            print("Storing json details")
+            store_json_details(temp_media_path, fingerprint, camera_number, date_data, time_data, location_data, signature_string)
+            print("Stored json details")
+        except Exception as e: 
+            errors = errors + "Error:" + f"Cannot store json details {str(e)}"
         
-        except Exception as e:
-            errors = errors + "Error:" + f"Error combining data: {str(e)}"
-
         try:
             public_key_base64 = get_public_key(int(camera_number))
             public_key = base64.b64decode(public_key_base64)
@@ -62,220 +89,88 @@ def handler(event, context):
         except Exception as e:
             errors = errors + "Error:" + f"Public key error: {str(e)}"
 
+        try:
+            combined_data = create_combined(fingerprint, camera_number, encoded_media, date_data, time_data, location_data)
+
+        except Exception as e:
+            errors = errors + "Error:" + f"Couldnt combine Data: {str(e)}"
         try: 
             valid = verify_signature(combined_data, signature, public_key)
 
         except Exception as e:
-            valid = False   # something went wrong verifying signature
             errors = errors + "Error:" + f"Error verifying or denying signature {str(e)}"
 
-        try:
-            if valid:
-                # Return true with metadata
-                return {
-                    'statusCode': 200,
-                    'headers': {
-                        'Content-Type': 'application/json',
-                        'Access-Control-Allow-Origin': '*'
-                    },
-                    'body': json.dumps({
-                        "result": "True",
-                        "metadata": {
-                            "fingerprint": fingerprint,
-                            "camera_number": camera_number,
-                            "time_data": time_data,
-                            "location_data": location_data,
-                            "signature": signature_string
-                        }
-                    })
-                }
-            else:
-                # Return false without metadata
-                return {
-                    'statusCode': 200,
-                    'headers': {
-                        'Content-Type': 'application/json',
-                        'Access-Control-Allow-Origin': '*'
-                    },
-                    'body': json.dumps({"result": "False"})
-                }
+        if valid == True:
+            try:
+                media_save_name, media_number = upload_verified(s3_client, fingerprint, camera_number, date_data, time_data, location_data, signature, temp_media_path, image)  # save the AVI file
 
-        except Exception as e:
-            errors = "Unhandled exception: " + str(e)
-            return {
-                'statusCode': 500,
-                'headers': {
-                    'Content-Type': 'application/json',
-                    'Access-Control-Allow-Origin': '*'
-                },
-                'body': json.dumps({"error": errors})
-            }
+            except Exception as e:
+                errors = errors + "Issue uploading to verified bucket" + str(e)
 
-    else:    # content type is video/avi
-        binary_video = binary_media
+            try: 
+                convert_to_mp4(temp_media_path, temp_mp4_path)
+                upload_verified_mp4(s3_client, fingerprint, temp_mp4_path, media_number)  # create and save a mp4 file
 
-        try:
-            details = get_json_details(binary_video)
+            except Exception as e:
+                errors = errors + "Issue uploading to verified bucket" + str(e)
 
-            if details  != False:
-                fingerprint = details[0]
-                camera_number = details[1]
-                time_data = details[2]
-                location_data = details[3]
-                signature_string = details[4]
-                signature = signature = base64.b64decode(signature_string)
+            try:
+                send_text(valid, fingerprint, media_save_name)
 
-        except Exception as e:
-            errors = errors + "Error:" + f"Error getting JSON details for video: {str(e)}"
+            except Exception as e:
+                errors = errors + "Issue Sending text: " + str(e)
 
-        try:
-            combined_data = create_combined(fingerprint, camera_number, binary_video, time_data, location_data)
-        
-        except Exception as e:
-            errors = errors + "Error:" + f"Error combining data: {str(e)}"
+            os.remove(temp_media_path)
+            os.remove(temp_mp4_path)
+            
+        else:
+            try:
+                send_text(valid, fingerprint)
 
-        try:
-            public_key_base64 = get_public_key(int(camera_number))
-            public_key = base64.b64decode(public_key_base64)
-
-        except Exception as e:
-            errors = errors + "Error:" + f"Public key error: {str(e)}"
-
-        try: 
-            valid = verify_signature(combined_data, signature, public_key)
-
-        except Exception as e:
-            valid = False   # something went wrong verifying signature
-            errors = errors + "Error:" + f"Error verifying or denying signature {str(e)}"
-
-        try:
-            if valid:
-                # Return true with metadata
-                return {
-                    'statusCode': 200,
-                    'headers': {
-                        'Content-Type': 'application/json',
-                        'Access-Control-Allow-Origin': '*'
-                    },
-                    'body': json.dumps({
-                        "result": "True",
-                        "metadata": {
-                            "fingerprint": fingerprint,
-                            "camera_number": camera_number,
-                            "time_data": time_data,
-                            "location_data": location_data,
-                            "signature": signature_string
-                        }
-                    })
-                }
-            else:
-                # Return false without metadata
-                return {
-                    'statusCode': 200,
-                    'headers': {
-                        'Content-Type': 'application/json',
-                        'Access-Control-Allow-Origin': '*'
-                    },
-                    'body': json.dumps({"result": "False"})
-                }
-
-        except Exception as e:
-            errors = "Unhandled exception: " + str(e)
-            return {
-                'statusCode': 500,
-                'headers': {
-                    'Content-Type': 'application/json',
-                    'Access-Control-Allow-Origin': '*'
-                },
-                'body': json.dumps({"error": errors})
-            }
+            except Exception as e:
+                errors = errors + "Issue Sending text after failing verification" + str(e)
 
 
+    except Exception as e:
+        errors = errors + f'There was an exeption: {str(e)}'
 
-def get_hash_for_query(binary_image):
-    ''' Function for taking binary version of image and converting it to hash'''
-    hash_object = hashlib.sha256()
-    hash_object.update(binary_image)
-    image_hash = hash_object.hexdigest()
+    print("Errors: ", errors)
 
-    return image_hash
-
-def binary_image_to_numpy(binary_image):
-    ''' Function for taking binary version of image and converting it to numpy array'''
-    # Assuming image_data contains the binary data of the image
-    temp_file_path = "/tmp/my_temp_file.png"
-
-    with open(temp_file_path, 'wb') as file:
-        file.write(binary_image)
-
-    image = cv2.imread(temp_file_path)
-    os.remove(temp_file_path)
-
-    return image
+    return {
+        'statusCode': 200,
+        'body': json.dumps('Function executed successfully!'),
+        'errors': errors,
+    }
 
 
-def get_json_details(binary_image):
-    # Environment variables for database connection
-    #host = os.environ['DB_HOST']
-    #user = os.environ['DB_USER']
-    #password = os.environ['DB_PASSWORD']
-    #database = os.environ['DB_NAME']
-    # Hash the image data to use as an index
+def recreate_data(metadata):
+    '''Intakes cv2 image data and metadata; returns camera number, time, location, signature, creates image file'''
 
-    image_hash = get_hash_for_query(binary_image)
+    fingerprint = metadata.get('fingerprint')
+    camera_number = metadata.get('cameranumber')
+    date_data = metadata.get('date')
+    time_data = metadata.get('time')
+    location_data = metadata.get('location')
+    
+    signature_string = metadata.get('signature')
+    signature = base64.b64decode(signature_string)
 
-    host = "publickeycamerastorage.c90gvpt3ri4q.us-east-2.rds.amazonaws.com"
-    user = "sdp"
-    password = "sdpsdpsdp"
-    database = "PublicKeySchema"
-
-    # Connect to the database
-    connection = mysql.connector.connect(
-        host=host, user=user, password=password, database=database
-    )
-    cursor = connection.cursor()
-
-    # SQL query to retrieve the data for given image_hash
-    query = "SELECT data FROM image_data WHERE image_hash = %s"
-
-    cursor.execute(query, (str(image_hash),))
-
-    # Fetch the result
-    result = cursor.fetchone()
-    cursor.close()
-    connection.close()
-
-    if result:      # if the image_hash is found in the database
-        data = json.loads(result[0])
-        fingerprint = data.get("Fingerprint")
-        camera_number = data.get("Camera Number")
-        time_data = data.get("Time")
-        location_data = data.get("Location")
-        signature = data.get("Signature_Base64")
-        print("Fingerprint: ", fingerprint)
-        print("Camera Number: ", camera_number)
-        print("Time: ", time_data)
-        print("Location: ", location_data)
-        print("Signature: ", signature)
-        print([fingerprint, camera_number, time_data, location_data, signature])
-
-        return [fingerprint, camera_number, time_data, location_data, signature]
-    else:
-        return False   # if the image_hash is not found in the database
+    return fingerprint, camera_number, date_data, time_data, location_data, signature, signature_string
 
 
-
-def create_combined(fingerprint: str, camera_number: str, media: bytes, time: str, location: str) -> bytes:
-    '''Takes in fingerprint, camera number, image, time, location and encodes then combines to form one byte object'''
+def create_combined(fingerprint: str, camera_number: str, media: bytes, date: str, time: str, location: str) -> bytes:
+    '''Takes in camera number, image, time, location and encodes then combines to form one byte object'''
 
     encoded_fingerprint = fingerprint.encode('utf-8')
     encoded_number = camera_number.encode('utf-8')
+    encoded_date = date.encode('utf-8')
     encoded_time = time.encode('utf-8')
     encoded_location = location.encode('utf-8')
 
-    combined_data = encoded_fingerprint + encoded_number + media + encoded_time + encoded_location
+    combined_data = encoded_fingerprint + encoded_number + media + encoded_date + encoded_time + encoded_location
 
     return combined_data
+
 
 
 
@@ -316,6 +211,99 @@ def get_public_key(camera_number):
     
 
 
+def upload_verified(s3_client, fingerprint, camera_number, date_data, time_data, location_data, signature, temp_media_path, image): #################### CHANGED TO FINGERPRINt, BUCKET NOT BASED ON NUMBER BUT FINGERPRINT
+# Get S3 bucket for verified images(camera_number)
+    bucket_name  = ''.join(fingerprint.split()).lower()
+    destination_bucket_name = bucket_name
+
+    try:
+        media_number = get_next_number_for_new_file(destination_bucket_name)
+
+    except Exception as e:
+        pass
+    
+    if image:
+        media_file_name = str(media_number) + '.png'  # Changes file extension
+    else:
+        media_file_name = str(media_number) + '.avi'
+
+    # Create JSON data
+    json_data = {
+        "Fingerprint": fingerprint,  # string
+        "Camera Number": camera_number,
+        "Date": date_data,  # string
+        "Time": time_data,  # string
+        "Location": location_data,   # string
+        "Signature_Base64": base64.b64encode(signature).decode('utf-8')  # signature is in base64 encoded (string)
+    }
+
+    # Save JSON data to a file with the same name as the image
+    json_file_name = str(media_number) + '.json'  # Changes file extension to .json
+
+    temp_json_path = f'/tmp/{json_file_name}'
+
+
+    with open(temp_json_path, 'w') as json_file:
+        json.dump(json_data, json_file)
+
+    try:
+        s3_client.upload_file(temp_media_path, destination_bucket_name, media_file_name)
+
+    except Exception as e:
+        pass
+        
+    try:     # Upload JSON file to the same new S3 bucket
+        s3_client.upload_file(temp_json_path, destination_bucket_name, json_file_name)
+        
+    except Exception as e:
+        pass
+        #print(f"Uploading JSON error : {e}")
+
+    # Clean up: Delete temporary files
+    os.remove(temp_json_path)
+
+    return media_file_name, media_number
+
+
+def upload_verified_mp4(s3_client, fingerprint, temp_mp4_path, media_number):  #################### CHANGED TO FINGERPRING, BUCKET NOT BASED ON NUMBER BUT FINGERPRINT
+# Get S3 bucket for verified images(camera_number)
+    bucket_name  = ''.join(fingerprint.split()).lower()
+    destination_bucket_name = bucket_name
+
+    media_file_name = str(media_number) + '.mp4'
+
+    try:
+        s3_client.upload_file(temp_mp4_path, destination_bucket_name, media_file_name, ExtraArgs={'ContentType': 'video/mp4'})
+
+    except Exception as e:
+        pass
+
+
+def get_next_number_for_new_file(bucket_name):
+    s3 = boto3.client('s3')
+    
+    # Use paginator to ensure we check all objects if there are more than 1000
+    paginator = s3.get_paginator('list_objects_v2')
+    highest_number = 0
+
+    for page in paginator.paginate(Bucket=bucket_name):
+        for obj in page.get('Contents', []):
+            file_name = obj['Key']
+            try:
+                # Extract the number from the file name
+                number = int(file_name.split('.')[0])
+                if number > highest_number:
+                    highest_number = number
+            except ValueError:
+                # If the file name does not start with a number, ignore it
+                continue
+    
+    # Assuming the sequence is uninterrupted and follows the naming convention strictly
+    next_number = highest_number + 1
+    return next_number
+
+
+
 def verify_signature(combined_data, signature, public_key):
 
 
@@ -344,3 +332,101 @@ def verify_signature(combined_data, signature, public_key):
         os.remove(temp_public_key_path)
         return False
     
+
+def send_text(valid, fingerprint, image_save_name="default"):
+
+    account_sid = '#'
+    auth_token = '#'
+    client = Client(account_sid, auth_token)
+
+    if valid == True:
+        Body = f"Your Image was Successfully Authenticated. Stored as {image_save_name}"
+
+    else:
+        Body = f"Your Image failed to be Authenticated. Deleted"
+
+    numbers = {"Dani Kasti": '+18025577844', 
+               "John Dale":'+17819159187',
+               "Darius Paradie": '+16032496942',
+               "Jace Christakis": '+17819993514'}
+    
+    receiving_user = numbers[fingerprint]
+
+    message = client.messages.create(
+    from_='+18573664416',
+    body=Body,
+    to=receiving_user
+    )
+
+
+def store_json_details(temp_image_path, fingerprint, camera_number, date_data, time_data, location_data, signature):
+    # Hash the image data to use as an index
+    with open(temp_image_path, 'rb') as file:
+        data = file.read()
+        hash_object = hashlib.sha256()
+        hash_object.update(data)
+        image_hash = hash_object.hexdigest()
+
+    # Convert details to JSON format
+    details = json.dumps({
+        'Fingerprint': fingerprint,
+        'Camera Number': camera_number,
+        'Date': date_data,
+        'Time': time_data,
+        'Location': location_data,
+        'Signature_Base64': signature
+    })
+    
+    print(f"Image Hash: {image_hash}")
+    print(f"Details: {details}")
+
+    # Database connection details
+    host = "publickeycamerastorage.c90gvpt3ri4q.us-east-2.rds.amazonaws.com"
+    user = "sdp"
+    password = "sdpsdpsdp"
+    database = "PublicKeySchema"
+
+    # Connect to the database
+    connection = mysql.connector.connect(
+        host=host, user=user, password=password, database=database
+    )
+    cursor = connection.cursor()
+
+    query = """
+    INSERT INTO image_data (image_hash, data)
+    VALUES (%s, %s)
+    ON DUPLICATE KEY UPDATE data = %s
+    """
+
+    cursor.execute(query, (image_hash, details, details))
+    
+    # Commit the transaction
+    connection.commit()
+
+    # Close the cursor and connection
+    cursor.close()
+    connection.close()
+
+    print(f"Stored the data with image hash {image_hash}, Time: {time_data}, Date: {date_data}, Location: {location_data}")
+
+
+def convert_to_mp4(temp_media_path, temp_mp4_path):
+
+    print("Trying to convert to mp4 from avi...........")
+
+    command_convert_to_mp4 = [
+        'ffmpeg',
+        '-i', temp_media_path,          # Input file path
+        '-c:v', 'libx264',              # Video codec to use (H.264)
+        '-crf', '23',                   # Constant Rate Factor (CRF) value, 18-28 is a good range, lower is higher quality
+        '-preset', 'medium',          # Preset for compression efficiency (you can use 'medium' for a balance between speed and quality)
+        '-c:a', 'aac',                  # Audio codec to use (AAC)
+        '-b:a', '128k',                 # Audio bitrate
+        '-strict', 'experimental',      # Allow experimental codecs (if needed for AAC)
+        temp_mp4_path                   # Output file path
+    ]
+
+    process = subprocess.Popen(command_convert_to_mp4, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    stdout, stderr = process.communicate()
+
+    print(f"Video output: stdout {stdout}, stderr: {stderr}")

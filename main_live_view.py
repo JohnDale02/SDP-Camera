@@ -7,7 +7,6 @@ import subprocess
 import cv2
 import os
 from main import main
-from nothing import sleep
 from threading import Lock
 from GPS_uart import read_gps_data
 from upload_image import upload_image
@@ -114,7 +113,7 @@ def fingerprint_monitor():
 def update_gps_data_continuously(gps_lock):
     global gps_status
     while True:
-        latitude, longitude, formatted_time = read_gps_data(gps_lock)
+        latitude, longitude, formatted_time, formatted_date = read_gps_data(gps_lock)
         if latitude != "None":
             gps_status = True
         else:
