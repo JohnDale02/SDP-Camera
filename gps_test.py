@@ -55,9 +55,7 @@ def read_gps_data():
             if sentence:
                 latitude, longitude, formatted_time, formatted_date = parse_nmea_sentence(sentence)
                 print(f"Latitude: {latitude}, Longitude: {longitude}, Time: {formatted_time}, Date: {formatted_date}")
-            if time.time() - start_time > ser.timeout:
-                print("Timeout reached. No GPS data received.")
-                break
+            time.sleep(3)
     except KeyboardInterrupt:
         print("Program terminated!")
     finally:
