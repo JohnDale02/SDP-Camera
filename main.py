@@ -39,7 +39,7 @@ def main(fingerprint, media_input, camera_number_string, save_media_filepath, gp
 		location = (f"{lat_value}, {long_value}")
 		time = (f"{time_value}")
 		date = (f"{date_value}")
-		#print(f"Recieved Time and GNSS Data: {time}{location}")
+		print(f"Recieved Time and GNSS Data: {time}{location}{date}")
 
 	#-------------- combine number + image + Time + Location ----------------------------------------------
 

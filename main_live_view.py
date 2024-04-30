@@ -32,7 +32,7 @@ from kivy.clock import Clock
 
 from kivy.core.window import Window
 Window.show_cursor = False
-#Window.fullscreen = False  # *********
+Window.fullscreen = False  # *********
 
 # -------------Global Variables ------------------------------
 image_mode = True
