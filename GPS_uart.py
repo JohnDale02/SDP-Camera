@@ -59,7 +59,7 @@ def parse_nmea_sentence(sentence):
             formatted_date = now.strftime("%Y-%m-%d")
             #return lat_value, lon_value, time_value
             return latitude, longitude, formatted_time, formatted_date
-    return None, None, None
+    return None, None, None, None
 
 
 def read_gps_data(gps_lock):
