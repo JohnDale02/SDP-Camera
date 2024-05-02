@@ -84,7 +84,7 @@ def handler(event, context):
                         "metadata": {
                             "fingerprint": fingerprint,
                             "camera_number": camera_number,
-                            "date_data" : data_data,
+                            "date_data" : date_data,
                             "time_data": time_data,
                             "location_data": location_data,
                             "signature": signature_string
