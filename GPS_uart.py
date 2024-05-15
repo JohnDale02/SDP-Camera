@@ -54,7 +54,7 @@ def parse_nmea_sentence(sentence):
             if lon_hemisphere == 'W':
                longitude *= -1
 
-            now = datetime.datetime.now()
+            now = datetime.now()
             # Format the datetime string as you prefer
             formatted_date = now.strftime("%Y-%m-%d")
             #return lat_value, lon_value, time_value
